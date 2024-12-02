@@ -12,5 +12,6 @@ namespace AdventOfCode2024.Problems
         public abstract void InitialiseProblem();
         public abstract T SolveFirstProblem<T>() where T : struct;
         public abstract T SolveSecondProblem<T>() where T : struct;
+        public abstract void OutputSolution();
     }
 }

@@ -108,7 +108,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(finalList.Sum(), typeof(T));
         }
 
-        public void OutputSolution()
+        public override void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
