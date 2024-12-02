@@ -9,7 +9,7 @@ namespace AdventOfCode2024.Problems
     public class Day1 : DayBase
     {
         string _input = string.Empty;
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\AdventOfCode2024Day1PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
         int _firstResult;
         int _secondResult;
         int[] _firstList = Array.Empty<int>();
