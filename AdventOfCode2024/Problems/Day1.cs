@@ -8,21 +8,20 @@ namespace AdventOfCode2024.Problems
 {
     public class Day1 : DayBase
     {
-        string _input = string.Empty;
         string _inputPath = @"PASTE PATH HERE";
         int _firstResult;
         int _secondResult;
         int[] _firstList = Array.Empty<int>();
         int[] _secondList = Array.Empty<int>();
 
-        public string Input
+        protected override string InputPath
         {
-            get => _input;
+            get => _inputPath;
             set
             {
-                if (_input != value) 
+                if (_inputPath != value) 
                 {
-                    _input = value;
+                    _inputPath = value;
                 }
             }
         }
