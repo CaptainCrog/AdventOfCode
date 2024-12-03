@@ -6,7 +6,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\AdventOfCode2024Day3PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
         string _corruptedData = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
