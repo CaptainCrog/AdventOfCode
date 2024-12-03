@@ -1,20 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day3 : DayBase
+    public partial class Day3 : DayBase
     {
         #region Fields
 
-        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay3.txt";
+        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\AdventOfCode2024Day3PuzzleInput.txt";
         string _corruptedData = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
+        int _sum = 0;
+        List<int> _multipliedNumbers = [];
 
         #endregion
 
@@ -58,12 +55,35 @@ namespace AdventOfCode2024.Problems
         string CorruptedData
         {
             get => _corruptedData;
-
             set
             {
                 if (_corruptedData != value)
                 {
                     _corruptedData = value;
+                }
+            }
+        }
+
+        List<int> MultipliedNumbers
+        {
+            get => _multipliedNumbers;
+            set
+            {
+                if (_multipliedNumbers != value)
+                {
+                    _multipliedNumbers = value;
+                }
+            }
+        }
+
+        int Sum
+        {
+            get => _sum;
+            set
+            {
+                if (_sum != value)
+                {
+                    _sum = value;
                 }
             }
         }
@@ -93,28 +113,26 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            var sum = 0;
-            var multipliedNums = new List<int>();
-            string pattern = @"[mul]{3}\([0-9]{1,3},[0-9]{1,3}\)";
-            var regex = new Regex(pattern);
-
+            Sum = 0;
+            MultipliedNumbers = new List<int>();
+            var regex = Part1Regex();
             var matches = regex.Matches(CorruptedData);
+
             foreach (var match in matches)
             {
-                var rawNums = Regex.Split(match.ToString(), @"\D").Where(x => !String.IsNullOrEmpty(x)).ToList();
-                multipliedNums.Add((int.Parse(rawNums.First()) * int.Parse(rawNums.Last())));
+                var rawNums = GetRawNumsFromString(match);
+                MultipliedNumbers.Add(int.Parse(rawNums.First()) * int.Parse(rawNums.Last()));
             }
 
-            sum = multipliedNums.Sum();
-            return (T)Convert.ChangeType(sum, typeof(T));
+            Sum = MultipliedNumbers.Sum();
+            return (T)Convert.ChangeType(Sum, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            var sum = 0;
-            var multipliedNums = new List<int>();
-            string pattern = @"[mul]{3}\([0-9]{1,3},[0-9]{1,3}\)|[do]{2}\(\)|[don]{3}[']{1}[t]{1}\(\)";
-            var regex = new Regex(pattern);
+            Sum = 0;
+            MultipliedNumbers = new List<int>();
+            var regex = Part2Regex();
             bool processMatches = true;
 
             var matches = regex.Matches(CorruptedData);
@@ -133,14 +151,26 @@ namespace AdventOfCode2024.Problems
                 }
                 if (processMatches)
                 {
-                    var rawNums = Regex.Split(match.ToString(), @"\D").Where(x => !String.IsNullOrEmpty(x)).ToList();
-                    multipliedNums.Add((int.Parse(rawNums.First()) * int.Parse(rawNums.Last())));
+                    var rawNums = GetRawNumsFromString(match);
+                    MultipliedNumbers.Add(int.Parse(rawNums.First()) * int.Parse(rawNums.Last()));
                 }
             }
 
-            sum = multipliedNums.Sum();
-            return (T)Convert.ChangeType(sum, typeof(T));
+            Sum = MultipliedNumbers.Sum();
+            return (T)Convert.ChangeType(Sum, typeof(T));
         }
+
+        private List<string> GetRawNumsFromString(object match)
+        {
+            return SplitNumberCharacters().Split(match.ToString()).Where(x => !String.IsNullOrEmpty(x)).ToList();
+        }
+
+        [GeneratedRegex(@"[mul]{3}\([0-9]{1,3},[0-9]{1,3}\)")]
+        private static partial Regex Part1Regex();
+        [GeneratedRegex(@"[mul]{3}\([0-9]{1,3},[0-9]{1,3}\)|[do]{2}\(\)|[don]{3}[']{1}[t]{1}\(\)")]
+        private static partial Regex Part2Regex();
+        [GeneratedRegex(@"\D")]
+        private static partial Regex SplitNumberCharacters();
 
         #endregion
     }
