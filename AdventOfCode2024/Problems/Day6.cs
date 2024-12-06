@@ -16,6 +16,7 @@ namespace AdventOfCode2024.Problems
         int _sum = 0;
         int _maxX = 0;
         int _maxY = 0;
+        int _part2HitOccurrences = 0;
         (int yPos, int xPos) _guard;
         (int yPos, int xPos) _initialStart;
         List<(int yPos, int xPos)> _traversedCoordinates = new();
@@ -124,6 +125,17 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
+        int Part2HitOccurrences
+        {
+            get => _part2HitOccurrences;
+            set
+            {
+                if (_part2HitOccurrences != value)
+                {
+                    _part2HitOccurrences = value;
+                }
+            }
+        }
 
         #endregion
 
@@ -164,26 +176,24 @@ namespace AdventOfCode2024.Problems
         {
             CalculateGuardsTrajectory('^', (-1, 0));
 
-            for (int i = 0; i < MaxY; i++)
-            {
-                for (int j = 0; j < MaxX; j++)
-                {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    if (Map[i, j] == 'X')
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                    }
-                    if ((i, j) == _initialStart)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                    }
+            //for (int i = 0; i < MaxY; i++)
+            //{
+            //    for (int j = 0; j < MaxX; j++)
+            //    {
+            //        Console.ForegroundColor = ConsoleColor.White;
+            //        if (Map[i, j] == 'X')
+            //        {
+            //            Console.ForegroundColor = ConsoleColor.Green;
+            //        }
+            //        if ((i, j) == _initialStart)
+            //        {
+            //            Console.ForegroundColor = ConsoleColor.Cyan;
+            //        }
                     
-                    Console.Write(Map[i, j]);
-                }
-                Console.WriteLine();
-            }
-
-            var temp = TraversedCoordinates.Distinct();
+            //        Console.Write(Map[i, j]);
+            //    }
+            //    Console.WriteLine();
+            //}
             Sum = TraversedCoordinates.Distinct().Count();
 
             return (T)Convert.ChangeType(Sum, typeof(T));
@@ -191,7 +201,28 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveSecondProblem<T>()
         {
+
+            Console.WriteLine("Starting PART 2");
             Sum = 0;
+
+            for (int i = 0; i < MaxY; i++)
+            {
+                for (int j = 0; j < MaxX; j++)
+                {
+                    Guard = _initialStart;
+                    Part2HitOccurrences = 0;
+                    if ((i, j) == _initialStart || Map[i, j] == '#')
+                        continue;
+                    Map[i, j] = '0';
+                    CalculateGuardsTrajectory('^', (-1, 0));
+                    if (Part2HitOccurrences == 2)
+                        Sum++;
+                    Map[i, j] = '.';
+                    Part2HitOccurrences = 0;
+
+                }
+                Console.WriteLine();
+            }
 
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
@@ -221,6 +252,13 @@ namespace AdventOfCode2024.Problems
                     }
                     else
                     {
+
+                        if (temp == '0')
+                        {
+                            Part2HitOccurrences++;
+                            if (Part2HitOccurrences == 2)
+                                return;
+                        }
                         Guard = nextPos;
                         TraversedCoordinates.Add(nextPos);
                         Map[nextPos.yPos, nextPos.xPos] = 'X';
