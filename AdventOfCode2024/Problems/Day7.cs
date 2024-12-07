@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdventOfCode2024.Problems
 {
@@ -15,8 +9,8 @@ namespace AdventOfCode2024.Problems
         #region Fields
         string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\AdventOfCode2024Day7PuzzleInput.txt";
         string[] _bridgeCalibrations;
-        long _firstResult = 0;
-        int _secondResult = 0;
+        ulong _firstResult = 0;
+        ulong _secondResult = 0;
         ulong _sum = 0;
         #endregion
 
@@ -45,7 +39,7 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        long FirstResult
+        ulong FirstResult
         {
             get => _firstResult;
             set
@@ -56,7 +50,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        ulong SecondResult
         {
             get => _secondResult;
             set
@@ -87,8 +81,13 @@ namespace AdventOfCode2024.Problems
         public Day7()
         {
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<long>();
-            SecondResult = SolveSecondProblem<int>();
+            var sw = Stopwatch.StartNew();
+            FirstResult = SolveFirstProblem<ulong>();
+            Console.WriteLine(sw.ElapsedMilliseconds.ToString());
+
+            sw.Restart();
+            SecondResult = SolveSecondProblem<ulong>();
+            Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             OutputSolution();
         }
         #endregion
@@ -155,7 +154,7 @@ namespace AdventOfCode2024.Problems
                         operatorMap += '|';
                 }
 
-                var result = ProcessNumbers(operators, operatorMap);
+                var result = ProcessNumbers(operators, operatorMap, testResult);
                 if (result == testResult)
                     return result;
 
@@ -163,11 +162,13 @@ namespace AdventOfCode2024.Problems
             return 0;
         }
 
-        public ulong ProcessNumbers(List<int> operators, string operatorMap)
+        public ulong ProcessNumbers(List<int> operators, string operatorMap, ulong testResult)
         {
             ulong sum = 0;
             for (int i = 1; i <= operatorMap.Count(); i++)
             {
+                if (sum > testResult)
+                    return sum;
                 if (sum == 0)
                 {
                     if (operatorMap[i - 1] == '+')
