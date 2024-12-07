@@ -11,7 +11,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\AdventOfCode2024Day5PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
         List<string> _pageOrderingRules = new();
         List<string> _pagesToProduce = new();
         List<string> _invalidPages = new();

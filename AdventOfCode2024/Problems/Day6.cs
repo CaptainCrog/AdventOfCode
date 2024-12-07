@@ -9,17 +9,17 @@ namespace AdventOfCode2024.Problems
     public class Day6 : DayBase
     {
         #region Fields
-        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay6.txt";
-        char[,] _map = new char[0,0];
+        string _inputPath = @"PASTE PATH HERE";
+        char[,] _map = new char[0, 0];
         int _firstResult = 0;
         int _secondResult = 0;
         int _sum = 0;
         int _maxX = 0;
         int _maxY = 0;
-        int _part2HitOccurrences = 0;
-        (int yPos, int xPos) _guard;
-        (int yPos, int xPos) _initialStart;
-        List<(int yPos, int xPos)> _traversedCoordinates = new();
+        (int yPos, int xPos, char direction) _guard;
+        (int yPos, int xPos, char direction) _initialStart;
+        HashSet<(int yPos, int xPos, char direction)> _traversedCoordinates = new();
+        int _callCount = 0;
         #endregion
 
         #region Properties
@@ -81,7 +81,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        (int yPos, int xPos) Guard
+        (int yPos, int xPos, char direction) Guard
         {
             get => _guard;
             set
@@ -92,7 +92,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        List<(int yPos, int xPos)> TraversedCoordinates
+        HashSet<(int yPos, int xPos, char direction)> TraversedCoordinates
         {
             get => _traversedCoordinates;
             set
@@ -125,17 +125,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int Part2HitOccurrences
-        {
-            get => _part2HitOccurrences;
-            set
-            {
-                if (_part2HitOccurrences != value)
-                {
-                    _part2HitOccurrences = value;
-                }
-            }
-        }
+
 
         #endregion
 
@@ -152,10 +142,9 @@ namespace AdventOfCode2024.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            //Line 90 Col69 is where the guard starts at
-            var input = File.ReadAllLines(_inputPath);
-            MaxX = input[0].Length - 1;
-            MaxY = input.Length - 1;
+            var input = File.ReadLines(_inputPath).ToArray();
+            MaxX = input[0].Length;
+            MaxY = input.Length;
             Map = new char[MaxY, MaxX];
             for (int i = 0; i < MaxY; i++)
             {
@@ -164,9 +153,9 @@ namespace AdventOfCode2024.Problems
                     Map[i, j] = input[i][j];
                     if (Map[i, j] == '^')
                     {
-                        Guard = (i, j);
-                        _initialStart = (i, j);
-                        TraversedCoordinates.Add(Guard);
+                        Guard = (i, j, '^');
+                        _initialStart = (i, j, '^');
+                        TraversedCoordinates.Add((_initialStart.yPos, _initialStart.xPos, '^'));
                     }
                 }
             }
@@ -174,27 +163,8 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            CalculateGuardsTrajectory('^', (-1, 0));
-
-            //for (int i = 0; i < MaxY; i++)
-            //{
-            //    for (int j = 0; j < MaxX; j++)
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.White;
-            //        if (Map[i, j] == 'X')
-            //        {
-            //            Console.ForegroundColor = ConsoleColor.Green;
-            //        }
-            //        if ((i, j) == _initialStart)
-            //        {
-            //            Console.ForegroundColor = ConsoleColor.Cyan;
-            //        }
-                    
-            //        Console.Write(Map[i, j]);
-            //    }
-            //    Console.WriteLine();
-            //}
-            Sum = TraversedCoordinates.Distinct().Count();
+            CalculateGuardsTrajectory((-1, 0));
+            Sum = TraversedCoordinates.Select(x => (x.xPos, x.yPos)).Distinct().Count();
 
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
@@ -204,24 +174,21 @@ namespace AdventOfCode2024.Problems
 
             Console.WriteLine("Starting PART 2");
             Sum = 0;
-
-            for (int i = 0; i < MaxY; i++)
+            // Navigate only the co-ordinates we know the guard will move across
+            var distinctTraversalGridPath = TraversedCoordinates.Select(x => (x.yPos, x.xPos)).Distinct().ToList();
+            foreach (var gridPath in distinctTraversalGridPath)
             {
-                for (int j = 0; j < MaxX; j++)
-                {
-                    Guard = _initialStart;
-                    Part2HitOccurrences = 0;
-                    if ((i, j) == _initialStart || Map[i, j] == '#')
-                        continue;
-                    Map[i, j] = '0';
-                    CalculateGuardsTrajectory('^', (-1, 0));
-                    if (Part2HitOccurrences == 2)
-                        Sum++;
-                    Map[i, j] = '.';
-                    Part2HitOccurrences = 0;
+                TraversedCoordinates = new();
+                Console.WriteLine($"Current Iteration {gridPath.yPos},{gridPath.xPos}");
+                Guard = _initialStart;
 
-                }
-                Console.WriteLine();
+                if (gridPath == (_initialStart.yPos, _initialStart.xPos))
+                    continue;
+
+                Map[gridPath.yPos, gridPath.xPos] = '0';
+                CalculateGuardsTrajectory((-1, 0));
+                Map[gridPath.yPos, gridPath.xPos] = '.';
+                Console.WriteLine($"Call {_callCount}");
             }
 
             return (T)Convert.ChangeType(Sum, typeof(T));
@@ -234,74 +201,43 @@ namespace AdventOfCode2024.Problems
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        void CalculateGuardsTrajectory(char directionalArrow, (int yPos, int xPos) direction)
+        void CalculateGuardsTrajectory((int yPos, int xPos) direction, char directionalArrow = '^')
         {
+
             while (true)
             {
-                (int yPos, int xPos) nextPos = (Guard.yPos + direction.yPos, Guard.xPos + direction.xPos);
-                if (IsNextPositionOutOfBounds(Guard, direction))
+                (int yPos, int xPos, char direction) nextPos = (Guard.yPos + direction.yPos, Guard.xPos + direction.xPos, directionalArrow);
+                if (IsNextPositionOutOfBounds((Guard.yPos, Guard.xPos), direction))
                     return;
-                //else if (Map[nextPos.xPos, nextPos.yPos] == '#')
-                //    break;
+                else if (Map[nextPos.yPos, nextPos.xPos] == '#' || Map[nextPos.yPos, nextPos.xPos] == '0')
+                    break;
                 else
                 {
-                    var temp = Map[nextPos.yPos, nextPos.xPos];
-                    if (temp == '#')
+                    Guard = nextPos;
+                    if (!TraversedCoordinates.Add(nextPos))
                     {
-                        break;
-                    }
-                    else
-                    {
-
-                        if (temp == '0')
-                        {
-                            Part2HitOccurrences++;
-                            if (Part2HitOccurrences == 2)
-                                return;
-                        }
-                        Guard = nextPos;
-                        TraversedCoordinates.Add(nextPos);
-                        Map[nextPos.yPos, nextPos.xPos] = 'X';
+                        Sum++;
+                        return;
                     }
                 }
             }
 
-
             if (directionalArrow == '^')
-            {
-                Console.WriteLine($"TURNING > AT {Guard}");
-                CalculateGuardsTrajectory('>', (0, 1));
-            }
-
-
+                CalculateGuardsTrajectory((0, 1), '>');
             else if (directionalArrow == '>')
-            {
-
-                Console.WriteLine($"TURNING v AT {Guard}");
-                CalculateGuardsTrajectory('v', (1, 0));
-            }
-
+                CalculateGuardsTrajectory((1, 0), 'v');
             else if (directionalArrow == 'v')
-            {
-
-                Console.WriteLine($"TURNING < AT {Guard}");
-                CalculateGuardsTrajectory('<', (0, -1));
-            }
-
+                CalculateGuardsTrajectory((0, -1), '<');
             else
-            {
-
-                Console.WriteLine($"TURNING ^ AT {Guard}");
-                CalculateGuardsTrajectory('^', (-1, 0));
-            }
+                CalculateGuardsTrajectory((-1, 0), '^');
         }
 
         bool IsNextPositionOutOfBounds((int yPos, int xPos) guardPos, (int yPos, int xPos) direction)
         {
-            return guardPos.xPos + direction.xPos == -1 || 
+            return guardPos.xPos + direction.xPos == -1 ||
                    guardPos.yPos + direction.yPos == -1 ||
-                   guardPos.xPos + direction.xPos == MaxX + 1 || 
-                   guardPos.yPos + direction.yPos == MaxY + 1;
+                   guardPos.xPos + direction.xPos == MaxX ||
+                   guardPos.yPos + direction.yPos == MaxY;
         }
 
         #endregion
