@@ -185,7 +185,7 @@ namespace AdventOfCode2024.Problems
             {
                 if (DiskMapDecoded[i] == ".")
                 {
-                    for (int j = reversedIndex; j >= i; j--)
+                    for (int j = reversedIndex; j >= i+1; j--)
                     {
                         if (DiskMapDecoded[j] != ".")
                         {
@@ -211,6 +211,7 @@ namespace AdventOfCode2024.Problems
                 sum += (int.Parse(DiskMapDecoded[i]) * i);
             }
             return sum;
+            //1945531743 TOO LOW
         }
 
         #endregion
