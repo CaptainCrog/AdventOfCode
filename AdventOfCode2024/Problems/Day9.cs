@@ -6,7 +6,7 @@
 
 
         #region Fields
-        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay9.txt";
+        string _inputPath = @"PASTE PATH HERE";
         ulong _firstResult = 0;
         ulong _secondResult = 0;
         int _sum = 0;
