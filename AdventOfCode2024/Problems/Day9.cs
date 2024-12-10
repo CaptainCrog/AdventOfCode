@@ -6,7 +6,7 @@
 
 
         #region Fields
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\AdventOfCode2024Day9PuzzleInput.txt";
+        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay9.txt";
         ulong _firstResult = 0;
         ulong _secondResult = 0;
         int _sum = 0;
@@ -118,7 +118,7 @@
         {
             InitialiseProblem();
             FirstResult = SolveFirstProblem<ulong>();
-            SecondResult = SolveSecondProblem<ulong>(); //PART 2 = 6390781891880, work back from this to find part 2 solution
+            SecondResult = SolveSecondProblem<ulong>();
             OutputSolution();
         }
         #endregion
@@ -249,107 +249,57 @@
 
         private List<(string id, int length)> SortDiskMapUnfragmented()
         {
-            var diskMapDecodedPart1Copy = DiskMapDecoded.ToList();
-            //int i = 0; i <= diskMapDecodedPart1Copy.Count() - 1; i++
-            for (int i = diskMapDecodedPart1Copy.Count() - 1; i >= 0; i--)
+            var diskMapDecodedPart2Copy = DiskMapDecoded.ToList();
+            for (int i = diskMapDecodedPart2Copy.Count() - 1; i >= 0; i--)
             {
-                if (diskMapDecodedPart1Copy[i].id != ".")
+                if (diskMapDecodedPart2Copy[i].id != ".")
                 {
                     for (int j = 0; j <= i; j++)
                     {
-                        if (diskMapDecodedPart1Copy[j].id == ".")
+                        if (diskMapDecodedPart2Copy[j].id == ".")
                         {
-                            if (diskMapDecodedPart1Copy[j].length >= diskMapDecodedPart1Copy[i].length)
+                            if (diskMapDecodedPart2Copy[j].length >= diskMapDecodedPart2Copy[i].length)
                             {
                                 int leftOverFreeSpaceLength = 0;
-                                var temp = diskMapDecodedPart1Copy[i];
-                                if (diskMapDecodedPart1Copy[j].length - diskMapDecodedPart1Copy[i].length != 0)
+                                var temp = diskMapDecodedPart2Copy[i];
+                                if (diskMapDecodedPart2Copy[j].length - diskMapDecodedPart2Copy[i].length != 0)
                                 {
-                                    leftOverFreeSpaceLength = diskMapDecodedPart1Copy[j].length - diskMapDecodedPart1Copy[i].length;
-                                    for (int k = diskMapDecodedPart1Copy[i].length; k <= diskMapDecodedPart1Copy[j].length; k++)
+                                    leftOverFreeSpaceLength = diskMapDecodedPart2Copy[j].length - diskMapDecodedPart2Copy[i].length;
+                                    for (int k = diskMapDecodedPart2Copy[i].length; k <= diskMapDecodedPart2Copy[j].length-1; k++)
                                     {
-                                        diskMapDecodedPart1Copy[j + k] = new(diskMapDecodedPart1Copy[j + k].id, leftOverFreeSpaceLength);
+                                        diskMapDecodedPart2Copy[j + k] = new(diskMapDecodedPart2Copy[j + k].id, leftOverFreeSpaceLength);
                                     }
                                 }
 
 
-                                for (int k = 0; k <= diskMapDecodedPart1Copy[j].length - 1; k++)
+                                for (int k = 0; k <= diskMapDecodedPart2Copy[j].length - 1; k++)
                                 {
-                                    var value = diskMapDecodedPart1Copy[i - k];
-                                    diskMapDecodedPart1Copy[i - k] = diskMapDecodedPart1Copy[j + k];
-                                    diskMapDecodedPart1Copy[j + k] = value;
+                                    var value = diskMapDecodedPart2Copy[i - k];
+                                    diskMapDecodedPart2Copy[i - k] = diskMapDecodedPart2Copy[j + k];
+                                    diskMapDecodedPart2Copy[j + k] = value;
                                 }
+
                                 break;
                             }
                         }
                     }
                 }
-
-
-
-
-
-                //    if (diskMapDecodedPart1Copy[i].id == ".")
-                //{
-                //    for (int j = diskMapDecodedPart1Copy.Count - 1; j >= i + 1; j--)
-                //    {
-                //        if (diskMapDecodedPart1Copy[j].id != ".")
-                //        {
-                //            if (diskMapDecodedPart1Copy[i].length >= diskMapDecodedPart1Copy[j].length)
-                //            {
-                //                int leftOverFreeSpaceLength = 0;
-                //                var temp = diskMapDecodedPart1Copy[j];
-                //                if (diskMapDecodedPart1Copy[i].length - diskMapDecodedPart1Copy[j].length != 0)
-                //                {
-                //                    leftOverFreeSpaceLength = diskMapDecodedPart1Copy[i].length - diskMapDecodedPart1Copy[j].length;
-                //                    for (int k = diskMapDecodedPart1Copy[j].length; k <= diskMapDecodedPart1Copy[i].length; k++)
-                //                    {
-                //                        diskMapDecodedPart1Copy[i + k] = new(diskMapDecodedPart1Copy[i + k].id, leftOverFreeSpaceLength);
-                //                    }
-                //                }
-
-
-                //                for (int k = 0; k <= diskMapDecodedPart1Copy[i].length - 1; k++)
-                //                {
-                //                    var value = diskMapDecodedPart1Copy[j - k];
-                //                    diskMapDecodedPart1Copy[j - k] = diskMapDecodedPart1Copy[i + k];
-                //                    diskMapDecodedPart1Copy[i + k] = value;
-                //                }
-                //                break;
-                //            }
-
-                //        }
-                //        else
-                //        {
-                //            continue;
-                //        }
-
-                //    }
-                //}
             }
 
-            return diskMapDecodedPart1Copy;
+            return diskMapDecodedPart2Copy;
         }
 
         private ulong CalculateDiskMap(List<(string id, int length)> diskMapDecodedPart1Copy)
-    {
-        ulong checkSum = 0;
-        for (int i = 0; i <= diskMapDecodedPart1Copy.Count() - 1; i++)
         {
-            if (ulong.TryParse(diskMapDecodedPart1Copy[i].id, out ulong number))
+            ulong checkSum = 0;
+            for (int i = 0; i <= diskMapDecodedPart1Copy.Count() - 1; i++)
             {
-                checkSum += number * (ulong)i;
+                if (ulong.TryParse(diskMapDecodedPart1Copy[i].id, out ulong number))
+                {
+                    checkSum += number * (ulong)i;
+                }
             }
-        }
-        return checkSum;
-            //6367087064415	THATS A BINGO
-
-            //6390216683958 PART 2 TOO LOW
-            //6390682211954	TOO LOW
-            //6390781741404
-            //6389514248351
-
-
+            return checkSum;
         }
 
         #endregion
