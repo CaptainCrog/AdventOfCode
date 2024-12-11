@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace AdventOfCode2024.Problems
 {
     public class Day11 : DayBase
@@ -11,17 +6,16 @@ namespace AdventOfCode2024.Problems
 
         #region Fields
 
-        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay11.txt";
+        string _inputPath = @"PASTE PATH HERE";
         int _firstResult = 0;
-        int _secondResult = 0;
-        int _trailHeadScore = 0;
-        int _sumOfStones = 0;
+        ulong _secondResult = 0;
+        ulong _sumOfStones = 0;
         string _initialArrangement = string.Empty;
-        List<ulong> _iniitialNumbers = new List<ulong>();
-        Dictionary<ulong, List<ulong>> _tempDictionary = new Dictionary<ulong, List<ulong>>()
+        Dictionary<ulong, ulong> _initialNumbers = new Dictionary<ulong, ulong>();
+        Dictionary<ulong, List<ulong>> _cache = new Dictionary<ulong, List<ulong>>()
         {
             { 0, new List<ulong>() { 1 } }
-        }; // Maximum number the dictionary gets to is 1436
+        };
 
         #endregion
 
@@ -50,7 +44,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        ulong SecondResult
         {
             get => _secondResult;
             set
@@ -74,7 +68,7 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        int SumOfStones
+        ulong SumOfStones
         {
             get => _sumOfStones;
             set
@@ -85,14 +79,26 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        List<ulong> InitialNumbers
+        Dictionary<ulong, ulong> InitialNumbers
         {
-            get => _iniitialNumbers;
+            get => _initialNumbers;
             set
             {
-                if (_iniitialNumbers != value)
+                if (_initialNumbers != value)
                 {
-                    _iniitialNumbers = value;
+                    _initialNumbers = value;
+                }
+            }
+        }
+
+        Dictionary<ulong, List<ulong>> Cache
+        {
+            get => _cache;
+            set
+            {
+                if (_cache != value)
+                {
+                    _cache = value;
                 }
             }
         }
@@ -104,7 +110,7 @@ namespace AdventOfCode2024.Problems
         {
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<ulong>();
             OutputSolution();
         }
         #endregion
@@ -116,7 +122,7 @@ namespace AdventOfCode2024.Problems
             var numberStrings = InitialArrangement.Split(" ");
             foreach (var numberString in numberStrings)
             {
-                InitialNumbers.Add(ulong.Parse(numberString));
+                InitialNumbers.Add(ulong.Parse(numberString), 1);
             }
 
         }
@@ -130,134 +136,82 @@ namespace AdventOfCode2024.Problems
         public override T SolveFirstProblem<T>()
         {
             SumOfStones = ProcessRocks(25);
-
             return (T)Convert.ChangeType(SumOfStones, typeof(T));
-            //194557 Correct
         }
 
 
         public override T SolveSecondProblem<T>()
         {
-            SumOfStones = ProcessRocks2(75);
-
+            SumOfStones = ProcessRocks(75);
             return (T)Convert.ChangeType(SumOfStones, typeof(T));
         }
 
 
-        private int ProcessRocks(int iterationLimit)
+        private ulong ProcessRocks(int iterationLimit)
         {
+            var stoneNumbers = InitialNumbers.ToDictionary();
             var iteration = 0;
-            var numbers = InitialNumbers.ToList();
-            while (iteration != iterationLimit)
+            ulong sum = 0;
+
+            while (iteration < iterationLimit)
             {
-                //foreach (var number in numbers)
-                //{
-                //    Console.Write($"{number} ");
-                //}
-                //Console.WriteLine();
-
-                var numbersCopy = new List<ulong>();
-
-                //ulong[] ones = Enumerable.Repeat((ulong)1, numbers.Where(x => x == 0).Count()).ToArray();
-                //numbersCopy.AddRange(ones);
-                //var splitNumbers = numbers.Where(x => Math.Floor(Math.Log10(x) + 1) % 2 == 0).ToList();
-                //foreach (var number in splitNumbers)
-                //{
-                //    (ulong leftNumber, ulong rightNumber) = GetSplitNumbers(number);
-                //    numbersCopy.AddRange(new List<ulong>() { leftNumber, rightNumber });
-                //}
-                //var numbersToMultiply = numbers.Where(x => x != 0 && Math.Floor(Math.Log10(x) + 1) % 2 != 0).ToList();
-                //numbersToMultiply.ForEach(x => numbersCopy.Add(x *= 2024));
-
-                for (int i = 0; i <= numbers.Count - 1; i++)
+                var blink = new Dictionary<ulong, ulong>();
+                foreach (var stoneNumber in stoneNumbers.Keys)
                 {
-                    if (_tempDictionary.TryGetValue(numbers[i], out var cachedNumberList))
-                    {
-                        numbersCopy.AddRange(cachedNumberList);
-                    }
-                    else if (Math.Floor(Math.Log10(numbers[i]) + 1) % 2 == 0)
-                    {
-                        var numberToSplit = numbers[i].ToString();
-                        var halfSize = numberToSplit.Length / 2;
-                        var leftNumber = ulong.Parse(numberToSplit.Substring(0, halfSize));
-                        var rightNumber = ulong.Parse(numberToSplit.Substring(halfSize, halfSize));
-                        _tempDictionary.Add(numbers[i], new List<ulong>() { leftNumber, rightNumber });
-                        numbersCopy.Add(leftNumber);
-                        numbersCopy.Add(rightNumber);
-                    }
-                    else
-                    {
-                        _tempDictionary.Add(numbers[i], new List<ulong>() { numbers[i] * 2024 });
-                        numbersCopy.Add(numbers[i] * 2024);
-                    }
+                    var count = stoneNumbers[stoneNumber];
+                    var blinkResults = ProcessNumber(stoneNumber);
 
+                    foreach (var result in blinkResults)
+                    {
+                        if (!blink.TryAdd(result, count))
+                            blink[result] += count;
+                    }
                 }
-                numbers = numbersCopy;
-                Console.WriteLine($"Processed iteration: {iteration}");
-
+                stoneNumbers = blink;
                 iteration++;
             }
 
-            return numbers.Count;
-        }
+            foreach (var stoneNumber in stoneNumbers.Keys)
+                sum += stoneNumbers[stoneNumber];
 
-        private int ProcessRocks2(int iterationLimit)
-        {
-            var numbers = InitialNumbers.ToList();
-            int sum = 0;
-            foreach (var num in numbers)
-            {
-                var iteration = 0;
-                List<ulong> numbersCopy = new List<ulong>();
-                while (iteration < iterationLimit)
-                {
-                    if (iteration == 0)
-                        numbersCopy = new List<ulong>() { num };
-                    numbersCopy = ProcessNumber(numbersCopy);
-                    sum = numbersCopy.Count;
-                    Console.WriteLine($"Processed Iteration: {iteration}");
-                    iteration++;
-                }
-            }
             return sum;
         }
 
-        private List<ulong> ProcessNumber(List<ulong> numbersCopy)
+
+        private List<ulong> ProcessNumber(ulong number)
         {
-            var temp3 = new List<ulong>();
-            for (int i = 0; i < numbersCopy.Count; i++)
+            var blinkResults = new List<ulong>();
             {
-                if (_tempDictionary.TryGetValue(numbersCopy[i], out var cachedNumberList))
+                if (Cache.TryGetValue(number, out var cachedNumberList))
                 {
-                    temp3.AddRange(cachedNumberList);
+                    blinkResults.AddRange(cachedNumberList);
                 }
-                else if (Math.Floor(Math.Log10(numbersCopy[i]) + 1) % 2 == 0)
+                else if (Math.Floor(Math.Log10(number) + 1) % 2 == 0)
                 {
-                    var numberToSplit = numbersCopy[i].ToString();
-                    var halfSize = numberToSplit.Length / 2;
-                    var leftNumber = ulong.Parse(numberToSplit.Substring(0, halfSize));
-                    var rightNumber = ulong.Parse(numberToSplit.Substring(halfSize, halfSize));
-                    _tempDictionary.Add(numbersCopy[i], new List<ulong>() { leftNumber, rightNumber });
-                    temp3.Add(leftNumber);
-                    temp3.Add(rightNumber);
+                    (ulong leftNumber, ulong rightNumber) = SplitNumber(number);
+                    Cache.Add(number, new List<ulong>() { leftNumber, rightNumber });
+                    blinkResults.AddRange(new List<ulong> { leftNumber, rightNumber });
                 }
                 else
                 {
-                    _tempDictionary.Add(numbersCopy[i], new List<ulong>() { numbersCopy[i] * 2024 });
-                    temp3.Add(numbersCopy[i] * 2024);
+                    var multipliedNumber = number * 2024;
+                    Cache.Add(number, new List<ulong>() { multipliedNumber });
+                    blinkResults.Add(multipliedNumber);
                 }
+                return blinkResults;
             }
-            return temp3;
         }
 
-        (ulong leftNumber, ulong rightNumber) GetSplitNumbers(ulong number)
+        (ulong leftNumber, ulong rightNumber) SplitNumber(ulong number)
         {
-            var numberToSplit = number.ToString();
-            var halfSize = numberToSplit.Length / 2;
-            var leftNumber = ulong.Parse(numberToSplit.Substring(0, halfSize));
-            var rightNumber = ulong.Parse(numberToSplit.Substring(halfSize, halfSize));
+            var digitCount = (ulong)Math.Floor(Math.Log10(number)) + 1;
+
+            var divisor = (ulong)Math.Pow(10, digitCount / 2);
+            var leftNumber = number / divisor;
+            var rightNumber = number % divisor;
+
             return (leftNumber, rightNumber);
         }
-    }
         #endregion
+    }
 }
