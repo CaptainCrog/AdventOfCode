@@ -47,6 +47,9 @@ public class Program
                         case 10:
                             _ = new Day10();
                             break;
+                        case 11:
+                            _ = new Day11();
+                            break;
                         default:
                             Console.WriteLine("Option is out of bound or unavailable at the moment");
                             break;
