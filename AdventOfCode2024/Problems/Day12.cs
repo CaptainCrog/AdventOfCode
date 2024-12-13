@@ -12,8 +12,8 @@ namespace AdventOfCode2024.Problems
 
         #region Fields
         string _inputPath = @"PASTE PATH HERE"; 
-        int _firstResult = 0;
-        ulong _secondResult = 0;
+        long _firstResult = 0;
+        long _secondResult = 0;
         string[] _gardenPlot = [];
         char[] _distinctPlotValues = [];
 
@@ -35,7 +35,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        long FirstResult
         {
             get => _firstResult;
             set
@@ -46,7 +46,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        ulong SecondResult
+        long SecondResult
         {
             get => _secondResult;
             set
@@ -99,8 +99,8 @@ namespace AdventOfCode2024.Problems
         public Day12()
         {
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<ulong>();
+            FirstResult = SolveFirstProblem<long>();
+            SecondResult = SolveSecondProblem<long>();
             OutputSolution();
         }
         #endregion
