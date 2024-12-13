@@ -113,7 +113,8 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            long sum = 0;
+            long sum1 = 0;
+            long sum2 = 0;
 
             _plotSummary = FindAllSeparatePlot(GardenPlot);
 
@@ -122,21 +123,27 @@ namespace AdventOfCode2024.Problems
                 var y2 = _plotSummary.Select(x => x.Value.Count).ToList();
                 var coordinateValues = _plotSummary.GetValueOrDefault(x);
                 if (coordinateValues.Count == 1)
-                    sum += 4;
+                {
+                    sum1 += 4;
+                    sum2 += 4;
+                }
                 else
                 {
                     HashSet<(int, int)> coordinates = coordinateValues.ToHashSet();
 
 
                     int perimeter = CalculatePerimeter(coordinates);
-                    var area = perimeter * coordinates.Count();
-                    sum += area;
+                    int sides = CalculateCorners(coordinates);
+                    var area1 = perimeter * coordinates.Count();
+                    var area2 = sides * coordinates.Count();
+                    sum1 += area1;
+                    sum2 += area2;
                     Console.WriteLine($"The perimeter of the shape is: {perimeter}");
                 }
 
             }
 
-            return (T)Convert.ChangeType(sum, typeof(T));
+            return (T)Convert.ChangeType(sum1, typeof(T));
         }
 
 
@@ -161,6 +168,64 @@ namespace AdventOfCode2024.Problems
             }
 
             return perimeter;
+        }
+
+        int CalculateCorners(HashSet<(int row, int col)> coordinates)
+        {
+            int corners = 0;
+
+            foreach (var (row, col) in coordinates)
+            {
+                bool left = coordinates.Contains((row, col - 1));
+                bool right = coordinates.Contains((row, col + 1));
+                bool top = coordinates.Contains((row - 1, col));
+                bool bottom = coordinates.Contains((row + 1, col));
+
+
+                bool topLeft = coordinates.Contains((row - 1, col - 1));
+                bool topRight = coordinates.Contains((row - 1, col + 1));
+                bool bottomRight = coordinates.Contains((row + 1, col + 1));
+                bool bottomLeft = coordinates.Contains((row + 1, col - 1));
+
+                if (!left && !top)
+                {
+                    corners++;
+                }
+                else if (left && top && !topLeft)
+                {
+                    corners++;
+                }
+
+                if (!right && !top)
+                {
+                    corners++;
+                }
+                else if (right && top && !topRight)
+                {
+                    corners++;
+                }
+
+                if (!right && !bottom)
+                {
+                    corners++;
+                }
+                else if (right && bottom && !bottomRight)
+                {
+                    corners++;
+                }
+
+                if (!left && !bottom)
+                {
+                    corners++;
+                }
+                else if (left && bottom && !bottomLeft)
+                {
+                    corners++;
+                }
+
+            }
+
+            return corners;
         }
 
         static Dictionary<string, List<(int, int)>> FindAllSeparatePlot(string[] gardenPlot)
@@ -198,6 +263,7 @@ namespace AdventOfCode2024.Problems
             SearchPlot(gardenPlot, visited, row, col + 1, plotValue, group);
             SearchPlot(gardenPlot, visited, row, col - 1, plotValue, group);
         }
+
         #endregion
     }
 }
