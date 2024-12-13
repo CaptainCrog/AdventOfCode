@@ -11,15 +11,11 @@ namespace AdventOfCode2024.Problems
     {
 
         #region Fields
-        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day12PuzzleInput.txt";
-        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day12TestInput2.txt";
-        //string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024TestInputDay12.txt";
-        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay12.txt";
+        string _inputPath = @"PASTE PATH HERE"; 
         int _firstResult = 0;
         ulong _secondResult = 0;
         string[] _gardenPlot = [];
         char[] _distinctPlotValues = [];
-        string _rawInput;
 
         Dictionary<string, List<(int row, int col)>> _plotSummary = new Dictionary<string, List<(int row, int col)>>();
 
@@ -84,6 +80,17 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
+        Dictionary<string, List<(int row, int col)>> PlotSummary
+        {
+            get => _plotSummary;
+            set
+            {
+                if (_plotSummary != value)
+                {
+                    _plotSummary = value;
+                }
+            }
+        }
 
 
         #endregion
@@ -101,8 +108,8 @@ namespace AdventOfCode2024.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            _rawInput = File.ReadAllText(InputPath);
-            GardenPlot = _rawInput.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            GardenPlot = File.ReadAllText(InputPath).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            PlotSummary = FindAllSeparatePlot(GardenPlot);
         }
 
         public override void OutputSolution()
@@ -113,46 +120,47 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            long sum1 = 0;
-            long sum2 = 0;
+            return (T)Convert.ChangeType(Calculate(1), typeof(T));
+        }
 
-            _plotSummary = FindAllSeparatePlot(GardenPlot);
+        public override T SolveSecondProblem<T>()
+        {
+            return (T)Convert.ChangeType(Calculate(2), typeof(T));
+        }
 
-            foreach (var x in _plotSummary.Keys)
+
+
+        private long Calculate(int part)
+        {
+            long sum = 0;
+
+            foreach (var plot in PlotSummary.Keys)
             {
-                var y2 = _plotSummary.Select(x => x.Value.Count).ToList();
-                var coordinateValues = _plotSummary.GetValueOrDefault(x);
+                var coordinateValues = PlotSummary.GetValueOrDefault(plot);
                 if (coordinateValues.Count == 1)
-                {
-                    sum1 += 4;
-                    sum2 += 4;
-                }
+                    sum += 4;
                 else
                 {
                     HashSet<(int, int)> coordinates = coordinateValues.ToHashSet();
 
-
-                    int perimeter = CalculatePerimeter(coordinates);
-                    int sides = CalculateCorners(coordinates);
-                    var area1 = perimeter * coordinates.Count();
-                    var area2 = sides * coordinates.Count();
-                    sum1 += area1;
-                    sum2 += area2;
-                    Console.WriteLine($"The perimeter of the shape is: {perimeter}");
+                    if (part == 1)
+                    {
+                        int perimeter = CalculatePerimeter(coordinates);
+                        var area = perimeter * coordinates.Count();
+                        sum += area;
+                    }
+                    else if (part == 2)
+                    {
+                        int corners = CalculateCorners(coordinates);
+                        var area = corners * coordinates.Count();
+                        sum += area;
+                    }
                 }
 
             }
 
-            return (T)Convert.ChangeType(sum1, typeof(T));
+            return sum;
         }
-
-
-        public override T SolveSecondProblem<T>()
-        {
-            var sum = 0;
-            return (T)Convert.ChangeType(sum, typeof(T));
-        }
-
 
         int CalculatePerimeter(HashSet<(int row, int col)> coordinates)
         {
@@ -188,40 +196,24 @@ namespace AdventOfCode2024.Problems
                 bool bottomLeft = coordinates.Contains((row + 1, col - 1));
 
                 if (!left && !top)
-                {
                     corners++;
-                }
                 else if (left && top && !topLeft)
-                {
                     corners++;
-                }
 
                 if (!right && !top)
-                {
                     corners++;
-                }
                 else if (right && top && !topRight)
-                {
                     corners++;
-                }
 
                 if (!right && !bottom)
-                {
                     corners++;
-                }
                 else if (right && bottom && !bottomRight)
-                {
                     corners++;
-                }
 
                 if (!left && !bottom)
-                {
                     corners++;
-                }
                 else if (left && bottom && !bottomLeft)
-                {
                     corners++;
-                }
 
             }
 
