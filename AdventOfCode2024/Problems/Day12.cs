@@ -11,15 +11,15 @@ namespace AdventOfCode2024.Problems
     {
 
         #region Fields
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day12PuzzleInput.txt";
+        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day12PuzzleInput.txt";
         //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day12TestInput2.txt";
+        //string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024TestInputDay12.txt";
+        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024PuzzleInputDay12.txt";
         int _firstResult = 0;
         ulong _secondResult = 0;
-        ulong _sumOfStones = 0;
-        int _maxX = 0;
-        int _maxY = 0;
         string[] _gardenPlot = [];
         char[] _distinctPlotValues = [];
+        string _rawInput;
 
         Dictionary<string, List<(int row, int col)>> _plotSummary = new Dictionary<string, List<(int row, int col)>>();
 
@@ -85,18 +85,6 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        ulong SumOfStones
-        {
-            get => _sumOfStones;
-            set
-            {
-                if (_sumOfStones != value)
-                {
-                    _sumOfStones = value;
-                }
-            }
-        }
-
 
         #endregion
 
@@ -113,10 +101,8 @@ namespace AdventOfCode2024.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            GardenPlot = File.ReadAllLines(InputPath);
-            _maxX = GardenPlot.Length - 1;
-            _maxY = GardenPlot[0].Length - 1;
-            DistinctPlotValues = string.Join(Environment.NewLine, GardenPlot).Select(x => x).Where(x => x != '\r' && x != '\n').Distinct().ToArray();
+            _rawInput = File.ReadAllText(InputPath);
+            GardenPlot = _rawInput.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public override void OutputSolution()
@@ -129,63 +115,17 @@ namespace AdventOfCode2024.Problems
         {
             long sum = 0;
 
-
-            var filteredGardenPlot = GardenPlot.ToArray();
-            var plotKeyEnumerator = 0;
-            var allPlotsCovered = new List<(int row, int col)>();
-            for (int i = 0; i <= filteredGardenPlot.Length - 1; i++)
-            {
-                for (int j = 0; j < filteredGardenPlot[0].Length - 1; j++)
-                {
-                    if (allPlotsCovered.Contains((i, j)))
-                        continue;
-
-                    var plotValue = filteredGardenPlot[i][j];
-                    var wholePlot = FindWholePlot(plotValue, new List<(int row, int col)> { (i, j) }, new List<(int row, int col)>());
-                    _plotSummary.Add($"{plotValue}{plotKeyEnumerator}", wholePlot);
-                    allPlotsCovered.AddRange(wholePlot);
-                    plotKeyEnumerator++;
-                }
-            }
+            _plotSummary = FindAllSeparatePlot(GardenPlot);
 
             foreach (var x in _plotSummary.Keys)
             {
                 var y2 = _plotSummary.Select(x => x.Value.Count).ToList();
-                var temp = _plotSummary.GetValueOrDefault(x);
-                if (temp.Count == 1)
-                {
-                    //for (int i = 0; i <= filteredGardenPlot.Length - 1; i++)
-                    //{
-                    //    for (int j = 0; j < filteredGardenPlot[0].Length - 1; j++)
-                    //    {
-                    //        if (temp.Contains((i, j)))
-                    //            Console.ForegroundColor = ConsoleColor.Green;
-                    //        else
-                    //            Console.ForegroundColor = ConsoleColor.White;
-                    //        Console.Write(filteredGardenPlot[i][j]);
-                    //    }
-                    //    Console.WriteLine();
-                    //}
-
+                var coordinateValues = _plotSummary.GetValueOrDefault(x);
+                if (coordinateValues.Count == 1)
                     sum += 4;
-                }
                 else
                 {
-                    var temp2 = temp.OrderBy(x => x.row).ThenBy(x => x.col).ToList();
-                    HashSet<(int, int)> coordinates = temp2.ToHashSet();
-
-                    //for (int i = 0; i <= filteredGardenPlot.Length - 1; i++)
-                    //{
-                    //    for (int j = 0; j < filteredGardenPlot[0].Length - 1; j++)
-                    //    {
-                    //        if (coordinates.Contains((i, j)))
-                    //            Console.ForegroundColor = ConsoleColor.Green;
-                    //        else
-                    //            Console.ForegroundColor = ConsoleColor.White;
-                    //        Console.Write(filteredGardenPlot[i][j]);
-                    //    }
-                    //    Console.WriteLine();
-                    //}
+                    HashSet<(int, int)> coordinates = coordinateValues.ToHashSet();
 
 
                     int perimeter = CalculatePerimeter(coordinates);
@@ -196,10 +136,7 @@ namespace AdventOfCode2024.Problems
 
             }
 
-
             return (T)Convert.ChangeType(sum, typeof(T));
-            //1532992 TOO LOW
-            //1533024
         }
 
 
@@ -209,39 +146,6 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(sum, typeof(T));
         }
 
-
-        List<(int row, int col)> FindWholePlot(char plotValue, List<(int row, int col)> plotsToCheck, List<(int row, int col)> plotsAlreadyChecked)
-        {
-            plotsAlreadyChecked.AddRange(plotsToCheck);
-            var nextPlotsToCheck = new List<(int row, int col)> ();
-
-            foreach (var plot in plotsToCheck)
-            {
-                if (plot.col-1 >= 0 && GardenPlot[plot.row][plot.col-1] == plotValue && !plotsAlreadyChecked.Contains((plot.row, plot.col-1)))
-                {
-                    nextPlotsToCheck.Add((plot.row, plot.col - 1));
-                }
-                if (plot.col + 1 <= _maxY && GardenPlot[plot.row][plot.col + 1] == plotValue && !plotsAlreadyChecked.Contains((plot.row, plot.col + 1)))
-                {
-                    nextPlotsToCheck.Add((plot.row, plot.col + 1));
-                }
-                if (plot.row + 1 <= _maxX && GardenPlot[plot.row + 1][plot.col] == plotValue && !plotsAlreadyChecked.Contains((plot.row + 1, plot.col)))
-                {
-                    nextPlotsToCheck.Add((plot.row + 1, plot.col));
-                }
-                if (plot.row - 1 >= 0 && GardenPlot[plot.row - 1][plot.col] == plotValue && !plotsAlreadyChecked.Contains((plot.row - 1, plot.col)))
-                {
-                    nextPlotsToCheck.Add((plot.row - 1, plot.col));
-                }
-            }
-
-            nextPlotsToCheck = nextPlotsToCheck.Distinct().ToList();
-
-            if (nextPlotsToCheck.Count > 0)
-                FindWholePlot(plotValue, nextPlotsToCheck, plotsAlreadyChecked);
-
-            return plotsAlreadyChecked;
-        }
 
         int CalculatePerimeter(HashSet<(int row, int col)> coordinates)
         {
@@ -257,6 +161,42 @@ namespace AdventOfCode2024.Problems
             }
 
             return perimeter;
+        }
+
+        static Dictionary<string, List<(int, int)>> FindAllSeparatePlot(string[] gardenPlot)
+        {
+            var visited = new bool[gardenPlot.Length, gardenPlot[0].Length];
+            var groups = new Dictionary<string, List<(int, int)>>();
+            int groupCounter = 1;
+
+            for (int i = 0; i < gardenPlot.Length; i++)
+            {
+                for (int j = 0; j < gardenPlot[i].Length; j++)
+                {
+                    if (!visited[i, j] && gardenPlot[i][j] != ' ')
+                    {
+                        var group = new List<(int, int)>();
+                        SearchPlot(gardenPlot, visited, i, j, gardenPlot[i][j], group);
+                        groups.Add($"{gardenPlot[i][j]}{groupCounter++}", group);
+                    }
+                }
+            }
+
+            return groups;
+        }
+
+        static void SearchPlot(string[] gardenPlot, bool[,] visited, int row, int col, char plotValue, List<(int, int)> group)
+        {
+            if (row < 0 || row >= gardenPlot.Length || col < 0 || col >= gardenPlot[row].Length || visited[row, col] || gardenPlot[row][col] != plotValue)
+                return;
+
+            visited[row, col] = true;
+            group.Add((row, col));
+
+            SearchPlot(gardenPlot, visited, row + 1, col, plotValue, group);
+            SearchPlot(gardenPlot, visited, row - 1, col, plotValue, group);
+            SearchPlot(gardenPlot, visited, row, col + 1, plotValue, group);
+            SearchPlot(gardenPlot, visited, row, col - 1, plotValue, group);
         }
         #endregion
     }
