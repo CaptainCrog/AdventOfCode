@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace AdventOfCode2024.Problems
 {
@@ -10,8 +11,8 @@ namespace AdventOfCode2024.Problems
     {
 
         #region Fields
-
-        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024TestInputDay12.txt";
+        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day12PuzzleInput.txt";
+        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day12TestInput2.txt";
         int _firstResult = 0;
         ulong _secondResult = 0;
         ulong _sumOfStones = 0;
@@ -19,6 +20,7 @@ namespace AdventOfCode2024.Problems
         int _maxY = 0;
         string[] _gardenPlot = [];
         char[] _distinctPlotValues = [];
+
         Dictionary<string, List<(int row, int col)>> _plotSummary = new Dictionary<string, List<(int row, int col)>>();
 
         #endregion
@@ -125,7 +127,7 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            var sum = 0;
+            long sum = 0;
 
 
             var filteredGardenPlot = GardenPlot.ToArray();
@@ -148,43 +150,56 @@ namespace AdventOfCode2024.Problems
 
             foreach (var x in _plotSummary.Keys)
             {
+                var y2 = _plotSummary.Select(x => x.Value.Count).ToList();
                 var temp = _plotSummary.GetValueOrDefault(x);
-                var temp2 = temp.OrderBy(x => x.row).ThenBy(x => x.col).ToList();
-
                 if (temp.Count == 1)
                 {
+                    //for (int i = 0; i <= filteredGardenPlot.Length - 1; i++)
+                    //{
+                    //    for (int j = 0; j < filteredGardenPlot[0].Length - 1; j++)
+                    //    {
+                    //        if (temp.Contains((i, j)))
+                    //            Console.ForegroundColor = ConsoleColor.Green;
+                    //        else
+                    //            Console.ForegroundColor = ConsoleColor.White;
+                    //        Console.Write(filteredGardenPlot[i][j]);
+                    //    }
+                    //    Console.WriteLine();
+                    //}
+
                     sum += 4;
                 }
+                else
+                {
+                    var temp2 = temp.OrderBy(x => x.row).ThenBy(x => x.col).ToList();
+                    HashSet<(int, int)> coordinates = temp2.ToHashSet();
 
-                //2 + i along the top
+                    //for (int i = 0; i <= filteredGardenPlot.Length - 1; i++)
+                    //{
+                    //    for (int j = 0; j < filteredGardenPlot[0].Length - 1; j++)
+                    //    {
+                    //        if (coordinates.Contains((i, j)))
+                    //            Console.ForegroundColor = ConsoleColor.Green;
+                    //        else
+                    //            Console.ForegroundColor = ConsoleColor.White;
+                    //        Console.Write(filteredGardenPlot[i][j]);
+                    //    }
+                    //    Console.WriteLine();
+                    //}
+
+
+                    int perimeter = CalculatePerimeter(coordinates);
+                    var area = perimeter * coordinates.Count();
+                    sum += area;
+                    Console.WriteLine($"The perimeter of the shape is: {perimeter}");
+                }
 
             }
 
 
-            //Antinodes = new List<(int row, int col)>();
-            //foreach (var frequency in AntennaFrequencies)
-            //{
-            //    var frequencyPositions = new List<(int, int)>();
-            //    var filteredAntennaSignals = AntennaSignals.ToArray();
-            //    for (int i = 0; i <= filteredAntennaSignals.Length - 1; i++)
-            //    {
-            //        for (int j = 0; j < filteredAntennaSignals[0].Length - 1; j++)
-            //        {
-            //            if (filteredAntennaSignals[i][j] == frequency)
-            //            {
-            //                frequencyPositions.Add((i, j));
-            //            }
-            //        }
-            //    }
-
-            //    ProcessSignal(frequencyPositions, isPartTwo);
-
-            //}
-            //Antinodes = Antinodes.Distinct().ToList();
-            //return Antinodes.Count;
-
-
             return (T)Convert.ChangeType(sum, typeof(T));
+            //1532992 TOO LOW
+            //1533024
         }
 
 
@@ -214,6 +229,10 @@ namespace AdventOfCode2024.Problems
                 {
                     nextPlotsToCheck.Add((plot.row + 1, plot.col));
                 }
+                if (plot.row - 1 >= 0 && GardenPlot[plot.row - 1][plot.col] == plotValue && !plotsAlreadyChecked.Contains((plot.row - 1, plot.col)))
+                {
+                    nextPlotsToCheck.Add((plot.row - 1, plot.col));
+                }
             }
 
             nextPlotsToCheck = nextPlotsToCheck.Distinct().ToList();
@@ -224,6 +243,21 @@ namespace AdventOfCode2024.Problems
             return plotsAlreadyChecked;
         }
 
+        int CalculatePerimeter(HashSet<(int row, int col)> coordinates)
+        {
+            int perimeter = 0;
+
+            foreach (var (row, col) in coordinates)
+            {
+                // Check each of the 4 possible neighbors
+                if (!coordinates.Contains((row - 1, col))) perimeter++; // Left
+                if (!coordinates.Contains((row + 1, col))) perimeter++; // Right
+                if (!coordinates.Contains((row, col - 1))) perimeter++; // Down
+                if (!coordinates.Contains((row, col + 1))) perimeter++; // Up
+            }
+
+            return perimeter;
+        }
         #endregion
     }
 }
