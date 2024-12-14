@@ -11,18 +11,13 @@ namespace AdventOfCode2024.Problems
     public partial class Day13 : DayBase
     {
         #region Fields
-        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day13TestInput.txt";
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day13PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
         long _firstResult = 0;
         ulong _secondResult = 0;
-        string[] _gardenPlot = [];
-        char[] _distinctPlotValues = [];
         List<ClawMachine> _clawMachines = [];
         MatchCollection _clawMachineMatches;
         int _buttonAToken = 3;
         int _buttonBToken = 1;
-
-        Dictionary<string, List<(int row, int col)>> _plotSummary = new Dictionary<string, List<(int row, int col)>>();
 
         #endregion
 
