@@ -11,7 +11,8 @@ namespace AdventOfCode2024.Problems
     public partial class Day14 : DayBase
     {
         #region Fields
-        string _inputPath = @"PAST PATH HERE";
+        string _inputPath = @"PASTE PATH HERE";
+        string _outputPath = @"OUTPUT PATH HERE";
         long _firstResult = 0;
         ulong _secondResult = 0;
         string[] _input = [];
@@ -95,7 +96,7 @@ namespace AdventOfCode2024.Problems
         public override void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
-            Console.WriteLine($"Second Solution is: {SecondResult}");
+            Console.WriteLine($"Second Solution can be found in the file setup in the output path");
         }
 
         public override T SolveFirstProblem<T>()
@@ -166,13 +167,13 @@ namespace AdventOfCode2024.Problems
 
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine();
-                File.AppendAllText(@"OUTPUT PATH HERE", stringBuilder.ToString());
+                File.AppendAllText(_outputPath, stringBuilder.ToString());
 
                 iter++;
             }
 
 
-            return (T)Convert.ChangeType(sum, typeof(T));
+            return (T)Convert.ChangeType(0, typeof(T));
         }
 
         void CreateRobots() 
