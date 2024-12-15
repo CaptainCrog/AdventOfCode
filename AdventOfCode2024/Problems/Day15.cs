@@ -264,14 +264,20 @@ namespace AdventOfCode2024.Problems
         {
             return _gridChars[position.row, position.col] == '#';
         }
+        bool CheckOutOfBounds((int rowLeft, int colLeft, int rowRight, int colRight) position)
+        {
+            return _gridChars[position.rowLeft, position.colLeft] == '#' || _gridChars[position.rowRight, position.colRight] == '#';
+        }
 
         void Part1DirectionProcessing((int row, int col) newRobotPosition, (int row, int col) movement)
         {
+
+            char currentChar = _gridChars[newRobotPosition.row, newRobotPosition.col];
             if (CheckOutOfBounds(newRobotPosition))
             {
                 return;
             }
-            else if (_gridChars[newRobotPosition.row, newRobotPosition.col] == 'O')
+            else if (currentChar == 'O')
             {
                 (int row, int col) newBoxPosition = (newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
                 // dont do anything if moving the box would move it out of bounds
@@ -303,32 +309,67 @@ namespace AdventOfCode2024.Problems
 
         void Part2DirectionProcessing((int row, int col) newRobotPosition, (int row, int col) movement)
         {
+
+            char currentChar = _gridChars[newRobotPosition.row, newRobotPosition.col];
+
             if (CheckOutOfBounds(newRobotPosition))
             {
                 return;
             }
-            else if (_gridChars[newRobotPosition.row, newRobotPosition.col] == '[' || _gridChars[newRobotPosition.row, newRobotPosition.col] == ']')
+            else if (currentChar == '[' || currentChar == ']')
             {
-                (int row, int col) newBoxPosition = (newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
-                // dont do anything if moving the box would move it out of bounds
-                if (CheckOutOfBounds(newBoxPosition))
+                (int rowLeft, int colLeft, int rowRight, int colRight) newLeftBoxPosition = (0, 0, 0, 0);
+                (int rowLeft, int colLeft, int rowRight, int colRight)? newRightBoxPosition = null;
+                (int row, int col) position = (newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
+                bool isBox;
+                if (currentChar == '[')
+                {
+                    newLeftBoxPosition = (position.row, position.col, position.row, position.col + 1);
+                }
+                else
+                {
+                    newLeftBoxPosition = (position.row, position.col-1, position.row, position.col);
+                }
+
+                isBox = _gridChars[newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft] == '[' || _gridChars[newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft] == ']' ||
+                         _gridChars[newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight] == '[' || _gridChars[newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight] == ']';
+
+                    //(newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
+                    // dont do anything if moving the box would move it out of bounds
+                if (CheckOutOfBounds(newLeftBoxPosition))
                 {
                     return;
                 }
-                else if (_gridChars[newBoxPosition.row, newBoxPosition.col] == '[' || _gridChars[newBoxPosition.row, newBoxPosition.col] == ']')
+                else if (isBox)
                 {
-                    while (_gridChars[newBoxPosition.row, newBoxPosition.col] == '[' || _gridChars[newBoxPosition.row, newBoxPosition.col] == ']')
+                    while (isBox)
                     {
-                        newBoxPosition = (newBoxPosition.row + movement.row, newBoxPosition.col + movement.col);
-                        if (CheckOutOfBounds(newBoxPosition))
+                        //if direction is Up or Down AND leftCol == ']' and rightCol == '[' which implies 2 different boxes
+                        // add two new box positions
+                        if (movement.row == 1 || movement.row == -1 && newLeftBoxPosition.colLeft == ']' && newLeftBoxPosition.colRight == '[')
+                        {
+                            newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col - 1, newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col);
+                            newRightBoxPosition = (newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col + 1);
+                        }
+                        else
+                        {
+                            newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col);
+                        }
+
+                        if (CheckOutOfBounds(newLeftBoxPosition))
                             return;
+                        else if (newRightBoxPosition.HasValue && CheckOutOfBounds(newRightBoxPosition.Value))
+                            return;
+
                     }
-                    _gridChars[newBoxPosition.row, newBoxPosition.col] = 'O';
+                    _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] = '[';
+                    _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] = ']';
 
                 }
                 else
                 {
-                    _gridChars[newBoxPosition.row, newBoxPosition.col] = 'O';
+                    _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] = '[';
+                    _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] = ']';
                 }
             }
 
