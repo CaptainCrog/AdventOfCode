@@ -217,11 +217,11 @@ namespace AdventOfCode2024.Problems
                     else
                         continue;
                 }
-                catch (InvalidOperationException ex)
+                catch (InvalidOperationException)
                 {
                     continue;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     continue;
                 }
