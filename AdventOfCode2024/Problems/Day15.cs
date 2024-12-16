@@ -10,7 +10,7 @@ namespace AdventOfCode2024.Problems
     public class Day15 : DayBase
     {
         #region Fields
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day15TestInput1.txt";
+        string _inputPath = @"C:\Users\craigp\Desktop\AdventOfCode2024TestInput2Day15.txt";
         //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day15PuzzleInput.txt";
         long _firstResult = 0;
         ulong _secondResult = 0;
@@ -233,6 +233,7 @@ namespace AdventOfCode2024.Problems
 
         void ProcessDirection(char direction, int part)
         {
+            Console.WriteLine(direction);
             (int row, int col) movement = (0, 0);
             switch (direction)
             {
@@ -310,74 +311,148 @@ namespace AdventOfCode2024.Problems
         void Part2DirectionProcessing((int row, int col) newRobotPosition, (int row, int col) movement)
         {
 
-            char currentChar = _gridChars[newRobotPosition.row, newRobotPosition.col];
-
-            if (CheckOutOfBounds(newRobotPosition))
+            try
             {
-                return;
-            }
-            else if (currentChar == '[' || currentChar == ']')
-            {
-                (int rowLeft, int colLeft, int rowRight, int colRight) newLeftBoxPosition = (0, 0, 0, 0);
-                (int rowLeft, int colLeft, int rowRight, int colRight)? newRightBoxPosition = null;
-                (int row, int col) position = (newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
-                bool isBox;
-                if (currentChar == '[')
-                {
-                    newLeftBoxPosition = (position.row, position.col, position.row, position.col + 1);
-                }
-                else
-                {
-                    newLeftBoxPosition = (position.row, position.col-1, position.row, position.col);
-                }
+                char currentChar = _gridChars[newRobotPosition.row, newRobotPosition.col];
 
-                isBox = _gridChars[newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft] == '[' || _gridChars[newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft] == ']' ||
-                         _gridChars[newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight] == '[' || _gridChars[newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight] == ']';
-
-                    //(newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
-                    // dont do anything if moving the box would move it out of bounds
-                if (CheckOutOfBounds(newLeftBoxPosition))
+                if (CheckOutOfBounds(newRobotPosition))
                 {
                     return;
                 }
-                else if (isBox)
+                else if (currentChar == '[' || currentChar == ']')
                 {
-                    while (isBox)
+                    List<(int rowLeft, int colLeft, int rowRight, int colRight)> allNewBoxPositions = new();
+                    List<(int rowLeft, int colLeft, int rowRight, int colRight)> allOldBoxPositions = new();
+                    (int rowLeft, int colLeft, int rowRight, int colRight) newLeftBoxPosition = (0, 0, 0, 0);
+                    (int rowLeft, int colLeft, int rowRight, int colRight)? newRightBoxPosition = null;
+                    (int row, int col) position = (newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
+                    bool isBox;
+                    if (currentChar == '[')
                     {
-                        //if direction is Up or Down AND leftCol == ']' and rightCol == '[' which implies 2 different boxes
-                        // add two new box positions
-                        if (movement.row == 1 || movement.row == -1 && newLeftBoxPosition.colLeft == ']' && newLeftBoxPosition.colRight == '[')
+                        newLeftBoxPosition = (position.row, position.col, position.row, position.col + 1);
+                        allNewBoxPositions.Add(newLeftBoxPosition);
+                        allOldBoxPositions.Add((newRobotPosition.row, newRobotPosition.col, newRobotPosition.row, newRobotPosition.col + 1));
+                    }
+                    else
+                    {
+                        newLeftBoxPosition = (position.row, position.col - 1, position.row, position.col);
+                        allNewBoxPositions.Add(newLeftBoxPosition);
+                        allOldBoxPositions.Add((newRobotPosition.row, newRobotPosition.col - 1, newRobotPosition.row, newRobotPosition.col));
+                    }
+
+                    isBox = CheckNextGridIsBox(movement, newLeftBoxPosition);
+
+                    //(newRobotPosition.row + movement.row, newRobotPosition.col + movement.col);
+                    // dont do anything if moving the box would move it out of bounds
+                    if (CheckOutOfBounds(newLeftBoxPosition))
+                    {
+                        return;
+                    }
+                    else if (isBox)
+                    {
+                        bool isTwoBoxes = false;
+                        while (isBox)
                         {
-                            newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col - 1, newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col);
-                            newRightBoxPosition = (newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col + 1);
+                            //if direction is Up or Down AND leftCol == ']' and rightCol == '[' which implies 2 different boxes
+                            // add two new box positions
+                            if (isTwoBoxes || (movement.row == 1 || movement.row == -1 && _gridChars[newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft] == ']' && _gridChars[newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight] == '['))
+                            {
+                                allOldBoxPositions.Add((newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft - 1, newLeftBoxPosition.rowLeft, newLeftBoxPosition.colLeft));
+                                allOldBoxPositions.Add((newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight, newLeftBoxPosition.rowRight, newLeftBoxPosition.colRight + 1));
+
+                                newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col - 1, newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col);
+                                newRightBoxPosition = (newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col + 1);
+
+                                allNewBoxPositions.Add(newLeftBoxPosition);
+                                allNewBoxPositions.Add(newRightBoxPosition.Value);
+                                isTwoBoxes = true;
+                                isBox = CheckNextGridIsBox(movement, newLeftBoxPosition) && CheckNextGridIsBox(movement, newRightBoxPosition.Value);
+                            }
+                            else
+                            {
+                                newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col);
+                                allNewBoxPositions.Add(newLeftBoxPosition);
+                                isBox = CheckNextGridIsBox(movement, newLeftBoxPosition);
+                            }
+
+
+                            if (isTwoBoxes)
+                            {
+                                if (CheckOutOfBounds(newLeftBoxPosition) || CheckOutOfBounds(newRightBoxPosition.Value))
+                                    return;
+                            }
+                            else if (CheckOutOfBounds(newLeftBoxPosition))
+                            {
+                                return;
+                            }
+
                         }
-                        else
+                        foreach (var box in allOldBoxPositions)
                         {
-                            newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col);
+                            _gridChars[box.rowLeft, box.colLeft] = '.';
+                            _gridChars[box.rowRight, box.colRight] = '.';
                         }
 
-                        if (CheckOutOfBounds(newLeftBoxPosition))
-                            return;
-                        else if (newRightBoxPosition.HasValue && CheckOutOfBounds(newRightBoxPosition.Value))
-                            return;
+                        foreach (var box in allNewBoxPositions)
+                        {
+                            _gridChars[box.rowLeft, box.colLeft] = '[';
+                            _gridChars[box.rowRight, box.colRight] = ']';
+                        }
 
                     }
-                    _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] = '[';
-                    _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] = ']';
+                    else
+                    {
+                        foreach (var box in allOldBoxPositions)
+                        {
+                            _gridChars[box.rowLeft, box.colLeft] = '.';
+                            _gridChars[box.rowRight, box.colRight] = '.';
+                        }
 
+                        foreach (var box in allNewBoxPositions)
+                        {
+                            _gridChars[box.rowLeft, box.colLeft] = '[';
+                            _gridChars[box.rowRight, box.colRight] = ']';
+                        }
+                    }
                 }
-                else
-                {
-                    _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] = '[';
-                    _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] = ']';
-                }
+
+                _gridChars[newRobotPosition.row, newRobotPosition.col] = '@';
+                _gridChars[_robotPosition.row, _robotPosition.col] = '.';
+                _robotPosition = newRobotPosition;
             }
+            finally
+            {
+                for (int i = 0; i < _rows; i++)
+                {
+                    for (int j = 0; j < _cols; j++)
+                    {
+                        Console.Write(_gridChars[i, j]);
+                    }
+                    Console.WriteLine();
+                }
 
-            _gridChars[newRobotPosition.row, newRobotPosition.col] = '@';
-            _gridChars[_robotPosition.row, _robotPosition.col] = '.';
-            _robotPosition = newRobotPosition;
+                Console.WriteLine();
+            }
         }
 
+
+        bool CheckNextGridIsBox((int row, int col) movement, (int rowLeft, int colLeft, int rowRight, int colRight) newBoxPosition)
+        {
+
+            if (movement.row == 1 | movement.row == -1)
+            {
+                return _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == '[' || _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == ']' ||
+                         _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == '[' || _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == ']';
+            }
+            else if (movement.col == -1)
+            {
+                return _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == ']';
+            }
+            else
+            {
+                return _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == '[';
+            }
+        }
         #endregion
     }
 }
