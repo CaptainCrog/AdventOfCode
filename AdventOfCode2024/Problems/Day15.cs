@@ -267,6 +267,13 @@ namespace AdventOfCode2024.Problems
         }
         bool CheckOutOfBounds((int rowLeft, int colLeft, int rowRight, int colRight) position)
         {
+
+            if (position.rowLeft < 1 || position.rowRight < 1 || position.colLeft < 1 || position.colRight < 1 ||
+                position.rowLeft > _grid.Count - 2 || position.rowRight > _grid.Count - 2 || position.colLeft > _grid[0].Length - 3 || position.colRight > _grid[0].Length - 3)
+            {
+                return false;
+            }
+
             return _gridChars[position.rowLeft, position.colLeft] == '#' || _gridChars[position.rowRight, position.colRight] == '#';
         }
 
@@ -370,7 +377,7 @@ namespace AdventOfCode2024.Problems
                             }
                             else
                             {
-                                newLeftBoxPosition = (newLeftBoxPosition.rowLeft + movement.row, newLeftBoxPosition.colLeft + movement.col, newLeftBoxPosition.rowRight + movement.row, newLeftBoxPosition.colRight + movement.col);
+                                newLeftBoxPosition = (newLeftBoxPosition.rowLeft + (movement.row * 2), newLeftBoxPosition.colLeft + (movement.col * 2), newLeftBoxPosition.rowRight + (movement.row * 2), newLeftBoxPosition.colRight + (movement.col * 2) );
                                 allNewBoxPositions.Add(newLeftBoxPosition);
                                 isBox = CheckNextGridIsBox(movement, newLeftBoxPosition);
                             }
@@ -438,19 +445,26 @@ namespace AdventOfCode2024.Problems
 
         bool CheckNextGridIsBox((int row, int col) movement, (int rowLeft, int colLeft, int rowRight, int colRight) newBoxPosition)
         {
-
-            if (movement.row == 1 | movement.row == -1)
+            if (newBoxPosition.rowLeft < 1 || newBoxPosition.rowRight < 1|| newBoxPosition.colLeft < 1 || newBoxPosition.colRight < 1 ||
+                newBoxPosition.rowLeft > _grid.Count - 2 || newBoxPosition.rowRight > _grid.Count - 2 || newBoxPosition.colLeft > _grid[0].Length - 3 || newBoxPosition.colRight > _grid[0].Length - 3)
             {
-                return _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == '[' || _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == ']' ||
-                         _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == '[' || _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == ']';
-            }
-            else if (movement.col == -1)
-            {
-                return _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == ']';
+                return false;
             }
             else
             {
-                return _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == '[';
+                if (movement.row == 1 || movement.row == -1)
+                {
+                    return _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == '[' || _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == ']' ||
+                             _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == '[' || _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == ']';
+                }
+                else if (movement.col == -1)
+                {
+                    return _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft] == ']' && _gridChars[newBoxPosition.rowLeft, newBoxPosition.colLeft - 1] == '[';
+                }
+                else
+                {
+                    return _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight] == '[' && _gridChars[newBoxPosition.rowRight, newBoxPosition.colRight + 1] == ']';
+                }
             }
         }
         #endregion
