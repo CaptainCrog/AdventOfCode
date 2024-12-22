@@ -9,8 +9,7 @@ namespace AdventOfCode2024.Problems
     public class Day16 : DayBase
     {
         #region Fields
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day16PuzzleInput.txt";
-        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\Day16\AdventOfCode2024Day16TestInput1.txt";
+        string _inputPath = @"PASTE PATH HERE";
         int _firstResult = 0;
         int _secondResult = 0;
         (List<List<Node>> paths, int shortestPathScore) _result;
