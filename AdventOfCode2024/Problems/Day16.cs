@@ -13,6 +13,7 @@ namespace AdventOfCode2024.Problems
         //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\Day16\AdventOfCode2024Day16TestInput1.txt";
         int _firstResult = 0;
         int _secondResult = 0;
+        (List<List<Node>> paths, int shortestPathScore) _result;
         string[] _raceMapRaw = [];
         char[,] _raceMap = new char [0,0];
         Node _start = new();
@@ -79,8 +80,7 @@ namespace AdventOfCode2024.Problems
         public Day16()
         {
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<int>();
+            SolveBothProblems();
             OutputSolution();
         }
         #endregion
@@ -115,18 +115,21 @@ namespace AdventOfCode2024.Problems
             }
         }
 
+        void SolveBothProblems()
+        {
+            _result = FindAllShortestPaths(_raceMap, _start, _end);
+            FirstResult = SolveFirstProblem<int>();
+            SecondResult = SolveSecondProblem<int>();
+        }
+
         public override T SolveFirstProblem<T>()
         {
-            var result = FindShortestPath(_raceMap, _start, _end);
-            return (T)Convert.ChangeType(result, typeof(T));
+            return (T)Convert.ChangeType(_result.shortestPathScore, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            int sum = 0;
-            var result = FindAllShortestPaths(_raceMap, _start, _end);
-            sum = result.SelectMany(x => x.Select(xx => (xx.X, xx.Y))).ToList().Distinct().Count();
-            return (T)Convert.ChangeType(sum, typeof(T));
+            return (T)Convert.ChangeType(_result.paths.SelectMany(x => x.Select(xx => (xx.X, xx.Y))).ToList().Distinct().Count(), typeof(T));
         }
 
         public override void OutputSolution()
@@ -136,61 +139,7 @@ namespace AdventOfCode2024.Problems
         }
         #endregion
 
-        public int FindShortestPath(char[,] grid, Node start, Node target)
-        {
-            int rows = grid.GetLength(0);
-            int cols = grid.GetLength(1);
-            var distances = new Dictionary<(int x, int y, Direction direction), int>();
-            var visited = new HashSet<(int x, int y, Direction direction)>();
-            var priorityQueue = new PriorityQueue<Node, int>();
-
-            // Initialize distances
-            for (int i = 0; i < rows; i++)
-                for (int j = 0; j < cols; j++)
-                    foreach (Direction dir in Enum.GetValues(typeof(Direction)))
-                        distances[(i, j, dir)] = int.MaxValue;
-
-            // Set starting node distance to 0 and enqueue it
-            distances[(start.X, start.Y, start.Direction)] = 0;
-            priorityQueue.Enqueue(start, 0);
-
-            while (priorityQueue.Count > 0)
-            {
-                Node current = priorityQueue.Dequeue();
-                if (visited.Contains((current.X, current.Y, current.Direction)))
-                    continue;
-
-                visited.Add((current.X, current.Y, current.Direction));
-
-                // If we reached the target node, return the distance
-                if (current.X == target.X && current.Y == target.Y)
-                    return distances[(current.X, current.Y, current.Direction)];
-
-                // Explore neighbors
-                foreach (var (dx, dy, newFacing) in _directions)
-                {
-                    int newX = current.X + dx;
-                    int newY = current.Y + dy;
-
-                    if (IsValid(newX, newY, rows, cols) && !visited.Contains((newX, newY, newFacing)))
-                    {
-                        int rotationCost = _rotationCost[(int)current.Direction, (int)newFacing];
-                        int movementCost = 1;
-                        int newCost = distances[(current.X, current.Y, current.Direction)] + rotationCost + movementCost;
-
-                        if (newCost < distances[(newX, newY, newFacing)])
-                        {
-                            distances[(newX, newY, newFacing)] = newCost;
-                            priorityQueue.Enqueue(new Node { X = newX, Y = newY, Direction = newFacing, Cost = newCost }, newCost);
-                        }
-                    }
-                }
-            }
-
-            return -1; // No path found
-        }
-
-        public List<List<Node>> FindAllShortestPaths(char[,] grid, Node start, Node target)
+        public (List<List<Node>> paths, int shortestPathScore) FindAllShortestPaths(char[,] grid, Node start, Node target)
         {
             int rows = grid.GetLength(0);
             int cols = grid.GetLength(1);
@@ -198,29 +147,28 @@ namespace AdventOfCode2024.Problems
             var previousNodes = new Dictionary<(int x, int y, Direction direction), List<Node>>();
             var priorityQueue = new PriorityQueue<Node, int>();
 
-            // Initialize distances and previous nodes
             for (int i = 0; i < rows; i++)
+            {
                 for (int j = 0; j < cols; j++)
+                {
                     foreach (Direction dir in Enum.GetValues(typeof(Direction)))
                     {
                         distances[(i, j, dir)] = int.MaxValue;
                         previousNodes[(i, j, dir)] = new List<Node>();
                     }
+                }
+            }
 
-            // Set starting node distance to 0 and enqueue it
             distances[(start.X, start.Y, start.Direction)] = 0;
             priorityQueue.Enqueue(start, 0);
 
-            // Process the priority queue
             while (priorityQueue.Count > 0)
             {
                 Node current = priorityQueue.Dequeue();
 
-                // Skip processing if we already have a better or equal distance for this node and direction
                 if (distances[(current.X, current.Y, current.Direction)] < current.Cost)
                     continue;
 
-                // Explore neighbors
                 foreach (var (dx, dy, newFacing) in _directions)
                 {
                     int newX = current.X + dx;
@@ -232,14 +180,13 @@ namespace AdventOfCode2024.Problems
                         int movementCost = 1;
                         int newCost = distances[(current.X, current.Y, current.Direction)] + rotationCost + movementCost;
 
-                        // If a shorter path to (newX, newY, newFacing) is found, update distances and enqueue
+
                         if (newCost < distances[(newX, newY, newFacing)])
                         {
                             distances[(newX, newY, newFacing)] = newCost;
                             previousNodes[(newX, newY, newFacing)] = new List<Node> { current };
                             priorityQueue.Enqueue(new Node { X = newX, Y = newY, Direction = newFacing, Cost = newCost }, newCost);
                         }
-                        // If we found an equal-cost path, add to previousNodes (to account for multiple paths)
                         else if (newCost == distances[(newX, newY, newFacing)])
                         {
                             previousNodes[(newX, newY, newFacing)].Add(current);
@@ -248,7 +195,6 @@ namespace AdventOfCode2024.Problems
                 }
             }
 
-            // Find the minimum score to the target
             int minCostToTarget = int.MaxValue;
             foreach (var direction in Enum.GetValues(typeof(Direction)))
             {
@@ -256,30 +202,24 @@ namespace AdventOfCode2024.Problems
                 minCostToTarget = Math.Min(minCostToTarget, distances[(target.X, target.Y, directionEnum)]);
             }
 
-            // If the target is unreachable, return an empty list
             if (minCostToTarget == int.MaxValue)
             {
-                return new List<List<Node>>(); // No path found
+                return (new List<List<Node>>(), 0);
             }
 
-            // Backtrack from the target to reconstruct only the shortest paths
             var allPaths = new List<List<Node>>();
-
-            // Helper function to backtrack and find all paths that match the minimum cost
             void Backtrack(Node currentNode, List<Node> path)
             {
-                // If we reach the start node, we have found a valid path
                 if (currentNode.X == start.X && currentNode.Y == start.Y)
                 {
                     path.Add(currentNode);
-                    allPaths.Add(path.AsEnumerable().Reverse().ToList()); // Reverse path to start from the start node
+                    allPaths.Add(path.AsEnumerable().Reverse().ToList());
                     return;
                 }
 
                 var key = (currentNode.X, currentNode.Y, currentNode.Direction);
                 foreach (var prevNode in previousNodes[key])
                 {
-                    // Only backtrack if the cost of the path matches the minimum cost to the target
                     if (distances[(prevNode.X, prevNode.Y, prevNode.Direction)] + 1 <= minCostToTarget)
                     {
                         var newPath = new List<Node>(path) { currentNode };
@@ -288,7 +228,6 @@ namespace AdventOfCode2024.Problems
                 }
             }
 
-            // Start backtracking from all directions at the target node
             foreach (var direction in Enum.GetValues(typeof(Direction)))
             {
                 var directionEnum = (Direction)direction;
@@ -298,7 +237,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
 
-            return allPaths;
+            return (allPaths, minCostToTarget);
         }
 
 
