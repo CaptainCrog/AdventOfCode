@@ -69,6 +69,8 @@ public class Program
                             _ = new Day17();
                             break;
                         case 18:
+                            _ = new Day18();
+                            break;
                         case 19:
                         case 20:
                         case 21:

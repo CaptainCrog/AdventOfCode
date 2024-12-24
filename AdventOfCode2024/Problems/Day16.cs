@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AdventOfCode2024.CommonTypes.Classes;
+using AdventOfCode2024.CommonTypes.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -247,21 +249,5 @@ namespace AdventOfCode2024.Problems
             return x >= 0 && y >= 0 && x < rows && y < cols && _raceMap[x,y] != '#';
         }
 
-    }
-
-    public class Node
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Cost { get; set; }
-        public Direction Direction { get; set; }
-    }
-
-    public enum Direction
-    {
-        North,
-        East,
-        South,
-        West
     }
 }
