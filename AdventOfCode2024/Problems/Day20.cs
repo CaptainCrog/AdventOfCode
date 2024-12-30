@@ -14,22 +14,9 @@ namespace AdventOfCode2024.Problems
 {
     public class Day20 : DayBase
     {
-        /// <summary>
-        /// Another Shorted Path Algorithm?
-        /// It needs to run fully once to know how many picoseconds the whole route will take
-        /// then we need to iterate while iterator < picoseconds
-        /// foreach iteration we need to blank the grid for 2 movements when the movement number is the iterator
-        /// e.g if iterator is 0 then we would blank the grid for 1 and 2 picoseconds
-        ///     if iterator is 100 then we would blank the grid for 101 and 102 picoseconds
-        ///     
-        /// After each iteration take the score of the current run and subtract this value from the standard score.
-        /// if score >= 100 we can add this route.
-        /// </summary>
-
         #region Fields
 
-        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day20TestInput.txt";
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day20PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
         int _firstResult = 0;
         int _secondResult = 0;
         int _sum = 0;
