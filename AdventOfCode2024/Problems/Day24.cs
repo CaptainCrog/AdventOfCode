@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,11 +15,10 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\Day24\AdventOfCode2024Day24TestInput2.txt";
-       //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day24PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
+        string[] _gatesInput = [];
         long _firstResult = 0;
-        int _secondResult = 0;
-        int _sum = 0;
+        string _secondResult = string.Empty;
         Dictionary<string, int> _wireValues = new(); 
         List<(string Input1, string Gate, string Input2, string Output)> _gates = new();
 
@@ -53,7 +53,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        string SecondResult
         {
             get => _secondResult;
             set
@@ -64,18 +64,6 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
         #endregion
 
         #region Constructor
@@ -83,7 +71,7 @@ namespace AdventOfCode2024.Problems
         {
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
-            SecondResult = SolveSecondProblem<int>();
+            SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -91,8 +79,20 @@ namespace AdventOfCode2024.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            var input = File.ReadAllLines(_inputPath);
-            foreach (var line in input) 
+            _gatesInput = File.ReadAllLines(_inputPath);
+        }
+
+        public override void OutputSolution()
+        {
+            Console.WriteLine($"First Solution is: {FirstResult}");
+            Console.WriteLine($"Second Solution is: {SecondResult}");
+        }
+
+        public override T SolveFirstProblem<T>()
+        {
+            _gates = new();
+            _wireValues = new();
+            foreach (var line in _gatesInput)
             {
                 if (line.Contains(':'))
                 {
@@ -106,21 +106,8 @@ namespace AdventOfCode2024.Problems
                     _gates.Add((gateParts[0], gateParts[1], gateParts[2], parts[1]));
                 }
             }
-        }
 
-        public override void OutputSolution()
-        {
-            Console.WriteLine($"First Solution is: {FirstResult}");
-            Console.WriteLine($"Second Solution is: {SecondResult}");
-        }
-
-        public override T SolveFirstProblem<T>()
-        {
-            Sum = 0;
-            var gatesCopy = _gates.ToList();
-            var wireValuesCopy = _wireValues.ToDictionary();
-
-            var simulation = RunSimulation(gatesCopy, wireValuesCopy);
+            var simulation = RunSimulation(_gates, _wireValues);
 
             // Combine results
             string binaryResult = string.Join("", simulation
@@ -138,62 +125,66 @@ namespace AdventOfCode2024.Problems
 
         public override T SolveSecondProblem<T>()
         {
-            Sum = 0;
-            var gatesCopy = _gates.ToList();
-            var wireValuesCopy = _wireValues.ToDictionary();
-
-            // Find gates violating the rules
-            var nxz = gatesCopy.Where(gate => gate.Output.StartsWith("z") && gate.Output != "z45" && gate.Gate != XOR).ToList();
-            var xnz = gatesCopy.Where(gate => !gate.Input1.StartsWith("x") && !gate.Input1.StartsWith("y") &&
-                                       !gate.Input2.StartsWith("x") && !gate.Input2.StartsWith("y") &&
-                                       !gate.Output.StartsWith("z") && gate.Gate == XOR).ToList();
-
-            // Perform swaps
-            for (int i = 0; i < xnz.Count(); i++)
+            _gates = new();
+            foreach (var line in _gatesInput)
             {
-                var gateCopy = gatesCopy[i];
-                var matchingGate = nxz.First(gate => gate.Output == FirstZThatUsesC(gatesCopy, gateCopy.Output));
-                var temp = gateCopy.Output;
-                gateCopy.Output = matchingGate.Output;
-                matchingGate.Output = temp;
+                if (line.Contains(" -> "))
+                {
+                    var parts = line.Split(new[] { " -> " }, StringSplitOptions.None);
+                    var gateParts = parts[0].Split(' ');
+                    // re-organise x and y inputs to ensure x variables are INPUT 1 and y variables are INPUT 2
+                    _gates.Add((string.Compare(gateParts[0], gateParts[2], StringComparison.Ordinal) < 0 ? gateParts[0] : gateParts[2], 
+                        gateParts[1],
+                        string.Compare(gateParts[0], gateParts[2], StringComparison.Ordinal) > 0 ? gateParts[0] : gateParts[2], 
+                        parts[1]));
+                }
             }
 
 
-            string xBinaryResult = string.Join("", wireValuesCopy
-                .Where(kvp => kvp.Key.StartsWith("x"))
-                .OrderByDescending(kvp => int.Parse(kvp.Key.Substring(1)))
-                .Select(kvp => kvp.Value.ToString()));
+            // Find gates violating the rules
+            var rule1Violations = _gates.Where(gate => gate.Output.StartsWith("z") && gate.Output != "z45" && gate.Gate != XOR).Select(x => x.Output).ToList();
+            var rule2Violations = _gates.Where(gate => !gate.Input1.StartsWith("x") && !gate.Output.StartsWith("z") && gate.Gate == XOR).Select(x => x.Output).ToList();
+            var rule3Violations = new List<string>();
+            _gates.ForEach(gate =>
+            {
+                if (gate.Gate == AND && gate.Input1 != "x00")
+                {
+                    var filter = _gates.Where(g => g.Input1 == gate.Output || g.Input2 == gate.Output).ToList();
+                    foreach (var item in filter)
+                    {
+                        if (item.Gate != OR)
+                        {
+                            rule3Violations.Add(gate.Output);
+                            break;
+                        }
+                    }
+                }
+            });
+            var rule4Violations = new List<string>();
+            _gates.ForEach(gate =>
+            {
+                if (gate.Gate == OR)
+                {
+                    var inputFilter = _gates.Single(g => g.Output == gate.Input1);
+                    if (inputFilter.Gate != AND)
+                    {
+                        rule4Violations.Add(inputFilter.Output);
+                    }
 
-            string yBinaryResult = string.Join("", wireValuesCopy
-                .Where(kvp => kvp.Key.StartsWith("y"))
-                .OrderByDescending(kvp => int.Parse(kvp.Key.Substring(1)))
-                .Select(kvp => kvp.Value.ToString()));
+                    inputFilter = _gates.Single(g => g.Output == gate.Input2);
+                    if (inputFilter.Gate != AND)
+                    {
+                        rule4Violations.Add(inputFilter.Output);
+                    }
+                }
+            });
+            var allViolations = rule1Violations.Concat(rule2Violations).Concat(rule3Violations).Concat(rule4Violations);
+            var distinctViolations = allViolations.Distinct().ToList();
+            distinctViolations.Sort();
 
-            long xDecimalResult = Convert.ToInt64(xBinaryResult, 2);
-            long yDecimalResult = Convert.ToInt64(yBinaryResult, 2);
+            SecondResult = string.Join(',', distinctViolations);
 
-
-
-
-            var simulation = RunSimulation(gatesCopy, wireValuesCopy);
-
-
-            string zBinaryResult = string.Join("", simulation
-                .Where(kvp => kvp.Key.StartsWith("z"))
-                .OrderByDescending(kvp => int.Parse(kvp.Key.Substring(1)))
-                .Select(kvp => kvp.Value.ToString()));
-
-            long zDecimalResult = Convert.ToInt64(zBinaryResult, 2);
-
-            // Fix carry issue
-            var falseCarry = CountTrailingZeroBits(xDecimalResult + yDecimalResult ^ zDecimalResult).ToString();
-            var finalGates = nxz.Concat(xnz)
-            .Concat(gatesCopy.Where(gate => gate.Input1.EndsWith(falseCarry) && gate.Input2.EndsWith(falseCarry)))
-                .Select(gate => gate.Output)
-                .OrderBy(output => output);
-
-
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            return (T)Convert.ChangeType(0, typeof(T));
         }
 
 
@@ -228,35 +219,6 @@ namespace AdventOfCode2024.Problems
             }
 
             return wireValuesCopy;
-        }
-        string FirstZThatUsesC(List<(string Input1, string Gate, string Input2, string Output)> gates, string c)
-        {
-            var dependentGates = gates.Where(gate => gate.Input1 == c || gate.Input2 == c).ToList();
-            var firstZGate = dependentGates.FirstOrDefault(gate => gate.Output.StartsWith("z"));
-            if (firstZGate.Input1 != null && firstZGate.Gate != null && firstZGate.Input2 != null && firstZGate.Output != null)
-            {
-                var result = firstZGate.Output;
-                return result;
-            }
-
-            foreach (var gate in dependentGates)
-            {
-                var result = FirstZThatUsesC(gates, gate.Output);
-                if (result != null) return result;
-            }
-
-            return null;
-        }
-
-        int CountTrailingZeroBits(long value)
-        {
-            int count = 0;
-            while ((value & 1) == 0 && value != 0)
-            {
-                count++;
-                value >>= 1;
-            }
-            return count;
         }
         #endregion
     }
