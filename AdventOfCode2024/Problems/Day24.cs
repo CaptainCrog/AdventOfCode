@@ -1,15 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using AdventOfCode2024.CommonTypes.HelperFunctions.BinaryHelperFunctions;
-using Microsoft.Win32;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day24 : DayBase
     {
