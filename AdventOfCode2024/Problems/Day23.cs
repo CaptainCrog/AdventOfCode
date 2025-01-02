@@ -12,8 +12,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        //string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day23TestInput.txt";
-        string _inputPath = @"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day23PuzzleInput.txt";
+        string _inputPath = @"PASTE PATH HERE";
         int _firstResult = 0;
         string _secondResult = string.Empty;
         Dictionary<string, HashSet<string>> _lanGroupGraph = new();
