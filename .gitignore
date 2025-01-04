@@ -9,8 +9,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-dir_to_ignore/inputs
-
+inputs/*
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
