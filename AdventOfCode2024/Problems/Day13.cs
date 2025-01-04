@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
     public partial class Day13 : DayBase
     {
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         long _firstResult = 0;
         ulong _secondResult = 0;
         List<ClawMachine> _clawMachines = [];
@@ -86,8 +80,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day13()
+        public Day13(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
             SecondResult = SolveSecondProblem<ulong>();
@@ -241,12 +236,12 @@ namespace AdventOfCode2024.Problems
 
     public class ClawMachine
     {
-        Button _buttonA;
-        Button _buttonB;
+        Button? _buttonA;
+        Button? _buttonB;
         (long xValue, long yValue) _prize;
 
 
-        public Button ButtonA
+        public Button? ButtonA
         {
             get => _buttonA;
             set
@@ -257,7 +252,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        public Button ButtonB
+        public Button? ButtonB
         {
             get => _buttonB;
             set

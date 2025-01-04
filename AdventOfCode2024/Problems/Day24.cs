@@ -4,7 +4,7 @@
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         string[] _gatesInput = [];
         long _firstResult = 0;
         string _secondResult = string.Empty;
@@ -56,8 +56,9 @@
         #endregion
 
         #region Constructor
-        public Day24()
+        public Day24(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
             SolveSecondProblem<int>();

@@ -1,6 +1,6 @@
-﻿using AdventOfCode2024.CommonTypes.Enums;
+﻿using CommonTypes.CommonTypes.Enums;
 
-namespace AdventOfCode2024.CommonTypes.Classes
+namespace CommonTypes.CommonTypes.Classes
 {
     /// <summary>
     /// Used for Shortest Path Algorithm

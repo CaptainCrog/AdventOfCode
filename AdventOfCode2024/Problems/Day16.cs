@@ -1,17 +1,12 @@
-﻿using AdventOfCode2024.CommonTypes.Classes;
-using AdventOfCode2024.CommonTypes.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Enums;
 
 namespace AdventOfCode2024.Problems
 {
     public class Day16 : DayBase
     {
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
         (List<List<Node>> paths, int shortestPathScore) _result;
@@ -19,7 +14,6 @@ namespace AdventOfCode2024.Problems
         char[,] _raceMap = new char [0,0];
         Node _start = new();
         Node _end = new();
-        (int row, int col) _startingDirection = (0, 1);
         List<Node> _djikstrasGraph = new ();
         (int dx, int dy, Direction direction)[] _directions = new (int, int, Direction)[]
         {
@@ -78,8 +72,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day16()
+        public Day16(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             SolveBothProblems();
             OutputSolution();

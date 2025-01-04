@@ -6,14 +6,14 @@
 
 
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         ulong _firstResult = 0;
         ulong _secondResult = 0;
         int _sum = 0;
         string _diskMap = string.Empty;
-        List<(string id, int length)> _diskMapDecoded = new List<(string id, int length)>();
-        char[] _antennaFrequencies;
-        List<(int row, int col)> _antinodes = new List<(int, int)>();
+        List<(string id, int length)> _diskMapDecoded = new();
+        char[] _antennaFrequencies = [];
+        List<(int row, int col)> _antinodes = new();
         #endregion
 
         #region Properties
@@ -114,8 +114,9 @@
         #endregion
 
         #region Constructor
-        public Day9()
+        public Day9(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<ulong>();
             SecondResult = SolveSecondProblem<ulong>();

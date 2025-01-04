@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day1 : DayBase
     {
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult;
         int _secondResult;
         int[] _firstList = Array.Empty<int>();
@@ -114,8 +108,9 @@ namespace AdventOfCode2024.Problems
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public Day1()
+        public Day1(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

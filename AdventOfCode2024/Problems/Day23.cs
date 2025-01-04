@@ -1,10 +1,4 @@
-﻿using AdventOfCode2024.CommonTypes.Algorithms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using CommonTypes.CommonTypes.Algorithms;
 
 namespace AdventOfCode2024.Problems
 {
@@ -12,7 +6,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         string _secondResult = string.Empty;
         Dictionary<string, HashSet<string>> _lanGroupGraph = new();
@@ -59,8 +53,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day23()
+        public Day23(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SolveSecondProblem<int>();

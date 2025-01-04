@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
@@ -7,8 +6,8 @@ namespace AdventOfCode2024.Problems
     {
 
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
-        string[] _bridgeCalibrations;
+        string _inputPath = string.Empty;
+        string[] _bridgeCalibrations = [];
         ulong _firstResult = 0;
         ulong _secondResult = 0;
         ulong _sum = 0;
@@ -78,16 +77,12 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day7()
+        public Day7(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
-            var sw = Stopwatch.StartNew();
             FirstResult = SolveFirstProblem<ulong>();
-            Console.WriteLine(sw.ElapsedMilliseconds.ToString());
-
-            sw.Restart();
             SecondResult = SolveSecondProblem<ulong>();
-            Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             OutputSolution();
         }
         #endregion

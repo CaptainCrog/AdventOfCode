@@ -1,5 +1,5 @@
-﻿using AdventOfCode2024.CommonTypes.Classes;
-using AdventOfCode2024.CommonTypes.Enums;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Enums;
 
 namespace AdventOfCode2024.Problems
 {
@@ -7,7 +7,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         (int row, int col) _secondResult = (0, 0);
         int _sum = 0;
@@ -86,8 +86,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day18()
+        public Day18(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<(int row, int col)>();

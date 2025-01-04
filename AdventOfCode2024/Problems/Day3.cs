@@ -6,7 +6,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         string _corruptedData = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
@@ -90,8 +90,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day3()
+        public Day3(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

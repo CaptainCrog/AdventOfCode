@@ -3,7 +3,7 @@
     public class Day2 : DayBase
     {
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         List<string> _reports = new List<string>();
         List<int> _reportValues = new List<int>();
         int _firstResult = 0;
@@ -74,8 +74,9 @@
         #endregion
 
         #region Constructor
-        public Day2()
+        public Day2(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

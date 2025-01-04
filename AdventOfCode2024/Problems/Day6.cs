@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day6 : DayBase
     {
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         char[,] _map = new char[0, 0];
         int _firstResult = 0;
         int _secondResult = 0;
@@ -130,8 +124,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day6()
+        public Day6(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

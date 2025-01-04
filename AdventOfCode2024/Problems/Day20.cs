@@ -1,14 +1,4 @@
-﻿using AdventOfCode2024.CommonTypes.Classes;
-using AdventOfCode2024.CommonTypes.Enums;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
+﻿using CommonTypes.CommonTypes.Classes;
 
 namespace AdventOfCode2024.Problems
 {
@@ -16,7 +6,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
         int _sum = 0;
@@ -95,8 +85,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day20()
+        public Day20(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

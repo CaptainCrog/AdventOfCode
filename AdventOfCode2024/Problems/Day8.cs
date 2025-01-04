@@ -1,24 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day8 : DayBase
     {
 
 
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
         int _sum = 0;
-        string[] _antennaSignals;
-        char[] _antennaFrequencies;
+        string[] _antennaSignals = [];
+        char[] _antennaFrequencies = [];
         List<(int row, int col)> _antinodes = new List<(int, int)>();
         #endregion
 
@@ -109,8 +101,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day8()
+        public Day8(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

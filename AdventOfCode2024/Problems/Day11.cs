@@ -1,12 +1,11 @@
-﻿
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day11 : DayBase
     {
 
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         ulong _secondResult = 0;
         ulong _sumOfStones = 0;
@@ -106,8 +105,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day11()
+        public Day11(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<ulong>();

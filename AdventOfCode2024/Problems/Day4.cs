@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day4 : DayBase
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         string[] _wordSearch = new string[0];
         int _firstResult = 0;
         int _secondResult = 0;
@@ -106,11 +99,12 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day4()
+        public Day4(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<int>(); //2593
-            SecondResult = SolveSecondProblem<int>(); //1950
+            FirstResult = SolveFirstProblem<int>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -263,21 +257,10 @@ namespace AdventOfCode2024.Problems
                     new List<(int yPosition, int xPosition)>{(-1, -1), ( 1, 1) },   // TL with BR
             };
 
-            try
-            {
-                var firstDiagonal = CheckPairCreatesMAS(currentCoordinate, allowedPairedCoordinates.First());
-                var secondDiagonal = CheckPairCreatesMAS(currentCoordinate, allowedPairedCoordinates.Last());
-                if (firstDiagonal && secondDiagonal)
-                    Sum++;
-            }
-            catch (InvalidOperationException ex)
-            {
-                return;
-            }
-            catch (Exception ex)
-            {
-                return;
-            }
+            var firstDiagonal = CheckPairCreatesMAS(currentCoordinate, allowedPairedCoordinates.First());
+            var secondDiagonal = CheckPairCreatesMAS(currentCoordinate, allowedPairedCoordinates.Last());
+            if (firstDiagonal && secondDiagonal)
+                Sum++;
         }
 
         bool CheckPairCreatesMAS((int yPosition, int xPosition) currentCoordinate, List<(int yPosition, int xPosition)> allowedPair)
