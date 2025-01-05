@@ -7,7 +7,7 @@ public static class Menu2024
         while (true)
         {
             Console.WriteLine("Choose which problem to solve (Options between 1 - 25)");
-            Console.WriteLine("Press Q to quit the application");
+            Console.WriteLine("Press Q to return to the main menu");
             var choiceRaw = Console.ReadLine();
             if (choiceRaw != null)
             {
@@ -99,8 +99,8 @@ public static class Menu2024
                 }
                 else if (choiceRaw.ToLower() == "q")
                 {
-                    Console.WriteLine("Exiting program");
-                    Environment.Exit(0);
+                    Console.WriteLine("Returning to main menu");
+                    return;
                 }
                 else
                 {
