@@ -1,11 +1,12 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day2 : DayBase
     {
         #region Fields
         string _inputPath = string.Empty;
-        List<string> _reports = new List<string>();
-        List<int> _reportValues = new List<int>();
+        ThreeDimensionalObject[] _allMeasurements = [];
         int _firstResult = 0;
         int _secondResult = 0;
         #endregion
@@ -19,30 +20,6 @@
                 if (_inputPath != value)
                 {
                     _inputPath = value;
-                }
-            }
-        }
-
-        List<string> Reports
-        {
-            get => _reports;
-            set
-            {
-                if (_reports != value)
-                {
-                    _reports = value;
-                }
-            }
-        }
-
-        List<int> ReportValues
-        {
-            get => _reportValues;
-            set
-            {
-                if (_reportValues != value)
-                {
-                    _reportValues = value;
                 }
             }
         }
@@ -87,91 +64,54 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            Reports = File.ReadLines(_inputPath).ToList();
+            var input = File.ReadLines(_inputPath).ToArray();
+            _allMeasurements = new ThreeDimensionalObject [input.Count()];
+            for (int i = 0; i < input.Count(); i++) 
+            {
+                var stringMeasurements = input[i].Split(['x']);
+                _allMeasurements[i] = new ThreeDimensionalObject(int.Parse(stringMeasurements[0]), int.Parse(stringMeasurements[1]), int.Parse(stringMeasurements[2]));
+            }
         }
 
         public override T SolveFirstProblem<T>()
         {
-            int sumOfValidReports = 0;
-            foreach (var report in Reports)
+            var squareFeet = 0;
+
+            foreach (var measurement in _allMeasurements)
             {
-                ReportValues = report.Split(" ").Select(int.Parse).ToList();
-                bool isAscending = ReportValues.First() < ReportValues.Last();
+                var smallestArea = int.MaxValue;
 
-                var isValid = ProcessReport(ReportValues.ToArray(), isAscending);
-                if (isValid)
-                    sumOfValidReports++;
+                var lw = measurement.Length * measurement.Width;
+                smallestArea = Math.Min(smallestArea, lw);
+                var wh = measurement.Width * measurement.Height;
+                smallestArea = Math.Min(smallestArea, wh);
+                var hl = measurement.Height * measurement.Length;
+                smallestArea = Math.Min(smallestArea, hl);
 
+                squareFeet += (2 * lw) + (2 * wh) + (2 * hl) + smallestArea;
             }
 
-            return (T)Convert.ChangeType(sumOfValidReports, typeof(T));
+            return (T)Convert.ChangeType(squareFeet, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            int sumOfValidReports = 0;
-            foreach (var report in Reports)
+            var feet = 0;
+            foreach (var measurement in _allMeasurements)
             {
-                ReportValues = report.Split(" ").Select(int.Parse).ToList();
-                bool isAscending = ReportValues.First() < ReportValues.Last();
+                var smallestPerimeter = int.MaxValue;
+                var lwh = measurement.Length * measurement.Width * measurement.Height;
+                var lwPerimeter = measurement.Length * 2 + measurement.Width * 2;
+                smallestPerimeter = Math.Min(smallestPerimeter, lwPerimeter);
+                var whPerimeter = measurement.Width * 2 + measurement.Height * 2;
+                smallestPerimeter = Math.Min(smallestPerimeter, whPerimeter);
+                var hlPerimeter = measurement.Height * 2 + measurement.Length * 2;
+                smallestPerimeter = Math.Min(smallestPerimeter, hlPerimeter);
 
-                var isValid = ProcessReport(ReportValues.ToArray(), isAscending);
-                if (!isValid)
-                    isValid = CanReportBeDampened(isAscending);
-
-                if (isValid)
-                    sumOfValidReports++;
-
+                feet += lwh + smallestPerimeter;
             }
-            return (T)Convert.ChangeType(sumOfValidReports, typeof(T));
-        }
 
-        public bool CanReportBeDampened(bool isAscending)
-        {
-            var reportValuesCopy = ReportValues.ToArray();
-            var dampenedReport = new List<int>();
-
-            for (int i = 0; i <= reportValuesCopy.Count() - 1; i++)
-            {
-                dampenedReport = reportValuesCopy.Select((value, index) => new {value, index})
-                                                    .Where(x => x.index != i)
-                                                    .Select(xx => xx.value)
-                                                    .ToList();
-                if(ProcessReport(dampenedReport.ToArray(), isAscending))
-                    return true;
-
-            }
-            return false;
-        }
-
-        private bool ProcessReport(int[] reportValues, bool isAscending)
-        {
-            for (int i = 0; i <= reportValues.Count() - 1; i++)
-            {
-                var currentValue = reportValues[i];
-                if (i != reportValues.Count() - 1)
-                {
-                    var nextValue = reportValues[i + 1];
-                    if (currentValue == nextValue)
-                        return false;
-
-                    else if (isAscending)
-                    {
-                        if (nextValue - currentValue > 3)
-                            return false;
-                        else if (nextValue - currentValue < 0)
-                            return false;
-                    }
-                    else if (!isAscending)
-                    {
-                        if (currentValue - nextValue > 3)
-                            return false;
-                        else if (currentValue - nextValue < 0)
-                            return false;
-                    }
-                }
-            }
-            return true;
+            return (T)Convert.ChangeType(feet, typeof(T));
         }
 
         public override void OutputSolution()
