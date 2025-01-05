@@ -114,19 +114,23 @@ namespace AdventOfCode2015.Problems
             return (T)Convert.ChangeType(niceStringsCount, typeof(T));
         }
 
-
+        //https://regex101.com/r/rbhn2l/1
         [GeneratedRegex(@"a|e|i|o|u")]
         private static partial Regex VowelRegex();
 
+        //https://regex101.com/r/ASMvJN/1
         [GeneratedRegex(@"([a-z]{1})\1")]
         private static partial Regex DoubleLetterRegex();
 
+        //https://regex101.com/r/JLeZ51/1
         [GeneratedRegex(@"ab|cd|pq|xy")]
         private static partial Regex InvalidStringRegex();
 
+        //https://regex101.com/r/Ebdbtt/1
         [GeneratedRegex(@"(..).*\1")]
         private static partial Regex RepeatedStringRegex();
 
+        //https://regex101.com/r/r7gXs3/1
         [GeneratedRegex(@"(.).\1")]
         private static partial Regex SingleLetterRepeatedAfterAnotherLetter();
 
