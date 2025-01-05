@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
     public class Day15 : DayBase
     {
         #region Fields
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
         string _input = string.Empty;
@@ -40,7 +35,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -51,7 +46,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -66,8 +61,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day15()
+        public Day15(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();

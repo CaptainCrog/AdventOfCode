@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdventOfCode2024.CommonTypes.HelperFunctions.BinaryHelperFunctions
+namespace CommonTypes.CommonTypes.HelperFunctions.BinaryHelperFunctions
 {
     public static class ConvertToBinaryArray
     {

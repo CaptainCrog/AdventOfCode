@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
@@ -11,7 +6,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         string _firstResult = string.Empty;
         string _output = string.Empty;
         ulong _secondResult = 0;
@@ -42,12 +37,12 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        string FirstResult
+        public string FirstResult
         {
             get;
             set;
         }
-        ulong SecondResult
+        public ulong SecondResult
         {
             get => _secondResult;
             set
@@ -62,8 +57,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day17()
+        public Day17(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             SolveFirstProblem<int>();
             FirstResult = _output;
@@ -129,7 +125,7 @@ namespace AdventOfCode2024.Problems
         public override T SolveFirstProblem<T>()
         {
             var result = ProcessProgram();
-            _output = string.Join(", ", Array.ConvertAll(result.ToArray(), x => x.ToString()));
+            _output = string.Join(",", Array.ConvertAll(result.ToArray(), x => x.ToString()));
             return (T)Convert.ChangeType(0, typeof(T));
         }
 

@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Reflection.Metadata.BlobBuilder;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day12 : DayBase
     {
 
         #region Fields
-        string _inputPath = @"PASTE PATH HERE"; 
+        string _inputPath = string.Empty; 
         int _firstResult = 0;
         ulong _secondResult = 0;
         string[] _gardenPlot = [];
@@ -35,7 +28,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -46,7 +39,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        ulong SecondResult
+        public ulong SecondResult
         {
             get => _secondResult;
             set
@@ -96,8 +89,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day12()
+        public Day12(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<ulong>();

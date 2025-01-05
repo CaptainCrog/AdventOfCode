@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdventOfCode2024.CommonTypes.HelperFunctions.BinaryHelperFunctions
+namespace CommonTypes.CommonTypes.HelperFunctions.BinaryHelperFunctions
 {
     public static class PerformBinaryAddition
     {
@@ -19,8 +19,8 @@ namespace AdventOfCode2024.CommonTypes.HelperFunctions.BinaryHelperFunctions
                 int bitFirstNumber = i < firstNumber.Length ? firstNumber[i] : 0;
                 int bitSecondNumber = i < secondNumber.Length ? secondNumber[i] : 0;
 
-                result[i] = (bitFirstNumber ^ bitSecondNumber ^ carry); // XOR for the sum
-                carry = (bitFirstNumber & bitSecondNumber) | (carry & (bitFirstNumber ^ bitSecondNumber));
+                result[i] = bitFirstNumber ^ bitSecondNumber ^ carry; // XOR for the sum
+                carry = bitFirstNumber & bitSecondNumber | carry & (bitFirstNumber ^ bitSecondNumber);
             }
 
             result[length] = carry;

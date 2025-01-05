@@ -1,21 +1,10 @@
-﻿using AdventOfCode2024.CommonTypes.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.Intrinsics.X86;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day21 : DayBase
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         long _firstResult = 0;
         long _secondResult = 0;
         string[] _codes = [];
@@ -39,7 +28,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        long FirstResult
+        public long FirstResult
         {
             get => _firstResult;
             set
@@ -50,7 +39,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        long SecondResult
+        public long SecondResult
         {
             get => _secondResult;
             set
@@ -64,8 +53,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day21()
+        public Day21(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
             SecondResult = SolveSecondProblem<long>();

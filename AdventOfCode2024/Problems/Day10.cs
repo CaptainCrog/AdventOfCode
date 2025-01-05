@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day10 : DayBase
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
         int _trailHeadScore = 0;
@@ -35,7 +29,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -46,7 +40,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -118,8 +112,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day10()
+        public Day10(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             SolveProblems(); //Made specific function which would do all the bulk work since each part didnt need anything huge changing
             OutputSolution();

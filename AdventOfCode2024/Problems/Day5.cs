@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
@@ -11,7 +6,7 @@ namespace AdventOfCode2024.Problems
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         List<string> _pageOrderingRules = new();
         List<string> _pagesToProduce = new();
         List<string> _invalidPages = new();
@@ -36,7 +31,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -47,7 +42,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -118,8 +113,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day5()
+        public Day5(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();
@@ -188,7 +184,7 @@ namespace AdventOfCode2024.Problems
                     GroupedRules.TryGetValue(numbers[i], out var group);
                     for (int j = i + 1; j < numbers.Count; j++)
                     {
-                        if (!group.Contains(numbers[j]))
+                        if (group == null || !group.Contains(numbers[j]))
                         {
                             pageInvalid = true;
                             InvalidPages.Add(page);

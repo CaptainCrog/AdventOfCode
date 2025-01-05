@@ -1,13 +1,10 @@
-﻿
-using System.Text.RegularExpressions;
-
-namespace AdventOfCode2024.Problems
+﻿namespace AdventOfCode2024.Problems
 {
     public class Day19 : DayBase
     {
         #region Fields
 
-        string _inputPath = @"PASTE PATH HERE";
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         long _secondResult = 0;
         int _sum = 0;
@@ -30,7 +27,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -41,7 +38,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        long SecondResult
+        public long SecondResult
         {
             get => _secondResult;
             set
@@ -67,8 +64,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day19()
+        public Day19(string inputPath)
         {
+            _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<long>();
