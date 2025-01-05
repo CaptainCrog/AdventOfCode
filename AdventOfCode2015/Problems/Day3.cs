@@ -1,17 +1,18 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
-    public partial class Day3 : DayBase
+    public class Day3 : DayBase
     {
         #region Fields
 
         string _inputPath = string.Empty;
-        string _corruptedData = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        int _sum = 0;
-        List<int> _multipliedNumbers = [];
+        string _movements = string.Empty;
+        Node[] _santaPositions = [];
+        Node[] _roboSantaPositions = [];
 
         #endregion
 
@@ -51,42 +52,6 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-
-        string CorruptedData
-        {
-            get => _corruptedData;
-            set
-            {
-                if (_corruptedData != value)
-                {
-                    _corruptedData = value;
-                }
-            }
-        }
-
-        List<int> MultipliedNumbers
-        {
-            get => _multipliedNumbers;
-            set
-            {
-                if (_multipliedNumbers != value)
-                {
-                    _multipliedNumbers = value;
-                }
-            }
-        }
-
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
         #endregion
 
         #region Constructor
@@ -103,7 +68,7 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            CorruptedData = File.ReadAllText(_inputPath);
+            _movements = File.ReadAllText(_inputPath);
         }
 
         public override void OutputSolution()
@@ -114,64 +79,114 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            Sum = 0;
-            MultipliedNumbers = new List<int>();
-            var regex = Part1Regex();
-            var matches = regex.Matches(CorruptedData);
-
-            foreach (var match in matches)
+            _santaPositions = new Node[_movements.Length + 1];
+            var currentNode = new Node() { X = 0, Y = 0 };
+            _santaPositions[0] = currentNode;
+            for (int i = 0; i < _movements.Length; i++)
             {
-                var rawNums = GetRawNumsFromString(match);
-                MultipliedNumbers.Add(int.Parse(rawNums.First()) * int.Parse(rawNums.Last()));
+                var movement = _movements[i];
+                var nextNode = new Node() { X = currentNode.X, Y = currentNode.Y };
+                if (movement == '^')
+                {
+                    nextNode.X = currentNode.X + 1;
+                    _santaPositions[i+1] = nextNode;
+                }
+                else if (movement == '>')
+                {
+                    nextNode.Y = currentNode.Y + 1;
+                    _santaPositions[i+1] = nextNode;
+                }
+                else if (movement == 'v')
+                {
+                    nextNode.X = currentNode.X - 1;
+                    _santaPositions[i+1] = nextNode;
+                }
+                else
+                {
+                    nextNode.Y = currentNode.Y - 1;
+                    _santaPositions[i+1] = nextNode;
+                }
+                currentNode = nextNode;
             }
 
-            Sum = MultipliedNumbers.Sum();
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            var distinctPositions = _santaPositions.DistinctBy(node => new { node.X, node.Y }).ToList();
+
+            return (T)Convert.ChangeType(distinctPositions.Count, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            Sum = 0;
-            MultipliedNumbers = new List<int>();
-            var regex = Part2Regex();
-            bool processMatches = true;
 
-            var matches = regex.Matches(CorruptedData);
-            foreach (var match in matches)
+            _santaPositions = new Node[_movements.Length/2 + 1];
+            _roboSantaPositions = new Node[_movements.Length / 2 + 1];
+            var currentSantaNode = new Node() { X = 0, Y = 0 };
+            var currentRoboSantaNode = new Node() { X = 0, Y = 0 };
+            _santaPositions[0] = currentSantaNode;
+            _roboSantaPositions[0] = currentRoboSantaNode;
+            var santaIterator = 1;
+            var roboSantaIterator = 1;
+
+            for (int i = 0; i < _movements.Length; i++)
             {
-                var matchString = match.ToString();
-                if (matchString.Contains("do()"))
+                var movement = _movements[i];
+                if (i % 2 == 0)
                 {
-                    processMatches = true;
-                    continue;
+                    var nextNode = new Node() { X = currentSantaNode.X, Y = currentSantaNode.Y };
+                    if (movement == '^')
+                    {
+                        nextNode.X = currentSantaNode.X + 1;
+                        _santaPositions[santaIterator] = nextNode;
+                    }
+                    else if (movement == '>')
+                    {
+                        nextNode.Y = currentSantaNode.Y + 1;
+                        _santaPositions[santaIterator] = nextNode;
+                    }
+                    else if (movement == 'v')
+                    {
+                        nextNode.X = currentSantaNode.X - 1;
+                        _santaPositions[santaIterator] = nextNode;
+                    }
+                    else
+                    {
+                        nextNode.Y = currentSantaNode.Y - 1;
+                        _santaPositions[santaIterator] = nextNode;
+                    }
+                    currentSantaNode = nextNode;
+                    santaIterator++;
                 }
-                else if (matchString.Contains("don't()"))
+                else
                 {
-                    processMatches = false;
-                    continue;
-                }
-                if (processMatches)
-                {
-                    var rawNums = GetRawNumsFromString(match);
-                    MultipliedNumbers.Add(int.Parse(rawNums.First()) * int.Parse(rawNums.Last()));
+                    var nextNode = new Node() { X = currentRoboSantaNode.X, Y = currentRoboSantaNode.Y };
+                    if (movement == '^')
+                    {
+                        nextNode.X = currentRoboSantaNode.X + 1;
+                        _roboSantaPositions[roboSantaIterator] = nextNode;
+                    }
+                    else if (movement == '>')
+                    {
+                        nextNode.Y = currentRoboSantaNode.Y + 1;
+                        _roboSantaPositions[roboSantaIterator] = nextNode;
+                    }
+                    else if (movement == 'v')
+                    {
+                        nextNode.X = currentRoboSantaNode.X - 1;
+                        _roboSantaPositions[roboSantaIterator] = nextNode;
+                    }
+                    else
+                    {
+                        nextNode.Y = currentRoboSantaNode.Y - 1;
+                        _roboSantaPositions[roboSantaIterator] = nextNode;
+                    }
+                    currentRoboSantaNode = nextNode;
+                    roboSantaIterator++;
                 }
             }
+            var allPositions = _santaPositions.Concat(_roboSantaPositions).ToArray();
+            var distinctSantaPositions = allPositions.DistinctBy(node => new { node.X, node.Y }).ToList();
 
-            Sum = MultipliedNumbers.Sum();
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            return (T)Convert.ChangeType(distinctSantaPositions.Count(), typeof(T));
         }
-
-        private List<string> GetRawNumsFromString(object match)
-        {
-            return SplitNumberCharacters().Split(match.ToString()).Where(x => !String.IsNullOrEmpty(x)).ToList();
-        }
-
-        [GeneratedRegex(@"[mul]{3}\([0-9]{1,3},[0-9]{1,3}\)")]
-        private static partial Regex Part1Regex();
-        [GeneratedRegex(@"[mul]{3}\([0-9]{1,3},[0-9]{1,3}\)|[do]{2}\(\)|[don]{3}[']{1}[t]{1}\(\)")]
-        private static partial Regex Part2Regex();
-        [GeneratedRegex(@"\D")]
-        private static partial Regex SplitNumberCharacters();
 
         #endregion
     }
