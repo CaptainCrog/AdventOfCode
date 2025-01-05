@@ -1,5 +1,4 @@
 ﻿using CommonTypes.CommonTypes.Classes;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
