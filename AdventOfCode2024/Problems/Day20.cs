@@ -10,6 +10,7 @@ namespace AdventOfCode2024.Problems
         int _firstResult = 0;
         int _secondResult = 0;
         int _sum = 0;
+        int _targetCheatTime = 0;
         Dictionary<Node, int> _initialRun = new();
         char[,] _charPositions = new char[0, 0];
         Node _start = new Node()
@@ -48,7 +49,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -59,7 +60,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -85,9 +86,10 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day20(string inputPath)
+        public Day20(string inputPath, int targetCheatTime)
         {
             _inputPath = inputPath;
+            _targetCheatTime = targetCheatTime;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();
@@ -137,7 +139,7 @@ namespace AdventOfCode2024.Problems
         {
             Sum = 0;
             var results = CalculateWithCheats(2, _initialRun);
-            Sum = results.Where(x => x.timeSaved >= 100).Select(x => x.timeSaved).Count();
+            Sum = results.Where(x => x.timeSaved >= _targetCheatTime).Select(x => x.timeSaved).Count();
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
 
@@ -145,7 +147,7 @@ namespace AdventOfCode2024.Problems
         {
             Sum = 0;
             var results = CalculateWithCheats(20, _initialRun);
-            Sum = results.Where(x => x.timeSaved >= 100).Select(x => x.timeSaved).Count();
+            Sum = results.Where(x => x.timeSaved >= _targetCheatTime).Select(x => x.timeSaved).Count();
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
 

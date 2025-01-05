@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode2024", "AdventOfCode2024\AdventOfCode2024.csproj", "{DB1CC978-D2D4-4A81-81B2-61EA9FFB090F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonTypes", "CommonTypes\CommonTypes.csproj", "{6B116CDF-ADD6-4021-B542-884C4E125E5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonTypes", "CommonTypes\CommonTypes.csproj", "{6B116CDF-ADD6-4021-B542-884C4E125E5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shell", "Shell\Shell.csproj", "{EED8F042-B6A9-4407-A53E-3953353B9877}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shell", "Shell\Shell.csproj", "{EED8F042-B6A9-4407-A53E-3953353B9877}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DB1CC978-D2D4-4A81-81B2-61EA9FFB090F} = {DB1CC978-D2D4-4A81-81B2-61EA9FFB090F}
 	EndProjectSection
@@ -21,13 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5A482189-3E4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E891E9C2-A98F-4923-8B3B-7EAB5042CE61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdventOfCode2024Tests", "AdventOfCode2024Tests\AdventOfCode2024Tests.csproj", "{B7EDC80A-8BFA-49AB-A61B-618DBD8542A9}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "inputs", "inputs", "{86C5F07F-AE84-4EC6-A3CB-6323493FEFF7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DA371DF2-508C-4F06-89AE-AC6B431C6A4D}"
-	ProjectSection(SolutionItems) = preProject
-		C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day8TestInput.txt = C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\TestInputs\AdventOfCode2024Day8TestInput.txt
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode2024Tests", "AdventOfCode2024Tests\AdventOfCode2024Tests.csproj", "{B7EDC80A-8BFA-49AB-A61B-618DBD8542A9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DB1CC978-D2D4-4A81-81B2-61EA9FFB090F} = {DB1CC978-D2D4-4A81-81B2-61EA9FFB090F}
 	EndProjectSection
 EndProject
 Global
@@ -61,7 +57,6 @@ Global
 		{6B116CDF-ADD6-4021-B542-884C4E125E5B} = {5A482189-3E43-44AA-91D1-D51531FFB850}
 		{EED8F042-B6A9-4407-A53E-3953353B9877} = {5A482189-3E43-44AA-91D1-D51531FFB850}
 		{B7EDC80A-8BFA-49AB-A61B-618DBD8542A9} = {E891E9C2-A98F-4923-8B3B-7EAB5042CE61}
-		{DA371DF2-508C-4F06-89AE-AC6B431C6A4D} = {86C5F07F-AE84-4EC6-A3CB-6323493FEFF7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B28518A0-453D-4047-8F9B-035EB2F7FF27}

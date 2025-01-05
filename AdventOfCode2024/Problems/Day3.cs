@@ -29,7 +29,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -40,7 +40,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set

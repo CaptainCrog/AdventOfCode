@@ -37,12 +37,12 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        string FirstResult
+        public string FirstResult
         {
             get;
             set;
         }
-        ulong SecondResult
+        public ulong SecondResult
         {
             get => _secondResult;
             set
@@ -125,7 +125,7 @@ namespace AdventOfCode2024.Problems
         public override T SolveFirstProblem<T>()
         {
             var result = ProcessProgram();
-            _output = string.Join(", ", Array.ConvertAll(result.ToArray(), x => x.ToString()));
+            _output = string.Join(",", Array.ConvertAll(result.ToArray(), x => x.ToString()));
             return (T)Convert.ChangeType(0, typeof(T));
         }
 

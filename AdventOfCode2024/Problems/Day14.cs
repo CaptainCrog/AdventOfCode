@@ -42,7 +42,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        long FirstResult
+        public long FirstResult
         {
             get => _firstResult;
             set
@@ -53,7 +53,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        ulong SecondResult
+        public ulong SecondResult
         {
             get => _secondResult;
             set

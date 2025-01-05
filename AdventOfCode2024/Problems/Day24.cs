@@ -7,6 +7,7 @@
         string _inputPath = string.Empty;
         string[] _gatesInput = [];
         long _firstResult = 0;
+        string _lastZOutput = string.Empty;
         string _secondResult = string.Empty;
         Dictionary<string, int> _wireValues = new(); 
         List<(string Input1, string Gate, string Input2, string Output)> _gates = new();
@@ -31,7 +32,7 @@
         }
 
 
-        long FirstResult
+        public long FirstResult
         {
             get => _firstResult;
             set
@@ -42,7 +43,7 @@
                 }
             }
         }
-        string SecondResult
+        public string SecondResult
         {
             get => _secondResult;
             set
@@ -56,9 +57,10 @@
         #endregion
 
         #region Constructor
-        public Day24(string inputPath)
+        public Day24(string inputPath, string lastZOutput)
         {
             _inputPath = inputPath;
+            _lastZOutput = lastZOutput;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
             SolveSecondProblem<int>();
@@ -132,7 +134,7 @@
 
 
             // Find gates violating the rules
-            var rule1Violations = _gates.Where(gate => gate.Output.StartsWith("z") && gate.Output != "z45" && gate.Gate != XOR).Select(x => x.Output).ToList();
+            var rule1Violations = _gates.Where(gate => gate.Output.StartsWith("z") && gate.Output != _lastZOutput && gate.Gate != XOR).Select(x => x.Output).ToList();
             var rule2Violations = _gates.Where(gate => !gate.Input1.StartsWith("x") && !gate.Output.StartsWith("z") && gate.Gate == XOR).Select(x => x.Output).ToList();
             var rule3Violations = new List<string>();
             _gates.ForEach(gate =>
@@ -155,14 +157,14 @@
             {
                 if (gate.Gate == OR)
                 {
-                    var inputFilter = _gates.Single(g => g.Output == gate.Input1);
-                    if (inputFilter.Gate != AND)
+                    var inputFilter = _gates.SingleOrDefault(g => g.Output == gate.Input1);
+                    if (inputFilter.Output != null && inputFilter.Gate != AND)
                     {
                         rule4Violations.Add(inputFilter.Output);
                     }
 
-                    inputFilter = _gates.Single(g => g.Output == gate.Input2);
-                    if (inputFilter.Gate != AND)
+                    inputFilter = _gates.SingleOrDefault(g => g.Output == gate.Input2);
+                    if (inputFilter.Output != null && inputFilter.Gate != AND)
                     {
                         rule4Violations.Add(inputFilter.Output);
                     }

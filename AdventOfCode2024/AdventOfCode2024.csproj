@@ -15,4 +15,10 @@
     <ProjectReference Include="..\CommonTypes\CommonTypes.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Inputs\Puzzles\Day1Puzzle.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

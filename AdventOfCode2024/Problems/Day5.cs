@@ -31,7 +31,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -42,7 +42,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -184,7 +184,7 @@ namespace AdventOfCode2024.Problems
                     GroupedRules.TryGetValue(numbers[i], out var group);
                     for (int j = i + 1; j < numbers.Count; j++)
                     {
-                        if (!group.Contains(numbers[j]))
+                        if (group == null || !group.Contains(numbers[j]))
                         {
                             pageInvalid = true;
                             InvalidPages.Add(page);

@@ -8,11 +8,11 @@ namespace AdventOfCode2024.Problems
         #region Fields
 
         string _inputPath = string.Empty;
+        int _numberOfBytes = 0;
         int _firstResult = 0;
         (int row, int col) _secondResult = (0, 0);
-        int _sum = 0;
         List<(int row, int col)> _bytePositions = new();
-        char[,] _charPositions = new char [71,71];
+        char[,] _charPositions = new char [0,0];
         Node _start = new Node()
         {
             X = 0,
@@ -49,7 +49,7 @@ namespace AdventOfCode2024.Problems
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -60,7 +60,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-        (int row, int col) SecondResult
+        public (int row, int col) SecondResult
         {
             get => _secondResult;
             set
@@ -71,24 +71,33 @@ namespace AdventOfCode2024.Problems
                 }
             }
         }
-
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
         #endregion
 
         #region Constructor
-        public Day18(string inputPath)
+        public Day18(string inputPath, int numberOfBytes)
         {
             _inputPath = inputPath;
+            _numberOfBytes = numberOfBytes;
+            if (_numberOfBytes == 12)
+            {
+                _charPositions = new char[7, 7];
+                _end = new Node()
+                {
+                    X = 6,
+                    Y = 6,
+                };
+            }
+            else
+            {
+                _charPositions = new char[71, 71];
+                _end = new Node()
+                {
+                    X = 70,
+                    Y = 70,
+                };
+            }
+
+
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<(int row, int col)>();
@@ -124,12 +133,11 @@ namespace AdventOfCode2024.Problems
         /// <returns></returns>
         public override T SolveFirstProblem<T>()
         {
-            Sum = 0;
-            WriteGrid(1024);
+            WriteGrid(_numberOfBytes);
             var result = FindShortestPath(_charPositions, _start, _end);
 
 
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         /// <summary>
@@ -139,7 +147,6 @@ namespace AdventOfCode2024.Problems
         /// <returns></returns>
         public override T SolveSecondProblem<T>()
         {
-            Sum = 0;
             int low = 0;
             int high = _bytePositions.Count() - 1;
             int cutoffIteration = -1;
@@ -163,7 +170,7 @@ namespace AdventOfCode2024.Problems
 
 
             // Find the coordinate at the cutoff iteration
-            (int row, int col) cutoffCoordinate = cutoffIteration >= 0 ? _bytePositions[cutoffIteration] : default;
+            (int row, int col) cutoffCoordinate = cutoffIteration >= 0 ? _bytePositions[cutoffIteration-1] : default;
             return (T)Convert.ChangeType(cutoffCoordinate, typeof(T));
         }
 
@@ -181,7 +188,7 @@ namespace AdventOfCode2024.Problems
                 }
             }
 
-            var bytes = _bytePositions.Take(numberOfBytes+1).ToList();
+            var bytes = _bytePositions.Take(numberOfBytes).ToList();
             foreach(var item in bytes)
             {
                 _charPositions[item.row, item.col] = '#';

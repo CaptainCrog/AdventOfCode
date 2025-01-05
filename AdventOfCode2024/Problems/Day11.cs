@@ -32,7 +32,7 @@
         }
 
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -43,7 +43,7 @@
                 }
             }
         }
-        ulong SecondResult
+        public ulong SecondResult
         {
             get => _secondResult;
             set

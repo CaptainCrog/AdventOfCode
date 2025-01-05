@@ -27,7 +27,7 @@
             }
         }
 
-        int FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -38,7 +38,7 @@
                 }
             }
         }
-        int SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set

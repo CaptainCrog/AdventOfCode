@@ -17,79 +17,79 @@ public static class Menu2024
                     switch (choiceSanitised)
                     {
                         case 1:
-                            _ = new Day1(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day1PuzzleInput.txt");
+                            _ = new Day1(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day1Puzzle.txt");
                             break;
                         case 2:
-                            _ = new Day2(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day2PuzzleInput.txt");
+                            _ = new Day2(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day2Puzzle.txt");
                             break;
                         case 3:
-                            _ = new Day3(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day3PuzzleInput.txt");
+                            _ = new Day3(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day3Puzzle.txt");
                             break;
                         case 4:
-                            _ = new Day4(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day4PuzzleInput.txt");
+                            _ = new Day4(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day4Puzzle.txt");
                             break;
                         case 5:
-                            _ = new Day5(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day5PuzzleInput.txt");
+                            _ = new Day5(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day5Puzzle.txt");
                             break;
                         case 6:
-                            _ = new Day6(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day6PuzzleInput.txt");
+                            _ = new Day6(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day6Puzzle.txt");
                             break;
                         case 7:
-                            _ = new Day7(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day7PuzzleInput.txt");
+                            _ = new Day7(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day7Puzzle.txt");
                             break;
                         case 8:
-                            _ = new Day8(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day8PuzzleInput.txt");
+                            _ = new Day8(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day8Puzzle.txt");
                             break;
                         case 9:
-                            _ = new Day9(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day9PuzzleInput.txt");
+                            _ = new Day9(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day9Puzzle.txt");
                             break;
                         case 10:
-                            _ = new Day10(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day10PuzzleInput.txt");
+                            _ = new Day10(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day10Puzzle.txt");
                             break;
                         case 11:
-                            _ = new Day11(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day11PuzzleInput.txt");
+                            _ = new Day11(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day11Puzzle.txt");
                             break;
                         case 12:
-                            _ = new Day12(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day12PuzzleInput.txt");
+                            _ = new Day12(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day12Puzzle.txt");
                             break;
                         case 13:
-                            _ = new Day13(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day13PuzzleInput.txt");
+                            _ = new Day13(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day13Puzzle.txt");
                             break;
                         case 14:
-                            _ = new Day14(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day14PuzzleInput.txt");
+                            _ = new Day14(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day14Puzzle.txt");
                             break;
                         case 15:
-                            _ = new Day15(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day15PuzzleInput.txt");
+                            _ = new Day15(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day15Puzzle.txt");
                             break;
                         case 16:
-                            _ = new Day16(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day16PuzzleInput.txt");
+                            _ = new Day16(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day16Puzzle.txt");
                             break;
                         case 17:
-                            _ = new Day17(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day17PuzzleInput.txt");
+                            _ = new Day17(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day17Puzzle.txt");
                             break;
                         case 18:
-                            _ = new Day18(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day18PuzzleInput.txt");
+                            _ = new Day18(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day18Puzzle.txt", 1024);
                             break;
                         case 19:
-                            _ = new Day19(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day19PuzzleInput.txt");
+                            _ = new Day19(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day19Puzzle.txt");
                             break;
                         case 20:
-                            _ = new Day20(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day20PuzzleInput.txt");
+                            _ = new Day20(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day20Puzzle.txt", 100);
                             break;
                         case 21:
-                            _ = new Day21(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day21PuzzleInput.txt");
+                            _ = new Day21(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day21Puzzle.txt");
                             break;
                         case 22:
-                            _ = new Day22(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day22PuzzleInput.txt");
+                            _ = new Day22(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day22Puzzle.txt");
                             break;
                         case 23:
-                            _ = new Day23(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day23PuzzleInput.txt");
+                            _ = new Day23(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day23Puzzle.txt");
                             break;
                         case 24:
-                            _ = new Day24(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day24PuzzleInput.txt");
+                            _ = new Day24(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day24Puzzle.txt", "z45");
                             break;
                         case 25:
-                            _ = new Day25(@"C:\Users\Craig\Desktop\AdventOfCodePuzzleInputs\2024\PuzzleInputs\AdventOfCode2024Day25PuzzleInput.txt");
+                            _ = new Day25(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day25Puzzle.txt");
                             break;
                         default:
                             Console.WriteLine("Option is out of bound or unavailable at the moment");
