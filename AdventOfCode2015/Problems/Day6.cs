@@ -1,19 +1,19 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
+using System.Linq;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day6 : DayBase
     {
         #region Fields
         string _inputPath = string.Empty;
-        char[,] _map = new char[0, 0];
         int _firstResult = 0;
         int _secondResult = 0;
-        int _sum = 0;
-        int _maxX = 0;
-        int _maxY = 0;
-        (int yPos, int xPos, char direction) _guard;
-        (int yPos, int xPos, char direction) _initialStart;
-        HashSet<(int yPos, int xPos, char direction)> _traversedCoordinates = new();
-        int _callCount = 0;
+        bool[,] _lightGrid = new bool [1000,1000];
+        int[,] _brightnessGrid = new int[1000, 1000];
+        List<LightChange> _lightChanges = new();
+
         #endregion
 
         #region Properties
@@ -25,18 +25,6 @@
                 if (_inputPath != value)
                 {
                     _inputPath = value;
-                }
-            }
-        }
-
-        char[,] Map
-        {
-            get => _map;
-            set
-            {
-                if (_map != value)
-                {
-                    _map = value;
                 }
             }
         }
@@ -64,63 +52,6 @@
             }
         }
 
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
-        (int yPos, int xPos, char direction) Guard
-        {
-            get => _guard;
-            set
-            {
-                if (_guard != value)
-                {
-                    _guard = value;
-                }
-            }
-        }
-        HashSet<(int yPos, int xPos, char direction)> TraversedCoordinates
-        {
-            get => _traversedCoordinates;
-            set
-            {
-                if (_traversedCoordinates != value)
-                {
-                    _traversedCoordinates = value;
-                }
-            }
-        }
-        int MaxX
-        {
-            get => _maxX;
-            set
-            {
-                if (_maxX != value)
-                {
-                    _maxX = value;
-                }
-            }
-        }
-        int MaxY
-        {
-            get => _maxY;
-            set
-            {
-                if (_maxY != value)
-                {
-                    _maxY = value;
-                }
-            }
-        }
-
-
         #endregion
 
         #region Constructor
@@ -138,55 +69,109 @@
         public override void InitialiseProblem()
         {
             var input = File.ReadLines(_inputPath).ToArray();
-            MaxX = input[0].Length;
-            MaxY = input.Length;
-            Map = new char[MaxY, MaxX];
-            for (int i = 0; i < MaxY; i++)
+            foreach (var line in input) 
             {
-                for (int j = 0; j < MaxX; j++)
+                var numberRegex = new Regex(@"\d+");
+                var matches = numberRegex.Matches(line);
+                var fromX = int.Parse(matches[0].Value);
+                var fromY = int.Parse(matches[1].Value);
+                var toX = int.Parse(matches[2].Value);
+                var toY = int.Parse(matches[3].Value);
+                if (line.Contains("turn"))
                 {
-                    Map[i, j] = input[i][j];
-                    if (Map[i, j] == '^')
+                    if (line.Contains("on"))
                     {
-                        Guard = (i, j, '^');
-                        _initialStart = (i, j, '^');
-                        TraversedCoordinates.Add((_initialStart.yPos, _initialStart.xPos, '^'));
+                        _lightChanges.Add(new LightChange(LightCommand.ON, fromX, fromY, toX, toY));
+                    }
+                    else
+                    {
+                        _lightChanges.Add(new LightChange(LightCommand.OFF, fromX, fromY, toX, toY));
                     }
                 }
+                else
+                {
+                    _lightChanges.Add(new LightChange(LightCommand.SWITCH, fromX, fromY, toX, toY));
+                }
             }
+
         }
 
         public override T SolveFirstProblem<T>()
         {
-            CalculateGuardsTrajectory((-1, 0));
-            Sum = TraversedCoordinates.Select(x => (x.xPos, x.yPos)).Distinct().Count();
+            foreach (var lightChange in _lightChanges)
+            {
+                for (int i = lightChange.From.X; i <= lightChange.To.X; i++)
+                {
+                    for (int j = lightChange.From.Y; j <= lightChange.To.Y; j++)
+                    {
+                        bool lightState;
 
-            return (T)Convert.ChangeType(Sum, typeof(T));
+                        if (lightChange.LightCommand == LightCommand.ON)
+                            lightState = true;
+                        else if (lightChange.LightCommand == LightCommand.OFF)
+                            lightState = false;
+                        else
+                            lightState = !_lightGrid[i, j];
+
+                        _lightGrid[i, j] = lightState;
+                    }
+                }
+            }
+
+            var lightsOn = 0;
+
+            for (int i = 0; i < _lightGrid.GetLength(0); i++)
+            {
+                for (int j = 0; j < _lightGrid.GetLength(1); j++)
+                {
+                    if (_lightGrid[i, j] == true)
+                        lightsOn++;
+                }
+            }
+
+            return (T)Convert.ChangeType(lightsOn, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-
-            Console.WriteLine("Starting PART 2");
-            Sum = 0;
-            // Navigate only the co-ordinates we know the guard will move across
-            var distinctTraversalGridPath = TraversedCoordinates.Select(x => (x.yPos, x.xPos)).Distinct().ToList();
-            foreach (var gridPath in distinctTraversalGridPath)
+            foreach (var lightChange in _lightChanges)
             {
-                TraversedCoordinates = new();
-                Console.WriteLine($"Current Iteration {gridPath.yPos},{gridPath.xPos}");
-                Guard = _initialStart;
+                for (int i = lightChange.From.X; i <= lightChange.To.X; i++)
+                {
+                    for (int j = lightChange.From.Y; j <= lightChange.To.Y; j++)
+                    {
+                        int lightBrightness;
+                        long currentBrightness = _brightnessGrid[i, j];
 
-                if (gridPath == (_initialStart.yPos, _initialStart.xPos))
-                    continue;
+                        if (lightChange.LightCommand == LightCommand.ON)
+                            lightBrightness = 1;
+                        else if (lightChange.LightCommand == LightCommand.OFF)
+                        {
+                            if (currentBrightness != 0)
+                                lightBrightness = -1;
+                            else
+                                lightBrightness = 0;
+                        }
+                        else
+                            lightBrightness = 2;
 
-                Map[gridPath.yPos, gridPath.xPos] = '0';
-                CalculateGuardsTrajectory((-1, 0));
-                Map[gridPath.yPos, gridPath.xPos] = '.';
-                Console.WriteLine($"Call {_callCount}");
+                        _brightnessGrid[i, j] = _brightnessGrid[i, j] += lightBrightness;
+                    }
+                }
             }
 
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            int lightsTotalBrightness = 0;
+
+            for (int i = 0; i < _brightnessGrid.GetLength(0); i++)
+            {
+                for (int j = 0; j < _brightnessGrid.GetLength(1); j++)
+                {
+                    lightsTotalBrightness += _brightnessGrid[i,j];
+                }
+            }
+
+
+            return (T)Convert.ChangeType(lightsTotalBrightness, typeof(T));
         }
 
 
@@ -195,47 +180,66 @@
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
-
-        void CalculateGuardsTrajectory((int yPos, int xPos) direction, char directionalArrow = '^')
-        {
-
-            while (true)
-            {
-                (int yPos, int xPos, char direction) nextPos = (Guard.yPos + direction.yPos, Guard.xPos + direction.xPos, directionalArrow);
-                if (IsNextPositionOutOfBounds((Guard.yPos, Guard.xPos), direction))
-                    return;
-                else if (Map[nextPos.yPos, nextPos.xPos] == '#' || Map[nextPos.yPos, nextPos.xPos] == '0')
-                    break;
-                else
-                {
-                    Guard = nextPos;
-                    if (!TraversedCoordinates.Add(nextPos))
-                    {
-                        Sum++;
-                        return;
-                    }
-                }
-            }
-
-            if (directionalArrow == '^')
-                CalculateGuardsTrajectory((0, 1), '>');
-            else if (directionalArrow == '>')
-                CalculateGuardsTrajectory((1, 0), 'v');
-            else if (directionalArrow == 'v')
-                CalculateGuardsTrajectory((0, -1), '<');
-            else
-                CalculateGuardsTrajectory((-1, 0), '^');
-        }
-
-        bool IsNextPositionOutOfBounds((int yPos, int xPos) guardPos, (int yPos, int xPos) direction)
-        {
-            return guardPos.xPos + direction.xPos == -1 ||
-                   guardPos.yPos + direction.yPos == -1 ||
-                   guardPos.xPos + direction.xPos == MaxX ||
-                   guardPos.yPos + direction.yPos == MaxY;
-        }
-
         #endregion
 
+    }
+
+    internal class LightChange
+    {
+        LightCommand _lightCommand;
+        Node _from;
+        Node _to;
+
+        public LightCommand LightCommand
+        {
+            get => _lightCommand;
+            private set
+            {
+                if ( _lightCommand != value ) 
+                {
+                    _lightCommand = value;
+                }
+            }
+        }
+
+
+        public Node From
+        {
+            get => _from;
+            private set
+            {
+                if (_from != value)
+                {
+                    _from = value;
+                }
+            }
+        }
+
+
+        public Node To
+        {
+            get => _to;
+            private set
+            {
+                if (_to != value)
+                {
+                    _to = value;
+                }
+            }
+        }
+
+        public LightChange(LightCommand lightCommand, int fromX, int fromY, int toX, int toY) 
+        { 
+            LightCommand = lightCommand;
+            From = new Node() { X = fromX, Y = fromY };
+            To = new Node() { X = toX, Y = toY };
+        }
+    }
+
+    internal enum LightCommand
+    {
+        ON = 1,
+        OFF = 2,
+        SWITCH = 3,
     }
 }
