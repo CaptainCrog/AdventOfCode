@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Constants;
+using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdventOfCode2015.Problems
 {
@@ -7,10 +9,13 @@ namespace AdventOfCode2015.Problems
 
         #region Fields
         string _inputPath = string.Empty;
-        string[] _bridgeCalibrations = [];
-        ulong _firstResult = 0;
-        ulong _secondResult = 0;
-        ulong _sum = 0;
+        string _search = string.Empty;
+        ushort _firstResult = 0;
+        ushort _secondResult = 0;
+        Dictionary<string, ushort> _wireValues;
+        List<(string Input1, string Gate, string Input2, string Output)> _gates = new();
+
+
         #endregion
 
         #region Properties
@@ -26,19 +31,7 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        string[] BridgeCalibrations
-        {
-            get => _bridgeCalibrations;
-            set
-            {
-                if (_bridgeCalibrations != value)
-                {
-                    _bridgeCalibrations = value;
-                }
-            }
-        }
-
-        public ulong FirstResult
+        public ushort FirstResult
         {
             get => _firstResult;
             set
@@ -49,7 +42,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public ulong SecondResult
+        public ushort SecondResult
         {
             get => _secondResult;
             set
@@ -61,28 +54,17 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        ulong Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
-
 
         #endregion
 
         #region Constructor
-        public Day7(string inputPath)
+        public Day7(string inputPath, string search)
         {
             _inputPath = inputPath;
+            _search = search;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<ulong>();
-            SecondResult = SolveSecondProblem<ulong>();
+            FirstResult = SolveFirstProblem<ushort>();
+            SecondResult = SolveSecondProblem<ushort>();
             OutputSolution();
         }
         #endregion
@@ -90,30 +72,48 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            BridgeCalibrations = File.ReadLines(_inputPath).ToArray();
+            _gates = new();
+            _wireValues = new();
+            var input = File.ReadLines(_inputPath).ToArray();
+            foreach (var line in input)
+            {
+                var parts = line.Split(new[] { " -> " }, StringSplitOptions.None);
+                var gateParts = parts[0].Split(' ');
+                if (ushort.TryParse(gateParts.First(), out ushort number))
+                {
+                    if (gateParts.Count() == 1)
+                        _wireValues[parts[1].Trim()] = number;
+                    else
+                        _gates.Add((gateParts[0], gateParts[1], gateParts[2], parts[1]));
+                }
+                else if (gateParts.First() == BitwiseLogicConstants.NOT)
+                {
+                    _gates.Add((gateParts[1], gateParts[0], int.MaxValue.ToString(), parts[1]));
+                }
+                else if (gateParts.Count() == 1)
+                {
+                    _gates.Add((gateParts[0], string.Empty, int.MaxValue.ToString(), parts[1]));
+                }
+                else
+                    _gates.Add((gateParts[0], gateParts[1], gateParts[2], parts[1]));
+            }
         }
 
         public override T SolveFirstProblem<T>()
         {
-            Sum = 0;
-            foreach (var calibration in BridgeCalibrations)
-            {
-                Sum += CalculateCalibration(calibration, 2);
-            }
+            var ranWireCircuit = RunCircuit(_gates.ToList(), _wireValues.ToDictionary());
+            var result = ranWireCircuit.Where(kvp => kvp.Key == "a").First().Value;
 
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            Sum = 0;
+            _wireValues["b"] = FirstResult;
+            var ranWireCircuit = RunCircuit(_gates.ToList(), _wireValues.ToDictionary());
+            var result = ranWireCircuit.Where(kvp => kvp.Key == "a").First().Value;
 
-            foreach (var calibration in BridgeCalibrations)
-            {
-                Sum += CalculateCalibration(calibration, 3);
-            }
-
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override void OutputSolution()
@@ -122,96 +122,63 @@ namespace AdventOfCode2015.Problems
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-
-        public ulong CalculateCalibration(string calibration, int baseValue)
+        private Dictionary<string, ushort> RunCircuit(List<(string Input1, string Gate, string Input2, string Output)> gatesCopy, Dictionary<string, ushort> wireValuesCopy)
         {
-            var calibrationRegex = GetNumbersRegex();
-            var allMatches = calibrationRegex.Matches(calibration).ToList();
-            var testResult = ulong.Parse(allMatches.First().Value);
-            allMatches.Remove(allMatches.First());
-            var operators = allMatches.Select(x => int.Parse(x.Value)).ToList();
-            var totalCombinations = Math.Pow(baseValue, operators.Count() - 1);
-
-
-            for (int i = 0; i <= totalCombinations - 1; i++)
+            // Simulate the circuit
+            while (gatesCopy.Count > 0)
             {
-                // Create a combination map using either a binary or ternary baseValue
-                string combination = CreateCombinationMap(operators, i, baseValue);
-                string operatorMap = "";
-
-                foreach (char bit in combination)
+                foreach (var gate in gatesCopy.ToList())
                 {
-                    if (bit == '0')
-                        operatorMap += '+';
-                    else if (bit == '1')
-                        operatorMap += '*';
-                    else
-                        operatorMap += '|';
-                }
-
-                var result = ProcessNumbers(operators, operatorMap, testResult);
-                if (result == testResult)
-                    return result;
-
-            }
-            return 0;
-        }
-
-        public ulong ProcessNumbers(List<int> operators, string operatorMap, ulong testResult)
-        {
-            ulong sum = 0;
-            for (int i = 1; i <= operatorMap.Count(); i++)
-            {
-                if (sum > testResult)
-                    return sum;
-                if (sum == 0)
-                {
-                    if (operatorMap[i - 1] == '+')
-                        sum = (ulong)(operators[i - 1] + operators[i]);
-                    else if (operatorMap[i - 1] == '*')
-                        sum = (ulong)(operators[i - 1] * operators[i]);
-                    else
-                        sum = ulong.Parse(operators[i - 1].ToString() + operators[i].ToString());
-                }
-                else
-                {
-                    if (operatorMap[i - 1] == '+')
-                        sum += (ulong)operators[i];
-                    else if (operatorMap[i - 1] == '*')
-                        sum *= (ulong)operators[i];
-                    else
+                    if ((wireValuesCopy.ContainsKey(gate.Input1) || int.TryParse(gate.Input1, out _)) && (wireValuesCopy.ContainsKey(gate.Input2) || int.TryParse(gate.Input2, out _)))
                     {
-                        var sumString = sum.ToString();
-                        sumString = sumString + operators[i].ToString();
-                        sum = ulong.Parse(sumString);
+
+                        var value1 = ProcessGateInput(gate.Input1, wireValuesCopy);
+                        var value2 = ProcessGateInput(gate.Input2, wireValuesCopy);
+
+                        ushort outputValue;
+                        switch (gate.Gate)
+                        {
+                            case BitwiseLogicConstants.AND:
+                                outputValue = (ushort)(value1 & value2);
+                                break;
+                            case BitwiseLogicConstants.OR:
+                                outputValue = (ushort)(value1 | value2);
+                                break;
+                            case BitwiseLogicConstants.XOR:
+                                outputValue = (ushort)(value1 ^ value2);
+                                break;
+                            case BitwiseLogicConstants.LSHIFT:
+                                outputValue = (ushort)(value1 << value2);
+                                break;
+                            case BitwiseLogicConstants.RSHIFT:
+                                outputValue = (ushort)(value1 >> value2);
+                                break;
+                            case BitwiseLogicConstants.NOT:
+                                outputValue = (ushort)~value1;
+                                break;
+                            default:
+                                outputValue = value1;
+                                break;
+                        }
+                        wireValuesCopy[gate.Output] = outputValue;
+                        gatesCopy.Remove(gate);
                     }
                 }
             }
-            return sum;
+
+            return wireValuesCopy;
         }
 
-        public string CreateCombinationMap(List<int> operators, int iterator, int baseValue)
+
+        ushort ProcessGateInput(string input, Dictionary<string, ushort> wireValuesCopy)
         {
-            var finalCombinationMap = string.Empty;
-            int modulusValue;
-            do
-            {
-                if (iterator == 0)
-                    break;
+            int.TryParse(input, out int valueInt);
+            ushort.TryParse(input, out ushort value);
+            if (value == 0 && valueInt != int.MaxValue)
+                value = wireValuesCopy[input];
 
-                modulusValue = iterator % baseValue;
-                iterator /= baseValue;
-                finalCombinationMap = modulusValue.ToString() + finalCombinationMap;
-            }
-            while (iterator > 0);
-
-            return finalCombinationMap.PadLeft(operators.Count() - 1, '0');
-
+            return value;
         }
-
-        [GeneratedRegex(@"[0-9]+")]
-        private static partial Regex GetNumbersRegex();
-
         #endregion
 
     }

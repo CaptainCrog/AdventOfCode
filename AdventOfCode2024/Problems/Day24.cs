@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Constants;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day24 : DayBase
     {
@@ -11,10 +13,6 @@
         string _secondResult = string.Empty;
         Dictionary<string, int> _wireValues = new(); 
         List<(string Input1, string Gate, string Input2, string Output)> _gates = new();
-
-        const string AND = "AND";
-        const string OR = "OR";
-        const string XOR = "XOR";
 
         #endregion
 
@@ -134,17 +132,17 @@
 
 
             // Find gates violating the rules
-            var rule1Violations = _gates.Where(gate => gate.Output.StartsWith("z") && gate.Output != _lastZOutput && gate.Gate != XOR).Select(x => x.Output).ToList();
-            var rule2Violations = _gates.Where(gate => !gate.Input1.StartsWith("x") && !gate.Output.StartsWith("z") && gate.Gate == XOR).Select(x => x.Output).ToList();
+            var rule1Violations = _gates.Where(gate => gate.Output.StartsWith("z") && gate.Output != _lastZOutput && gate.Gate != BitwiseLogicConstants.XOR).Select(x => x.Output).ToList();
+            var rule2Violations = _gates.Where(gate => !gate.Input1.StartsWith("x") && !gate.Output.StartsWith("z") && gate.Gate == BitwiseLogicConstants.XOR).Select(x => x.Output).ToList();
             var rule3Violations = new List<string>();
             _gates.ForEach(gate =>
             {
-                if (gate.Gate == AND && gate.Input1 != "x00")
+                if (gate.Gate == BitwiseLogicConstants.AND && gate.Input1 != "x00")
                 {
                     var filter = _gates.Where(g => g.Input1 == gate.Output || g.Input2 == gate.Output).ToList();
                     foreach (var item in filter)
                     {
-                        if (item.Gate != OR)
+                        if (item.Gate != BitwiseLogicConstants.OR)
                         {
                             rule3Violations.Add(gate.Output);
                             break;
@@ -155,16 +153,16 @@
             var rule4Violations = new List<string>();
             _gates.ForEach(gate =>
             {
-                if (gate.Gate == OR)
+                if (gate.Gate == BitwiseLogicConstants.OR)
                 {
                     var inputFilter = _gates.SingleOrDefault(g => g.Output == gate.Input1);
-                    if (inputFilter.Output != null && inputFilter.Gate != AND)
+                    if (inputFilter.Output != null && inputFilter.Gate != BitwiseLogicConstants.AND)
                     {
                         rule4Violations.Add(inputFilter.Output);
                     }
 
                     inputFilter = _gates.SingleOrDefault(g => g.Output == gate.Input2);
-                    if (inputFilter.Output != null && inputFilter.Gate != AND)
+                    if (inputFilter.Output != null && inputFilter.Gate != BitwiseLogicConstants.AND)
                     {
                         rule4Violations.Add(inputFilter.Output);
                     }
@@ -194,13 +192,13 @@
                         int outputValue = 0;
                         switch (gate.Gate)
                         {
-                            case AND:
+                            case BitwiseLogicConstants.AND:
                                 outputValue = value1 & value2;
                                 break;
-                            case OR:
+                            case BitwiseLogicConstants.OR:
                                 outputValue = value1 | value2;
                                 break;
-                            case XOR:
+                            case BitwiseLogicConstants.XOR:
                                 outputValue = value1 ^ value2;
                                 break;
                         }
