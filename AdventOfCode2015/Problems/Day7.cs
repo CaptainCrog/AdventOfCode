@@ -10,8 +10,8 @@ namespace AdventOfCode2015.Problems
         #region Fields
         string _inputPath = string.Empty;
         string _search = string.Empty;
-        ulong _firstResult = 0;
-        ulong _secondResult = 0;
+        ushort _firstResult = 0;
+        ushort _secondResult = 0;
         Dictionary<string, ushort> _wireValues;
         List<(string Input1, string Gate, string Input2, string Output)> _gates = new();
 
@@ -31,7 +31,7 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        public ulong FirstResult
+        public ushort FirstResult
         {
             get => _firstResult;
             set
@@ -42,7 +42,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public ulong SecondResult
+        public ushort SecondResult
         {
             get => _secondResult;
             set
@@ -63,8 +63,8 @@ namespace AdventOfCode2015.Problems
             _inputPath = inputPath;
             _search = search;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<ulong>();
-            SecondResult = SolveSecondProblem<ulong>();
+            FirstResult = SolveFirstProblem<ushort>();
+            SecondResult = SolveSecondProblem<ushort>();
             OutputSolution();
         }
         #endregion
@@ -80,10 +80,14 @@ namespace AdventOfCode2015.Problems
                 var parts = line.Split(new[] { " -> " }, StringSplitOptions.None);
                 var gateParts = parts[0].Split(' ');
                 if (ushort.TryParse(gateParts.First(), out ushort number))
-                    _wireValues[parts[1].Trim()] = number;
+                {
+                    if (gateParts.Count() == 1)
+                        _wireValues[parts[1].Trim()] = number;
+                    else
+                        _gates.Add((gateParts[0], gateParts[1], gateParts[2], parts[1]));
+                }
                 else if (gateParts.First() == BitwiseLogicConstants.NOT)
                 {
-                    //~gateParts[1]
                     _gates.Add((gateParts[1], gateParts[0], int.MaxValue.ToString(), parts[1]));
                 }
                 else if (gateParts.Count() == 1)
@@ -98,21 +102,18 @@ namespace AdventOfCode2015.Problems
         public override T SolveFirstProblem<T>()
         {
             var ranWireCircuit = RunCircuit(_gates.ToList(), _wireValues.ToDictionary());
-            var temp = ranWireCircuit.Where(kvp => kvp.Key == "a").First();
-
-            ranWireCircuit = ranWireCircuit.OrderBy(kvp => kvp.Key).ToDictionary();
-            int result = ranWireCircuit.First(kvp => kvp.Key.StartsWith(_search)).Value;
+            var result = ranWireCircuit.Where(kvp => kvp.Key == "a").First().Value;
 
             return (T)Convert.ChangeType(result, typeof(T));
-            //1 Wrong
-            //0 Wrong
-            //65535 Wrong
         }
 
         public override T SolveSecondProblem<T>()
         {
+            _wireValues["b"] = FirstResult;
+            var ranWireCircuit = RunCircuit(_gates.ToList(), _wireValues.ToDictionary());
+            var result = ranWireCircuit.Where(kvp => kvp.Key == "a").First().Value;
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override void OutputSolution()
@@ -128,16 +129,13 @@ namespace AdventOfCode2015.Problems
             {
                 foreach (var gate in gatesCopy.ToList())
                 {
-                    if (wireValuesCopy.ContainsKey(gate.Input1) && (wireValuesCopy.ContainsKey(gate.Input2) || int.TryParse(gate.Input2, out _)))
+                    if ((wireValuesCopy.ContainsKey(gate.Input1) || int.TryParse(gate.Input1, out _)) && (wireValuesCopy.ContainsKey(gate.Input2) || int.TryParse(gate.Input2, out _)))
                     {
-                        ushort value1 = wireValuesCopy[gate.Input1];
-                        int.TryParse(gate.Input2, out int value2Int);
-                        ushort.TryParse(gate.Input2, out ushort value2);
 
-                        if (value2 == 0 && value2Int != int.MaxValue)
-                            value2 = wireValuesCopy[gate.Input2];
+                        var value1 = ProcessGateInput(gate.Input1, wireValuesCopy);
+                        var value2 = ProcessGateInput(gate.Input2, wireValuesCopy);
 
-                        ushort outputValue = 0;
+                        ushort outputValue;
                         switch (gate.Gate)
                         {
                             case BitwiseLogicConstants.AND:
@@ -171,6 +169,16 @@ namespace AdventOfCode2015.Problems
             return wireValuesCopy;
         }
 
+
+        ushort ProcessGateInput(string input, Dictionary<string, ushort> wireValuesCopy)
+        {
+            int.TryParse(input, out int valueInt);
+            ushort.TryParse(input, out ushort value);
+            if (value == 0 && valueInt != int.MaxValue)
+                value = wireValuesCopy[input];
+
+            return value;
+        }
         #endregion
 
     }
