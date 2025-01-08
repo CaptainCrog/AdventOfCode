@@ -1,17 +1,15 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using System.Text.RegularExpressions;
+
+namespace AdventOfCode2015.Problems
 {
-    public class Day8 : DayBase
+    public partial class Day8 : DayBase
     {
-
-
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        int _sum = 0;
-        string[] _antennaSignals = [];
-        char[] _antennaFrequencies = [];
-        List<(int row, int col)> _antinodes = new List<(int, int)>();
+        string[] _digitalList = [];
+        int _stringLiteralLength = 0;
         #endregion
 
         #region Properties
@@ -50,54 +48,6 @@
             }
         }
 
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
-        string[] AntennaSignals
-        {
-            get => _antennaSignals;
-            set
-            {
-                if (_antennaSignals != value)
-                {
-                    _antennaSignals = value;
-                }
-            }
-        }
-
-        char[] AntennaFrequencies
-        {
-            get => _antennaFrequencies;
-            set
-            {
-                if (_antennaFrequencies != value)
-                {
-                    _antennaFrequencies = value;
-                }
-            }
-        }
-
-        List<(int row, int col)> Antinodes
-        {
-            get => _antinodes;
-            set
-            {
-                if (_antinodes != value)
-                {
-                    _antinodes = value;
-                }
-            }
-        }
-
-
         #endregion
 
         #region Constructor
@@ -114,20 +64,65 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            AntennaSignals = File.ReadLines(_inputPath).ToArray();
-            AntennaFrequencies = string.Join(Environment.NewLine, AntennaSignals).Select(x => x).Where(x => x != '\r' && x != '\n' && x != '.').Distinct().ToArray();
+            _digitalList = File.ReadAllLines(_inputPath);
         }
 
         public override T SolveFirstProblem<T>()
         {
-            Sum = CreateFrequencyPositions(false);
+            _stringLiteralLength = 0;
+            var stringInMemoryLength = 0;
 
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            var hexRegex = HexadecimalRegex();
+            var quoteRegex = EscapedQuoteRegex();
+            var backslashRegex = EscapedBackslashRegex();
+
+            foreach (var input in _digitalList)
+            {
+                var inputCopy = input;
+                _stringLiteralLength += inputCopy.Length;
+
+                inputCopy = backslashRegex.Replace(inputCopy, "#");
+                inputCopy = hexRegex.Replace(inputCopy, "#");
+                inputCopy = quoteRegex.Replace(inputCopy, "#");
+                var inMemoryLength = inputCopy.Length - 2;
+
+                stringInMemoryLength += inMemoryLength;
+            }
+
+            var result = _stringLiteralLength - stringInMemoryLength;
+            return (T)Convert.ChangeType(result, typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            Sum = CreateFrequencyPositions(true);
-            return (T)Convert.ChangeType(Sum, typeof(T));
+
+            var cumulativeEncodedStringLength = 0;
+            var backslashRegex = BackslashRegex();
+            var quoteRegex = QuoteRegex();
+            foreach (var input in _digitalList)
+            {
+                var encodedStringLength = 0;
+                var inputCopy = input;
+                var backslashMatches = backslashRegex.Matches(inputCopy);
+                var quoteMatches = quoteRegex.Matches(inputCopy);
+                foreach (Match match in backslashMatches) 
+                {
+                    encodedStringLength += 2;
+                }
+                foreach (Match match in quoteMatches)
+                {
+                    encodedStringLength += 2;
+                }
+
+                inputCopy = backslashRegex.Replace(inputCopy, @"");
+                inputCopy = quoteRegex.Replace(inputCopy, "");
+                encodedStringLength += inputCopy.Length + 2; //Add start + end changes -> "" -> "\"\""
+
+                cumulativeEncodedStringLength += encodedStringLength;
+            }
+
+
+            var result = cumulativeEncodedStringLength - _stringLiteralLength;
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override void OutputSolution()
@@ -136,59 +131,27 @@
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        private int CreateFrequencyPositions(bool isPartTwo)
-        {
-            Antinodes = new List<(int row, int col)>();
-            foreach (var frequency in AntennaFrequencies)
-            {
-                var frequencyPositions = new List<(int, int)>();
-                var filteredAntennaSignals = AntennaSignals.ToArray();
-                for (int i = 0; i <= filteredAntennaSignals.Length - 1; i++)
-                {
-                    for (int j = 0; j < filteredAntennaSignals[0].Length - 1; j++)
-                    {
-                        if (filteredAntennaSignals[i][j] == frequency)
-                        {
-                            frequencyPositions.Add((i, j));
-                        }
-                    }
-                }
 
-                ProcessSignal(frequencyPositions, isPartTwo);
+        //https://regex101.com/r/N3j4k1/4
+        [GeneratedRegex(@"(?<!\\)\\x[a-z0-9]{2}")]
+        private static partial Regex HexadecimalRegex();
 
-            }
-            Antinodes = Antinodes.Distinct().ToList();
-            return Antinodes.Count;
-        }
+        //https://regex101.com/r/kkS2ue/2
+        [GeneratedRegex(@"\\[`""`](?!$)")]
+        private static partial Regex EscapedQuoteRegex();
 
-        void ProcessSignal(List<(int, int)> frequencyPositions, bool isPartTwo)
-        {
-            foreach ((int row, int col) frequencyPosition in frequencyPositions)
-            {
-                var otherFrequencyPositions = frequencyPositions.Where(x => x != frequencyPosition).ToList();
-                foreach ((int row, int col) otherFrequencyPosition in otherFrequencyPositions)
-                {
-                    (int row, int col) distance = (frequencyPosition.row - otherFrequencyPosition.row, frequencyPosition.col - otherFrequencyPosition.col);
-                    (int row, int col) antinode = (frequencyPosition.row + distance.row, frequencyPosition.col + distance.col);
-                    if (isPartTwo)
-                    {
-                        Antinodes.Add(frequencyPosition);
-                        while (antinode.row >= 0 && antinode.row <= AntennaSignals.Length - 1 && antinode.col >= 0 && antinode.col <= AntennaSignals[0].Length - 1)
-                        {
-                            Antinodes.Add(antinode);
-                            antinode = (antinode.row + distance.row, antinode.col + distance.col);
-                        }
-                    }
-                    else
-                    {
-                        if (antinode.row < 0 || antinode.row > AntennaSignals.Length - 1 || antinode.col < 0 || antinode.col > AntennaSignals[0].Length - 1)
-                            continue;
-                        else
-                            Antinodes.Add(antinode);
-                    }
-                }
-            }
-        }
+        //https://regex101.com/r/8tTh9g/2
+        [GeneratedRegex(@"\\\\")]
+        private static partial Regex EscapedBackslashRegex();
+
+
+        //
+        [GeneratedRegex(@"\\")]
+        private static partial Regex BackslashRegex();
+
+        //
+        [GeneratedRegex(@"[""]")]
+        private static partial Regex QuoteRegex();
 
         #endregion
     }
