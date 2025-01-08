@@ -3,6 +3,7 @@ namespace AdventOfCode2015Tests
     [TestClass]
     public class Day7
     {
+        //No day 7 Part 2 tests as it builds off the same logic covered in Part 1's tests
         [TestMethod]
         [DeploymentItem("Inputs/Day7/Day7Test1.txt")]
         public void Part1_FindsDValue_IsTrue()
@@ -59,13 +60,5 @@ namespace AdventOfCode2015Tests
             var instance = new AdventOfCode2015.Problems.Day7("Day7Test1.txt", "y");
             instance.FirstResult.Should().Be(456);
         }
-
-        //[TestMethod]
-        //[DeploymentItem("Inputs/Day7/Day7Test1.txt")]
-        //public void Part2_ProducesCorrectCalibrationResultTotal_IsTrue()
-        //{
-        //    var instance = new AdventOfCode2015.Problems.Day7("Day7Test1.txt");
-        //    instance.SecondResult.Should().Be(11387);
-        //}
     }
 }
