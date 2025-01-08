@@ -2,18 +2,11 @@
 {
     public class Day9 : DayBase
     {
-
-
-
         #region Fields
         string _inputPath = string.Empty;
-        ulong _firstResult = 0;
-        ulong _secondResult = 0;
-        int _sum = 0;
-        string _diskMap = string.Empty;
-        List<(string id, int length)> _diskMapDecoded = new();
-        char[] _antennaFrequencies = [];
-        List<(int row, int col)> _antinodes = new();
+        int _firstResult = 0;
+        int _secondResult = 0;
+        List<SantasRoutes> _routes = new();
         #endregion
 
         #region Properties
@@ -29,7 +22,7 @@
             }
         }
 
-        public ulong FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -40,7 +33,7 @@
                 }
             }
         }
-        public ulong SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -52,65 +45,6 @@
             }
         }
 
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
-        string DiskMap
-        {
-            get => _diskMap;
-            set
-            {
-                if (_diskMap != value)
-                {
-                    _diskMap = value;
-                }
-            }
-        }
-        List<(string id, int length)> DiskMapDecoded
-        {
-            get => _diskMapDecoded;
-            set
-            {
-                if (_diskMapDecoded != value)
-                {
-                    _diskMapDecoded = value;
-                }
-            }
-        }
-
-        char[] AntennaFrequencies
-        {
-            get => _antennaFrequencies;
-            set
-            {
-                if (_antennaFrequencies != value)
-                {
-                    _antennaFrequencies = value;
-                }
-            }
-        }
-
-        List<(int row, int col)> Antinodes
-        {
-            get => _antinodes;
-            set
-            {
-                if (_antinodes != value)
-                {
-                    _antinodes = value;
-                }
-            }
-        }
-
-
         #endregion
 
         #region Constructor
@@ -118,8 +52,8 @@
         {
             _inputPath = inputPath;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<ulong>();
-            SecondResult = SolveSecondProblem<ulong>();
+            FirstResult = SolveFirstProblem<int>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -127,43 +61,24 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            DiskMap = File.ReadAllText(_inputPath).Replace("\r", string.Empty).Replace("\n", string.Empty);
-            bool isFile = true;
-            int id = 0;
-            foreach (var numberChar in DiskMap)
+            var input = File.ReadAllLines(_inputPath);
+
+            foreach (var line in input) 
             {
-                int length = int.Parse(numberChar.ToString());
-                if (isFile)
-                {
-                    for (int i = 0; i <= length - 1; i++)
-                    {
-                        DiskMapDecoded.Add((id.ToString(), length));
-                    }
-                    id++;
-                }
-                else
-                {
-                    for (int i = 0; i <= length - 1; i++)
-                    {
-                        DiskMapDecoded.Add((".", length));
-                    }
-                }
-                isFile = !isFile;
+                var parts = line.Split(" = ");
+                var locations = parts[0].Split(" to ");
+                _routes.Add(new SantasRoutes() { Distance = int.Parse(parts[1].Trim()), Location1 = locations[0], Location2 = locations[1] });
             }
         }
 
         public override T SolveFirstProblem<T>()
         {
-            var diskMapDecodedPart1Copy = SortDiskMapFragmented();
-            var result = CalculateDiskMap(diskMapDecodedPart1Copy);
 
-            return (T)Convert.ChangeType(result, typeof(T));
+            return (T)Convert.ChangeType(0, typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            var disMapDecodedPart2Copy = SortDiskMapUnfragmented();
-            var result = CalculateDiskMap(disMapDecodedPart2Copy);
-            return (T)Convert.ChangeType(result, typeof(T));
+            return (T)Convert.ChangeType(0, typeof(T));
         }
 
         public override void OutputSolution()
@@ -172,137 +87,15 @@
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        private List<(string id, int length)> SortDiskMapFragmented()
-        {
-            int reversedIndex = DiskMapDecoded.Count() - 1;
-            var diskMapDecodedPart1Copy = DiskMapDecoded.ToList();
-
-            for (int i = 0; i <= diskMapDecodedPart1Copy.Count() - 1; i++)
-            {
-                if (diskMapDecodedPart1Copy[i].id == ".")
-                {
-                    for (int j = reversedIndex; j >= i + 1; j--)
-                    {
-                        if (diskMapDecodedPart1Copy[j].id != ".")
-                        {
-                            var value = diskMapDecodedPart1Copy[j];
-                            diskMapDecodedPart1Copy[j] = diskMapDecodedPart1Copy[i];
-                            diskMapDecodedPart1Copy[i] = value;
-                            reversedIndex = j;
-                            break;
-                        }
-                        else
-                            continue;
-                    }
-                }
-            }
-
-            return diskMapDecodedPart1Copy;
-        }
-
-        private List<(string id, int length)> SortDiskMapUnfragmented2()
-        {
-            var diskMapDecodedPart1Copy = DiskMapDecoded.ToList();
-
-            for (int i = 0; i <= diskMapDecodedPart1Copy.Count() - 1; i++)
-            {
-                if (diskMapDecodedPart1Copy[i].id == ".")
-                {
-                    for (int j = diskMapDecodedPart1Copy.Count - 1; j >= i + 1; j--)
-                    {
-                        if (diskMapDecodedPart1Copy[j].id != ".")
-                        {
-                            if (diskMapDecodedPart1Copy[i].length >= diskMapDecodedPart1Copy[j].length)
-                            {
-                                int leftOverFreeSpaceLength = 0;
-                                var temp = diskMapDecodedPart1Copy[j];
-                                if (diskMapDecodedPart1Copy[i].length - diskMapDecodedPart1Copy[j].length != 0)
-                                {
-                                    leftOverFreeSpaceLength = diskMapDecodedPart1Copy[i].length - diskMapDecodedPart1Copy[j].length;
-                                    for (int k = diskMapDecodedPart1Copy[j].length; k <= diskMapDecodedPart1Copy[i].length; k++)
-                                    {
-                                        diskMapDecodedPart1Copy[i + k] = new(diskMapDecodedPart1Copy[i + k].id, leftOverFreeSpaceLength);
-                                    }
-                                }
-
-
-                                for (int k = 0; k <= diskMapDecodedPart1Copy[i].length - 1; k++)
-                                {
-                                    var value = diskMapDecodedPart1Copy[j - k];
-                                    diskMapDecodedPart1Copy[j - k] = diskMapDecodedPart1Copy[i + k];
-                                    diskMapDecodedPart1Copy[i + k] = value;
-                                }
-                                break;
-                            }
-
-                        }
-                        else
-                        {
-                            continue;
-                        }
-
-                    }
-                }
-            }
-
-            return diskMapDecodedPart1Copy;
-        }
-
-        private List<(string id, int length)> SortDiskMapUnfragmented()
-        {
-            var diskMapDecodedPart2Copy = DiskMapDecoded.ToList();
-            for (int i = diskMapDecodedPart2Copy.Count() - 1; i >= 0; i--)
-            {
-                if (diskMapDecodedPart2Copy[i].id != ".")
-                {
-                    for (int j = 0; j <= i; j++)
-                    {
-                        if (diskMapDecodedPart2Copy[j].id == ".")
-                        {
-                            if (diskMapDecodedPart2Copy[j].length >= diskMapDecodedPart2Copy[i].length)
-                            {
-                                int leftOverFreeSpaceLength = 0;
-                                var temp = diskMapDecodedPart2Copy[i];
-                                if (diskMapDecodedPart2Copy[j].length - diskMapDecodedPart2Copy[i].length != 0)
-                                {
-                                    leftOverFreeSpaceLength = diskMapDecodedPart2Copy[j].length - diskMapDecodedPart2Copy[i].length;
-                                    for (int k = diskMapDecodedPart2Copy[i].length; k <= diskMapDecodedPart2Copy[j].length-1; k++)
-                                    {
-                                        diskMapDecodedPart2Copy[j + k] = new(diskMapDecodedPart2Copy[j + k].id, leftOverFreeSpaceLength);
-                                    }
-                                }
-
-
-                                for (int k = 0; k <= diskMapDecodedPart2Copy[j].length - 1; k++)
-                                {
-                                    var value = diskMapDecodedPart2Copy[i - k];
-                                    diskMapDecodedPart2Copy[i - k] = diskMapDecodedPart2Copy[j + k];
-                                    diskMapDecodedPart2Copy[j + k] = value;
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return diskMapDecodedPart2Copy;
-        }
-
-        private ulong CalculateDiskMap(List<(string id, int length)> diskMapDecodedPart1Copy)
-        {
-            ulong checkSum = 0;
-            for (int i = 0; i <= diskMapDecodedPart1Copy.Count() - 1; i++)
-            {
-                if (ulong.TryParse(diskMapDecodedPart1Copy[i].id, out ulong number))
-                {
-                    checkSum += number * (ulong)i;
-                }
-            }
-            return checkSum;
-        }
 
         #endregion
+    }
+
+
+    internal record SantasRoutes
+    {
+        public required string Location1 { get; init; }
+        public required string Location2 { get; init; }
+        public required int Distance { get; init;}
     }
 }
