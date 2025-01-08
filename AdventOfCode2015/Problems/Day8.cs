@@ -150,9 +150,6 @@ namespace AdventOfCode2015.Problems
         private static partial Regex BackslashRegex();
 
         //
-        [GeneratedRegex(@"(?<!\\)\\x")]
-        private static partial Regex BackslashHexadecimalRegex();
-
         [GeneratedRegex(@"[""]")]
         private static partial Regex QuoteRegex();
 
