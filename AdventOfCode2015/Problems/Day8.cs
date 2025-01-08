@@ -9,6 +9,7 @@ namespace AdventOfCode2015.Problems
         int _firstResult = 0;
         int _secondResult = 0;
         string[] _digitalList = [];
+        int _stringLiteralLength = 0;
         #endregion
 
         #region Properties
@@ -68,62 +69,60 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            var stringLiteralLength = 0;
+            _stringLiteralLength = 0;
             var stringInMemoryLength = 0;
 
             var hexRegex = HexadecimalRegex();
             var quoteRegex = EscapedQuoteRegex();
             var backslashRegex = EscapedBackslashRegex();
-            var hexValues = new List<string>();
-            //foreach (var input in _digitalList)
-            //{
-            //    stringLiteralLength += input.Length;
-            //    var inMemoryLength = input.Length - 2;
-
-            //    var quoteMatches = quoteRegex.Matches(input);
-            //    var backslashMatches = backslashRegex.Matches(input);
-
-            //    // since \" and \\ equals 2 -> 1 we can just count the matches and remove these from the inMemoryLength
-            //    inMemoryLength -= quoteMatches.Count();
-            //    inMemoryLength -= backslashMatches.Count();
-
-            //    // hex matches are 4 chars -> 1 so we do count * 4-1 (3)
-            //    var hexCharCount = hexMatches.Count() * 3;
-            //    inMemoryLength -= hexCharCount;
-
-            //    stringInMemoryLength += inMemoryLength;
-            //}
 
             foreach (var input in _digitalList)
             {
                 var inputCopy = input;
-                stringLiteralLength += inputCopy.Length;
+                _stringLiteralLength += inputCopy.Length;
 
+                inputCopy = backslashRegex.Replace(inputCopy, "#");
                 inputCopy = hexRegex.Replace(inputCopy, "#");
                 inputCopy = quoteRegex.Replace(inputCopy, "#");
-                inputCopy = backslashRegex.Replace(inputCopy, "#");
                 var inMemoryLength = inputCopy.Length - 2;
 
                 stringInMemoryLength += inMemoryLength;
-
-
-                var hexMatches = hexRegex.Matches(input);
-
-                foreach (Match match in hexMatches)
-                    hexValues.Add(ConvertHex(match.Value.Substring(2)));
             }
 
-            var result = stringLiteralLength - stringInMemoryLength;
+            var result = _stringLiteralLength - stringInMemoryLength;
             return (T)Convert.ChangeType(result, typeof(T));
-            
-            //1375 WRONG TOO HIGH
-            //1362 WRONG N/A
-            //1330 WRONG TOO LOW
-            // 1328
         }
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
+
+            var cumulativeEncodedStringLength = 0;
+            var backslashRegex = BackslashRegex();
+            var quoteRegex = QuoteRegex();
+            foreach (var input in _digitalList)
+            {
+                var encodedStringLength = 0;
+                var inputCopy = input;
+                var backslashMatches = backslashRegex.Matches(inputCopy);
+                var quoteMatches = quoteRegex.Matches(inputCopy);
+                foreach (Match match in backslashMatches) 
+                {
+                    encodedStringLength += 2;
+                }
+                foreach (Match match in quoteMatches)
+                {
+                    encodedStringLength += 2;
+                }
+
+                inputCopy = backslashRegex.Replace(inputCopy, @"");
+                inputCopy = quoteRegex.Replace(inputCopy, "");
+                encodedStringLength += inputCopy.Length + 2; //Add start + end changes -> "" -> "\"\""
+
+                cumulativeEncodedStringLength += encodedStringLength;
+            }
+
+
+            var result = cumulativeEncodedStringLength - _stringLiteralLength;
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override void OutputSolution()
@@ -145,29 +144,17 @@ namespace AdventOfCode2015.Problems
         [GeneratedRegex(@"\\\\")]
         private static partial Regex EscapedBackslashRegex();
 
-        public static string ConvertHex(string hexString)
-        {
-            try
-            {
-                string ascii = string.Empty;
 
-                for (int i = 0; i < hexString.Length; i += 2)
-                {
-                    string hs = string.Empty;
+        //
+        [GeneratedRegex(@"\\")]
+        private static partial Regex BackslashRegex();
 
-                    hs = hexString.Substring(i, 2);
-                    uint decval = System.Convert.ToUInt32(hs, 16);
-                    char character = System.Convert.ToChar(decval);
-                    ascii += character;
+        //
+        [GeneratedRegex(@"(?<!\\)\\x")]
+        private static partial Regex BackslashHexadecimalRegex();
 
-                }
-
-                return ascii;
-            }
-            catch (Exception ex) { Console.WriteLine(ex.Message); }
-
-            return string.Empty;
-        }
+        [GeneratedRegex(@"[""]")]
+        private static partial Regex QuoteRegex();
 
         #endregion
     }
