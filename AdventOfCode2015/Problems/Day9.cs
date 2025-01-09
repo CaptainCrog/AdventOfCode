@@ -10,8 +10,6 @@ namespace AdventOfCode2015.Problems
         int _secondResult = 0;
         List<SantasRoutes> _routes = new();
         List<string> _locationsVisited = new();
-        //HashSet<string> _locationsVisited = new();
-        //HashSet<(List<string> locationCombinations, int totalDistanceTraversed)> _combinationsVisited = new();
         Dictionary<string, int> _combinationsVisited = new();
         List<(List<string>, int)> _allLocationsVisitedCombinations = new();
         #endregion
