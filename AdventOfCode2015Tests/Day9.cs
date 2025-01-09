@@ -5,17 +5,17 @@ namespace AdventOfCode2015Tests
     {
         [TestMethod]
         [DeploymentItem("Inputs/Day9/Day9Test1.txt")]
-        public void Part1_ProducesCorrectFileChecksum_IsTrue()
+        public void Part1_ProducesShortestRoute_IsTrue()
         {
             var instance = new AdventOfCode2015.Problems.Day9("Day9Test1.txt");
-            instance.FirstResult.Should().Be(1928);
+            instance.FirstResult.Should().Be(605);
         }
-        //[TestMethod]
-        //[DeploymentItem("Inputs/Day9/Day9Test1.txt")]
-        //public void Part2_ProducesCorrectFileChecksum_IsTrue()
-        //{
-        //    var instance = new AdventOfCode2015.Problems.Day9("Day9Test1.txt");
-        //    instance.SecondResult.Should().Be(2858);
-        //}
+        [TestMethod]
+        [DeploymentItem("Inputs/Day9/Day9Test1.txt")]
+        public void Part2_ProducesLongestRoute_IsTrue()
+        {
+            var instance = new AdventOfCode2015.Problems.Day9("Day9Test1.txt");
+            instance.SecondResult.Should().Be(982);
+        }
     }
 }

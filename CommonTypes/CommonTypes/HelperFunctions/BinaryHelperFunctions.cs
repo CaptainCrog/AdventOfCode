@@ -1,14 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommonTypes.CommonTypes.HelperFunctions.BinaryHelperFunctions
+﻿namespace CommonTypes.CommonTypes.HelperFunctions
 {
-    public static class PerformBinaryAddition
+    public static class BinaryHelperFunctions
     {
-        public static int[] RunAddition(int[] firstNumber, int[] secondNumber)
+        public static int[] Convert(int number, int bitCount)
+        {
+            var binary = new int[bitCount];
+            for (int i = 0; i < bitCount; i++)
+            {
+                binary[i] = number >> i & 1;
+            }
+            return binary;
+        }
+
+
+        public static int[] PerformBinaryAddition(int[] firstNumber, int[] secondNumber)
         {
             int length = Math.Max(firstNumber.Length, secondNumber.Length);
             int[] result = new int[length + 1]; // One extra bit for overflow

@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using CommonTypes.CommonTypes.HelperFunctions;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day9 : DayBase
     {
@@ -7,6 +9,11 @@
         int _firstResult = 0;
         int _secondResult = 0;
         List<SantasRoutes> _routes = new();
+        List<string> _locationsVisited = new();
+        //HashSet<string> _locationsVisited = new();
+        //HashSet<(List<string> locationCombinations, int totalDistanceTraversed)> _combinationsVisited = new();
+        Dictionary<string, int> _combinationsVisited = new();
+        List<(List<string>, int)> _allLocationsVisitedCombinations = new();
         #endregion
 
         #region Properties
@@ -63,22 +70,52 @@
         {
             var input = File.ReadAllLines(_inputPath);
 
-            foreach (var line in input) 
+            foreach (var line in input)
             {
                 var parts = line.Split(" = ");
                 var locations = parts[0].Split(" to ");
                 _routes.Add(new SantasRoutes() { Distance = int.Parse(parts[1].Trim()), Location1 = locations[0], Location2 = locations[1] });
             }
+
+            var allStartingLocations = _routes.Select(x => x.Location1).ToList().Concat(_routes.Select(x => x.Location2).ToList()).Distinct().ToList();
+            foreach (var startingLocation in allStartingLocations)
+            {
+                var allOtherLocations = _routes.Select(x => x.Location1).ToList().Concat(_routes.Select(x => x.Location2).ToList()).Distinct().Where(x => x != startingLocation).ToArray();
+                var allOtherLocationPermutations = ArrayHelperFunctions.GetAllPermutations<string>(allOtherLocations.ToArray());
+                foreach (var combination in allOtherLocationPermutations)
+                {
+                    var currentLocation = startingLocation;
+                    int routeDistance = 0;
+                    _locationsVisited = [currentLocation];
+
+                    foreach (var otherLocation in combination)
+                    {
+                        routeDistance += _routes.Where(x => (x.Location1 == currentLocation || x.Location2 == currentLocation) &&
+                                                            (x.Location1 == otherLocation || x.Location2 == otherLocation))
+                                                .Select(x => x.Distance).Single();
+
+                        currentLocation = otherLocation;
+                        _locationsVisited.Add(currentLocation);
+                    }
+
+                    var routeKey = string.Join(" -> ", _locationsVisited);
+                    if (!_combinationsVisited.TryGetValue(routeKey, out int totalTraversedDistance))
+                    {
+                        _combinationsVisited[routeKey] = routeDistance;
+                    }
+                }
+            }
         }
 
         public override T SolveFirstProblem<T>()
         {
-
-            return (T)Convert.ChangeType(0, typeof(T));
+            var shortestRoute = _combinationsVisited.OrderBy(x => x.Value).ToDictionary().First().Value;
+            return (T)Convert.ChangeType(shortestRoute, typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
+            var longestRoute = _combinationsVisited.OrderByDescending(x => x.Value).ToDictionary().First().Value;
+            return (T)Convert.ChangeType(longestRoute, typeof(T));
         }
 
         public override void OutputSolution()
@@ -96,6 +133,6 @@
     {
         public required string Location1 { get; init; }
         public required string Location2 { get; init; }
-        public required int Distance { get; init;}
+        public required int Distance { get; init; }
     }
 }
