@@ -5,18 +5,18 @@ namespace AdventOfCode2015Tests
     {
         [TestMethod]
         [DeploymentItem("Inputs/Day11/Day11Test1.txt")]
-        public void Part1_ProducesCorrectTotalFor25Blinks_IsTrue()
+        public void Part1_ProducesCorrectNextPasswordFile1_IsTrue()
         {
             var instance = new AdventOfCode2015.Problems.Day11("Day11Test1.txt");
-            instance.FirstResult.Should().Be(55312);
+            instance.FirstResult.Should().Be("abcdffaa");
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day11/Day11Test1.txt")]
-        public void Part2_ProducesCorrectTotalFor75Blinks_IsTrue()
+        [DeploymentItem("Inputs/Day11/Day11Test2.txt")]
+        public void Part1_ProducesCorrectNextPasswordFile2_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day11("Day11Test1.txt");
-            instance.SecondResult.Should().Be(65601038650482);
+            var instance = new AdventOfCode2015.Problems.Day11("Day11Test2.txt");
+            instance.FirstResult.Should().Be("ghjaabcc");
         }
     }
 }
