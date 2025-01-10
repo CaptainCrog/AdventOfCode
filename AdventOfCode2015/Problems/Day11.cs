@@ -1,6 +1,9 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using System.Text;
+using System.Text.RegularExpressions;
+
+namespace AdventOfCode2015.Problems
 {
-    public class Day11 : DayBase
+    public partial class Day11 : DayBase
     {
 
         #region Fields
@@ -8,13 +11,7 @@
         string _inputPath = string.Empty;
         int _firstResult = 0;
         ulong _secondResult = 0;
-        ulong _sumOfStones = 0;
-        string _initialArrangement = string.Empty;
-        Dictionary<ulong, ulong> _initialNumbers = new Dictionary<ulong, ulong>();
-        Dictionary<ulong, List<ulong>> _cache = new Dictionary<ulong, List<ulong>>()
-        {
-            { 0, new List<ulong>() { 1 } }
-        };
+        string _currentPassword = string.Empty;
 
         #endregion
 
@@ -55,53 +52,6 @@
             }
         }
 
-        string InitialArrangement
-        {
-            get => _initialArrangement;
-            set
-            {
-                if (_initialArrangement != value)
-                {
-                    _initialArrangement = value;
-                }
-            }
-        }
-
-        ulong SumOfStones
-        {
-            get => _sumOfStones;
-            set
-            {
-                if (_sumOfStones != value)
-                {
-                    _sumOfStones = value;
-                }
-            }
-        }
-        Dictionary<ulong, ulong> InitialNumbers
-        {
-            get => _initialNumbers;
-            set
-            {
-                if (_initialNumbers != value)
-                {
-                    _initialNumbers = value;
-                }
-            }
-        }
-
-        Dictionary<ulong, List<ulong>> Cache
-        {
-            get => _cache;
-            set
-            {
-                if (_cache != value)
-                {
-                    _cache = value;
-                }
-            }
-        }
-
         #endregion
 
         #region Constructor
@@ -118,12 +68,7 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            InitialArrangement = File.ReadAllText(InputPath);
-            var numberStrings = InitialArrangement.Split(" ");
-            foreach (var numberString in numberStrings)
-            {
-                InitialNumbers.Add(ulong.Parse(numberString), 1);
-            }
+            _currentPassword = File.ReadAllText(InputPath);
 
         }
 
@@ -135,83 +80,82 @@
 
         public override T SolveFirstProblem<T>()
         {
-            SumOfStones = ProcessRocks(25);
-            return (T)Convert.ChangeType(SumOfStones, typeof(T));
+            
+            return (T)Convert.ChangeType(0, typeof(T));
         }
 
 
         public override T SolveSecondProblem<T>()
         {
-            SumOfStones = ProcessRocks(75);
-            return (T)Convert.ChangeType(SumOfStones, typeof(T));
+            return (T)Convert.ChangeType(0, typeof(T));
         }
 
-
-        private ulong ProcessRocks(int iterationLimit)
+        string GeneratePasswords()
         {
-            var stoneNumbers = InitialNumbers.ToDictionary();
-            var iteration = 0;
-            ulong sum = 0;
-
-            while (iteration < iterationLimit)
+            var invalidCharactersRegex = InvalidCharactersRegex();
+            var doubleCharactersRegex = DoubleCharactersRegex();
+            var passwordCopy = _currentPassword.ToString();
+            while (true)
             {
-                var blink = new Dictionary<ulong, ulong>();
-                foreach (var stoneNumber in stoneNumbers.Keys)
+                var invalidMatches = invalidCharactersRegex.Matches(passwordCopy);
+                if (invalidMatches.Any())
                 {
-                    var count = stoneNumbers[stoneNumber];
-                    var blinkResults = ProcessNumber(stoneNumber);
+                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length);
+                    continue;
+                }
+                
+                var doubleMatches = doubleCharactersRegex.Matches(passwordCopy);
+                if (!doubleMatches.Any() || doubleMatches.Count < 2)
+                {
+                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length);
+                    continue;
+                }
 
-                    foreach (var result in blinkResults)
+                for (int i = 0; i < passwordCopy.Length-2; i++)
+                {
+                    var firstChar = (int)passwordCopy[i];
+                    var secondChar = (int)passwordCopy[i + 1];
+                    var thirdChar = (int)passwordCopy[i + 2];
+                    if (secondChar - firstChar == 1 && thirdChar - secondChar == 1)
                     {
-                        if (!blink.TryAdd(result, count))
-                            blink[result] += count;
+                        return passwordCopy;
+                    }
+                    else
+                    {
+                        passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length);
+                        continue;
                     }
                 }
-                stoneNumbers = blink;
-                iteration++;
             }
-
-            foreach (var stoneNumber in stoneNumbers.Keys)
-                sum += stoneNumbers[stoneNumber];
-
-            return sum;
         }
 
-
-        private List<ulong> ProcessNumber(ulong number)
+        string ShiftPassword(string passwordCopy, int position)
         {
-            var blinkResults = new List<ulong>();
+            char positionChar = passwordCopy[position];
+            var currentPassword = string.Empty;
+            if (positionChar == 'z')
             {
-                if (Cache.TryGetValue(number, out var cachedNumberList))
-                {
-                    blinkResults.AddRange(cachedNumberList);
-                }
-                else if (Math.Floor(Math.Log10(number) + 1) % 2 == 0)
-                {
-                    (ulong leftNumber, ulong rightNumber) = SplitNumber(number);
-                    Cache.Add(number, new List<ulong>() { leftNumber, rightNumber });
-                    blinkResults.AddRange(new List<ulong> { leftNumber, rightNumber });
-                }
-                else
-                {
-                    var multipliedNumber = number * 2015;
-                    Cache.Add(number, new List<ulong>() { multipliedNumber });
-                    blinkResults.Add(multipliedNumber);
-                }
-                return blinkResults;
+                positionChar = 'a';
+                currentPassword = ShiftPassword(passwordCopy, position - 1);
             }
+            else
+            {
+                positionChar++;
+            }
+            currentPassword = passwordCopy.Substring(0, position - 1) + positionChar;
+
+            return (currentPassword);
         }
 
-        (ulong leftNumber, ulong rightNumber) SplitNumber(ulong number)
-        {
-            var digitCount = (ulong)Math.Floor(Math.Log10(number)) + 1;
+        //https://regex101.com/r/LYDPsd/2
+        [GeneratedRegex(@"[iol]")]
+        private static partial Regex InvalidCharactersRegex();
 
-            var divisor = (ulong)Math.Pow(10, digitCount / 2);
-            var leftNumber = number / divisor;
-            var rightNumber = number % divisor;
+        //https://regex101.com/r/ULYRyA/1
+        [GeneratedRegex(@"(.)\1")]
+        private static partial Regex DoubleCharactersRegex();
 
-            return (leftNumber, rightNumber);
-        }
+
         #endregion
     }
 }
