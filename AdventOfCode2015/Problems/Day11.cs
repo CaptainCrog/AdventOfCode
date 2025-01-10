@@ -9,8 +9,8 @@ namespace AdventOfCode2015.Problems
         #region Fields
 
         string _inputPath = string.Empty;
-        int _firstResult = 0;
-        ulong _secondResult = 0;
+        string _firstResult = string.Empty;
+        string _secondResult = string.Empty;
         string _currentPassword = string.Empty;
 
         #endregion
@@ -29,7 +29,7 @@ namespace AdventOfCode2015.Problems
         }
 
 
-        public int FirstResult
+        public string FirstResult
         {
             get => _firstResult;
             set
@@ -40,7 +40,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public ulong SecondResult
+        public string SecondResult
         {
             get => _secondResult;
             set
@@ -59,8 +59,8 @@ namespace AdventOfCode2015.Problems
         {
             _inputPath = inputPath;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<ulong>();
+            SolveFirstProblem<int>();
+            SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -80,13 +80,15 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            
+            FirstResult = GeneratePasswords();
             return (T)Convert.ChangeType(0, typeof(T));
         }
 
 
         public override T SolveSecondProblem<T>()
         {
+            _currentPassword = ShiftPassword(FirstResult, FirstResult.Length-1);
+            SecondResult = GeneratePasswords();
             return (T)Convert.ChangeType(0, typeof(T));
         }
 
@@ -95,23 +97,45 @@ namespace AdventOfCode2015.Problems
             var invalidCharactersRegex = InvalidCharactersRegex();
             var doubleCharactersRegex = DoubleCharactersRegex();
             var passwordCopy = _currentPassword.ToString();
+            var passwordLength = passwordCopy.Length;
             while (true)
             {
                 var invalidMatches = invalidCharactersRegex.Matches(passwordCopy);
                 if (invalidMatches.Any())
                 {
-                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length);
+                    int lowestPosition = int.MaxValue;
+                    if (passwordCopy.Contains('i'))
+                        lowestPosition = Math.Min(passwordCopy.IndexOf('i'), lowestPosition);
+                    if (passwordCopy.Contains('o'))
+                        lowestPosition = Math.Min(passwordCopy.IndexOf('o'), lowestPosition);
+                    if (passwordCopy.Contains('l'))
+                        lowestPosition = Math.Min(passwordCopy.IndexOf('l'), lowestPosition);
+
+                    var charAtLowestPosition = passwordCopy[lowestPosition];
+
+                    if (charAtLowestPosition == 'i')
+                        passwordCopy = passwordCopy.Replace('i', 'j').Substring(0, lowestPosition+1);
+                    else if (charAtLowestPosition == 'o')
+                        passwordCopy = passwordCopy.Replace('o', 'p').Substring(0, lowestPosition+1);
+                    else
+                        passwordCopy = passwordCopy.Replace('l', 'm').Substring(0, lowestPosition+1);
+
+
+                    while (passwordCopy.Length != passwordLength)
+                    {
+                        passwordCopy += 'a';
+                    }
                     continue;
                 }
                 
                 var doubleMatches = doubleCharactersRegex.Matches(passwordCopy);
                 if (!doubleMatches.Any() || doubleMatches.Count < 2)
                 {
-                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length);
+                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length-1);
                     continue;
                 }
 
-                for (int i = 0; i < passwordCopy.Length-2; i++)
+                for (int i = 0; i < passwordCopy.Length-3; i++)
                 {
                     var firstChar = (int)passwordCopy[i];
                     var secondChar = (int)passwordCopy[i + 1];
@@ -120,31 +144,27 @@ namespace AdventOfCode2015.Problems
                     {
                         return passwordCopy;
                     }
-                    else
-                    {
-                        passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length);
-                        continue;
-                    }
                 }
+
+                passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length - 1);
             }
         }
 
         string ShiftPassword(string passwordCopy, int position)
         {
             char positionChar = passwordCopy[position];
-            var currentPassword = string.Empty;
             if (positionChar == 'z')
             {
                 positionChar = 'a';
-                currentPassword = ShiftPassword(passwordCopy, position - 1);
+                passwordCopy = ShiftPassword(passwordCopy, position - 1);
             }
             else
             {
                 positionChar++;
             }
-            currentPassword = passwordCopy.Substring(0, position - 1) + positionChar;
+            passwordCopy = passwordCopy.Substring(0, position) + positionChar;
 
-            return (currentPassword);
+            return passwordCopy;
         }
 
         //https://regex101.com/r/LYDPsd/2
