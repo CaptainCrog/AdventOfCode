@@ -5,68 +5,40 @@ namespace AdventOfCode2015Tests
     {
         [TestMethod]
         [DeploymentItem("Inputs/Day10/Day10Test1.txt")]
-        public void Part1_ProducesCorrectTrailHeadCountFile1_IsTrue()
+        public void Part1_ProducesCorrectValueOutput_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test1.txt");
-            instance.FirstResult.Should().Be(1);
+            var instance = new AdventOfCode2015.Problems.Day10("Day10Test1.txt", 1);
+            instance.FirstResult.Should().Be(2);
         }
 
         [TestMethod]
         [DeploymentItem("Inputs/Day10/Day10Test2.txt")]
         public void Part1_ProducesCorrectTrailHeadCountFile2_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test2.txt");
+            var instance = new AdventOfCode2015.Problems.Day10("Day10Test2.txt", 1);
             instance.FirstResult.Should().Be(2);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day10/Day10Test3.txt")]
         public void Part1_ProducesCorrectTrailHeadCountFile3_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test3.txt");
+            var instance = new AdventOfCode2015.Problems.Day10("Day10Test3.txt", 1);
             instance.FirstResult.Should().Be(4);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day10/Day10Test4.txt")]
         public void Part1_ProducesCorrectTrailHeadCountFile4_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test4.txt");
-            instance.FirstResult.Should().Be(3);
+            var instance = new AdventOfCode2015.Problems.Day10("Day10Test4.txt", 1);
+            instance.FirstResult.Should().Be(6);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day10/Day10Test5.txt")]
         public void Part1_ProducesCorrectTrailHeadCountFile5_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test5.txt");
-            instance.FirstResult.Should().Be(36);
+            var instance = new AdventOfCode2015.Problems.Day10("Day10Test5.txt", 1);
+            instance.FirstResult.Should().Be(7);
         }
-
-        [TestMethod]
-        [DeploymentItem("Inputs/Day10/Day10Test6.txt")]
-        public void Part2_ProducesCorrectTrailHeadRatingFile6_IsTrue()
-        {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test6.txt");
-            instance.SecondResult.Should().Be(3);
-        }
-        [TestMethod]
-        [DeploymentItem("Inputs/Day10/Day10Test3.txt")]
-        public void Part2_ProducesCorrectTrailHeadRatingFile3_IsTrue()
-        {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test3.txt");
-            instance.SecondResult.Should().Be(13);
-        }
-        [TestMethod]
-        [DeploymentItem("Inputs/Day10/Day10Test7.txt")]
-        public void Part2_ProducesCorrectTrailHeadRatingFile7_IsTrue()
-        {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test7.txt");
-            instance.SecondResult.Should().Be(227);
-        }
-        [TestMethod]
-        [DeploymentItem("Inputs/Day10/Day10Test5.txt")]
-        public void Part2_ProducesCorrectTrailHeadRatingFile5_IsTrue()
-        {
-            var instance = new AdventOfCode2015.Problems.Day10("Day10Test5.txt");
-            instance.SecondResult.Should().Be(81);
-        }
+        // No part 2 tests as it builds off the original functionality again which is already covered by part 1 tests
     }
 }
