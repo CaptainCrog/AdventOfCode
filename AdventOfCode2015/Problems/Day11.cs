@@ -103,28 +103,7 @@ namespace AdventOfCode2015.Problems
                 var invalidMatches = invalidCharactersRegex.Matches(passwordCopy);
                 if (invalidMatches.Any())
                 {
-                    int lowestPosition = int.MaxValue;
-                    if (passwordCopy.Contains('i'))
-                        lowestPosition = Math.Min(passwordCopy.IndexOf('i'), lowestPosition);
-                    if (passwordCopy.Contains('o'))
-                        lowestPosition = Math.Min(passwordCopy.IndexOf('o'), lowestPosition);
-                    if (passwordCopy.Contains('l'))
-                        lowestPosition = Math.Min(passwordCopy.IndexOf('l'), lowestPosition);
-
-                    var charAtLowestPosition = passwordCopy[lowestPosition];
-
-                    if (charAtLowestPosition == 'i')
-                        passwordCopy = passwordCopy.Replace('i', 'j').Substring(0, lowestPosition+1);
-                    else if (charAtLowestPosition == 'o')
-                        passwordCopy = passwordCopy.Replace('o', 'p').Substring(0, lowestPosition+1);
-                    else
-                        passwordCopy = passwordCopy.Replace('l', 'm').Substring(0, lowestPosition+1);
-
-
-                    while (passwordCopy.Length != passwordLength)
-                    {
-                        passwordCopy += 'a';
-                    }
+                    passwordCopy = ProcessInvalidCharacter(passwordCopy, passwordLength);
                     continue;
                 }
                 
@@ -163,6 +142,33 @@ namespace AdventOfCode2015.Problems
                 positionChar++;
             }
             passwordCopy = passwordCopy.Substring(0, position) + positionChar;
+
+            return passwordCopy;
+        }
+        string ProcessInvalidCharacter(string passwordCopy, int passwordLength)
+        {
+            int lowestPosition = int.MaxValue;
+            if (passwordCopy.Contains('i'))
+                lowestPosition = Math.Min(passwordCopy.IndexOf('i'), lowestPosition);
+            if (passwordCopy.Contains('o'))
+                lowestPosition = Math.Min(passwordCopy.IndexOf('o'), lowestPosition);
+            if (passwordCopy.Contains('l'))
+                lowestPosition = Math.Min(passwordCopy.IndexOf('l'), lowestPosition);
+
+            var charAtLowestPosition = passwordCopy[lowestPosition];
+
+            if (charAtLowestPosition == 'i')
+                passwordCopy = passwordCopy.Replace('i', 'j').Substring(0, lowestPosition + 1);
+            else if (charAtLowestPosition == 'o')
+                passwordCopy = passwordCopy.Replace('o', 'p').Substring(0, lowestPosition + 1);
+            else
+                passwordCopy = passwordCopy.Replace('l', 'm').Substring(0, lowestPosition + 1);
+
+
+            while (passwordCopy.Length != passwordLength)
+            {
+                passwordCopy += 'a';
+            }
 
             return passwordCopy;
         }
