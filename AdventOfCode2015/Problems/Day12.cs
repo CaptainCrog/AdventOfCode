@@ -1,16 +1,15 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using System.Text.RegularExpressions;
+
+namespace AdventOfCode2015.Problems
 {
-    public class Day12 : DayBase
+    public partial class Day12 : DayBase
     {
 
         #region Fields
-        string _inputPath = string.Empty; 
+        string _inputPath = string.Empty;
+        string _input = string.Empty;
         int _firstResult = 0;
         ulong _secondResult = 0;
-        string[] _gardenPlot = [];
-        char[] _distinctPlotValues = [];
-
-        Dictionary<string, List<(int row, int col)>> _plotSummary = new Dictionary<string, List<(int row, int col)>>();
 
         #endregion
 
@@ -50,42 +49,6 @@
                 }
             }
         }
-
-        string[] GardenPlot
-        {
-            get => _gardenPlot;
-            set
-            {
-                if (_gardenPlot != value)
-                {
-                    _gardenPlot = value;
-                }
-            }
-        }
-        char[] DistinctPlotValues
-        {
-            get => _distinctPlotValues;
-            set
-            {
-                if (_distinctPlotValues != value)
-                {
-                    _distinctPlotValues = value;
-                }
-            }
-        }
-        Dictionary<string, List<(int row, int col)>> PlotSummary
-        {
-            get => _plotSummary;
-            set
-            {
-                if (_plotSummary != value)
-                {
-                    _plotSummary = value;
-                }
-            }
-        }
-
-
         #endregion
 
         #region Constructor
@@ -102,8 +65,7 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            GardenPlot = File.ReadAllText(InputPath).Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            PlotSummary = FindAllSeparatePlot(GardenPlot);
+            _input = File.ReadAllText(InputPath);
         }
 
         public override void OutputSolution()
@@ -114,141 +76,100 @@
 
         public override T SolveFirstProblem<T>()
         {
-            return (T)Convert.ChangeType(Calculate(1), typeof(T));
+            var sum = 0;
+
+            var numberRegex = NumberRegex();
+            var matches = numberRegex.Matches(_input).Select(x => x.Value);
+            foreach (var match in matches)
+            {
+                sum += int.Parse(match);
+            }
+
+            return (T)Convert.ChangeType(sum, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(Calculate(2), typeof(T));
-        }
+            var sum = 0;
+            var inputCopy = _input.ToString();
 
+            var fillerChars = inputCopy.Where(x => x != '[' && x != ']' && x != '{' && x != '}' && x != '-' &&
+                                                        x != '1' && x != '2' && x != '3' && x != '4' && x != '5' && x != '6' && x != '7' && x != '8' && x != '9' && x != '0')
+                                            .ToList()
+                                            .Distinct();
 
-
-        private long Calculate(int part)
-        {
-            long sum = 0;
-
-            foreach (var plot in PlotSummary.Keys)
+            foreach (var characterType in fillerChars)
             {
-                var coordinateValues = PlotSummary.GetValueOrDefault(plot);
-                if (coordinateValues.Count == 1)
-                    sum += 4;
-                else
-                {
-                    HashSet<(int, int)> coordinates = coordinateValues.ToHashSet();
-
-                    if (part == 1)
-                    {
-                        int perimeter = CalculatePerimeter(coordinates);
-                        var area = perimeter * coordinates.Count();
-                        sum += area;
-                    }
-                    else if (part == 2)
-                    {
-                        int corners = CalculateCorners(coordinates);
-                        var area = corners * coordinates.Count();
-                        sum += area;
-                    }
-                }
-
+                inputCopy = inputCopy.Replace(characterType, ' ');
             }
 
+            for (int i = 0; i < inputCopy.Length; i++)
+            {
+                if (IsOpeningBracket(inputCopy[i]))
+                {
+                    sum += ProcessTillEndBracket(inputCopy, ref i);
+                }
+            }
+
+            return (T)Convert.ChangeType(0, typeof(T));
+        }
+
+        bool IsOpeningBracket(char inputChar)
+        {
+            if (inputChar == '[' || inputChar == '{')
+                return true;
+            return false;
+        }
+
+        bool IsClosingBracket(char inputChar)
+        {
+            if (inputChar == ']' || inputChar == '}')
+                return true;
+            return false;
+        }
+
+        int ProcessTillEndBracket(string inputCopy, ref int index)
+        {
+            Console.WriteLine();
+            var sum = 0;
+            int depth = 1;
+            index++;
+            while (depth != 0)
+            {
+                if (inputCopy[index] == ' ')
+                {
+                    index++;
+                }
+                else if (IsOpeningBracket(inputCopy[index]))
+                {
+                    index++;
+                    depth++;
+                }
+                else if (IsClosingBracket(inputCopy[index]))
+                {
+                    index++;
+                    depth--;
+                }
+                else
+                {
+                    var number = string.Empty;
+                    while (inputCopy[index] == '-' || char.IsDigit(inputCopy[index]))
+                    {
+                        number += inputCopy[index];
+                        index++;
+                    }
+                    Console.WriteLine(number);
+                    sum += int.Parse(number);
+                }
+            }
+            Console.WriteLine(sum);
             return sum;
         }
 
-        int CalculatePerimeter(HashSet<(int row, int col)> coordinates)
-        {
-            int perimeter = 0;
 
-            foreach (var (row, col) in coordinates)
-            {
-                // Check each of the 4 possible neighbors
-                if (!coordinates.Contains((row - 1, col))) perimeter++; // Left
-                if (!coordinates.Contains((row + 1, col))) perimeter++; // Right
-                if (!coordinates.Contains((row, col - 1))) perimeter++; // Down
-                if (!coordinates.Contains((row, col + 1))) perimeter++; // Up
-            }
-
-            return perimeter;
-        }
-
-        int CalculateCorners(HashSet<(int row, int col)> coordinates)
-        {
-            int corners = 0;
-
-            foreach (var (row, col) in coordinates)
-            {
-                bool left = coordinates.Contains((row, col - 1));
-                bool right = coordinates.Contains((row, col + 1));
-                bool top = coordinates.Contains((row - 1, col));
-                bool bottom = coordinates.Contains((row + 1, col));
-
-
-                bool topLeft = coordinates.Contains((row - 1, col - 1));
-                bool topRight = coordinates.Contains((row - 1, col + 1));
-                bool bottomRight = coordinates.Contains((row + 1, col + 1));
-                bool bottomLeft = coordinates.Contains((row + 1, col - 1));
-
-                if (!left && !top)
-                    corners++;
-                else if (left && top && !topLeft)
-                    corners++;
-
-                if (!right && !top)
-                    corners++;
-                else if (right && top && !topRight)
-                    corners++;
-
-                if (!right && !bottom)
-                    corners++;
-                else if (right && bottom && !bottomRight)
-                    corners++;
-
-                if (!left && !bottom)
-                    corners++;
-                else if (left && bottom && !bottomLeft)
-                    corners++;
-
-            }
-
-            return corners;
-        }
-
-        static Dictionary<string, List<(int, int)>> FindAllSeparatePlot(string[] gardenPlot)
-        {
-            var visited = new bool[gardenPlot.Length, gardenPlot[0].Length];
-            var groups = new Dictionary<string, List<(int, int)>>();
-            int groupCounter = 1;
-
-            for (int i = 0; i < gardenPlot.Length; i++)
-            {
-                for (int j = 0; j < gardenPlot[i].Length; j++)
-                {
-                    if (!visited[i, j] && gardenPlot[i][j] != ' ')
-                    {
-                        var group = new List<(int, int)>();
-                        SearchPlot(gardenPlot, visited, i, j, gardenPlot[i][j], group);
-                        groups.Add($"{gardenPlot[i][j]}{groupCounter++}", group);
-                    }
-                }
-            }
-
-            return groups;
-        }
-
-        static void SearchPlot(string[] gardenPlot, bool[,] visited, int row, int col, char plotValue, List<(int, int)> group)
-        {
-            if (row < 0 || row >= gardenPlot.Length || col < 0 || col >= gardenPlot[row].Length || visited[row, col] || gardenPlot[row][col] != plotValue)
-                return;
-
-            visited[row, col] = true;
-            group.Add((row, col));
-
-            SearchPlot(gardenPlot, visited, row + 1, col, plotValue, group);
-            SearchPlot(gardenPlot, visited, row - 1, col, plotValue, group);
-            SearchPlot(gardenPlot, visited, row, col + 1, plotValue, group);
-            SearchPlot(gardenPlot, visited, row, col - 1, plotValue, group);
-        }
+        //
+        [GeneratedRegex(@"[iol]")]
+        private static partial Regex NumberRegex();
 
         #endregion
     }
