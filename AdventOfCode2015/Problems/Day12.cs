@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -9,7 +10,8 @@ namespace AdventOfCode2015.Problems
         string _inputPath = string.Empty;
         string _input = string.Empty;
         int _firstResult = 0;
-        ulong _secondResult = 0;
+        int _secondResult = 0;
+        List<(int firstIndex, int lastIndex)> _positionsToRemove = new();
 
         #endregion
 
@@ -38,7 +40,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public ulong SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -57,7 +59,7 @@ namespace AdventOfCode2015.Problems
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<ulong>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -91,85 +93,100 @@ namespace AdventOfCode2015.Problems
         public override T SolveSecondProblem<T>()
         {
             var sum = 0;
-            var inputCopy = _input.ToString();
-
-            var fillerChars = inputCopy.Where(x => x != '[' && x != ']' && x != '{' && x != '}' && x != '-' &&
-                                                        x != '1' && x != '2' && x != '3' && x != '4' && x != '5' && x != '6' && x != '7' && x != '8' && x != '9' && x != '0')
-                                            .ToList()
-                                            .Distinct();
-
-            foreach (var characterType in fillerChars)
+            var redGroupRegex = RedGroupRegex();
+            var redMatches = redGroupRegex.Matches(_input);
+            foreach (Match match in redMatches)
             {
-                inputCopy = inputCopy.Replace(characterType, ' ');
+                ProcessRed(_input, match.Index);
             }
 
-            for (int i = 0; i < inputCopy.Length; i++)
+            var inputWithoutInvalidReds = new StringBuilder();
+            for (int i = 0; i < _input.Length; i++)
             {
-                if (IsOpeningBracket(inputCopy[i]))
+                if (_positionsToRemove.Any(x => x.firstIndex == i))
                 {
-                    sum += ProcessTillEndBracket(inputCopy, ref i);
+                    var nextIndex = _positionsToRemove.Where(x => x.firstIndex == i).FirstOrDefault().lastIndex;
+                    i = nextIndex;
                 }
+                inputWithoutInvalidReds.Append(_input[i]);
             }
 
-            return (T)Convert.ChangeType(0, typeof(T));
-        }
 
-        bool IsOpeningBracket(char inputChar)
-        {
-            if (inputChar == '[' || inputChar == '{')
-                return true;
-            return false;
-        }
-
-        bool IsClosingBracket(char inputChar)
-        {
-            if (inputChar == ']' || inputChar == '}')
-                return true;
-            return false;
-        }
-
-        int ProcessTillEndBracket(string inputCopy, ref int index)
-        {
-            Console.WriteLine();
-            var sum = 0;
-            int depth = 1;
-            index++;
-            while (depth != 0)
+            var numberRegex = NumberRegex();
+            var matches = numberRegex.Matches(inputWithoutInvalidReds.ToString()).Select(x => x.Value);
+            foreach (var match in matches)
             {
-                if (inputCopy[index] == ' ')
+                sum += int.Parse(match);
+            }
+
+            return (T)Convert.ChangeType(sum, typeof(T));
+        }
+
+        void ProcessRed(string inputCopy, int index)
+        {
+            var indexCopy = index;
+            var depth = 0;
+            int lastIndex;
+            int firstIndex;
+            while (true)
+            {
+                var temp = inputCopy[indexCopy];
+                if (inputCopy[indexCopy] == '{' || inputCopy[indexCopy] == '[')
                 {
-                    index++;
-                }
-                else if (IsOpeningBracket(inputCopy[index]))
-                {
-                    index++;
                     depth++;
                 }
-                else if (IsClosingBracket(inputCopy[index]))
+
+                if (inputCopy[indexCopy] == ']' || inputCopy[indexCopy] == '}' )
                 {
-                    index++;
-                    depth--;
-                }
-                else
-                {
-                    var number = string.Empty;
-                    while (inputCopy[index] == '-' || char.IsDigit(inputCopy[index]))
+                    if (depth == 0)
                     {
-                        number += inputCopy[index];
-                        index++;
+                        // If the first bracket we find is an array then we can ignore this
+                        if (inputCopy[indexCopy] == ']')
+                            return;
+                        else
+                        {
+                            lastIndex = indexCopy;
+                            break;
+                        }
                     }
-                    Console.WriteLine(number);
-                    sum += int.Parse(number);
+                    else
+                        depth--;
                 }
+
+                indexCopy++;
             }
-            Console.WriteLine(sum);
-            return sum;
+            indexCopy = index;
+            while (true)
+            {
+                // if we find another of this bracket then we know there's another depth
+                if (inputCopy[indexCopy] == '}')
+                {
+                    depth++;
+                }
+
+                if (inputCopy[indexCopy] == '{')
+                {
+                    if (depth == 0)
+                    {
+                        firstIndex = indexCopy;
+                        break;
+                    }
+                    else
+                        depth--;
+                }
+                indexCopy--;
+            }
+
+            _positionsToRemove.Add((firstIndex, lastIndex));
         }
 
-
         //
-        [GeneratedRegex(@"[iol]")]
+        [GeneratedRegex(@"-?\d+")]
         private static partial Regex NumberRegex();
+
+        //https://regex101.com/r/RgEfsO/1
+        [GeneratedRegex(@"red")]
+        private static partial Regex RedGroupRegex();
 
         #endregion
     }
