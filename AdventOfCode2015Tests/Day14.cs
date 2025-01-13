@@ -5,46 +5,18 @@ namespace AdventOfCode2015Tests
     {
         [TestMethod]
         [DeploymentItem("Inputs/Day14/Day14Test1.txt")]
-        public void Part1_ProducesCorrectSafetyFactorAfter100Seconds_IsTrue()
+        public void Part1_ProducesLargestReindeerDistance_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day14("Day14Test1.txt");
-            instance.FirstResult.Should().Be(12);
+            var instance = new AdventOfCode2015.Problems.Day14("Day14Test1.txt", 1000);
+            instance.FirstResult.Should().Be(1120);
         }
 
-        //PART 2 Generates a file which can be searched manually by finding a long list of '###############################' which represents the top/bottom of the picture
-
-        //      ###############################
-        //      #.............................#
-        //      #.............................#
-        //      #.............................#
-        //      #.............................#
-        //      #..............#..............#
-        //      #.............###.............#
-        //      #............#####............#
-        //      #...........#######...........#
-        //      #..........#########..........#
-        //      #............#####............#
-        //      #...........#######...........#
-        //      #..........#########..........#
-        //      #.........###########.........#
-        //      #........#############........#
-        //      #..........#########..........#
-        //      #.........###########.........#
-        //      #........#############........#
-        //      #.......###############.......#
-        //      #......#################......#
-        //      #........#############........#
-        //      #.......###############.......#
-        //      #......#################......#
-        //      #.....###################.....#
-        //      #....#####################....#
-        //      #.............###.............#
-        //      #.............###.............#
-        //      #.............###.............#
-        //      #.............................#
-        //      #.............................#
-        //      #.............................#
-        //      #.............................#
-        //      ###############################
+        [TestMethod]
+        [DeploymentItem("Inputs/Day14/Day14Test1.txt")]
+        public void Part2_ProducesLargestReindeerDistance_IsTrue()
+        {
+            var instance = new AdventOfCode2015.Problems.Day14("Day14Test1.txt", 1000);
+            instance.SecondResult.Should().Be(689);
+        }
     }
 }
