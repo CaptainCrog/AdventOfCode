@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommonTypes.CommonTypes.Regex;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,21 +11,11 @@ namespace AdventOfCode2015.Problems
     {
         #region Fields
         string _inputPath = string.Empty;
-        string _outputPath = @"OUTPUT PATH HERE";
-        long _firstResult = 0;
-        ulong _secondResult = 0;
-        string[] _input = [];
-        int _gridWidth = 0;
-        int _gridHeight = 0;
-        int _heightCenter = 0;
-        int _widthCenter = 0;
-        int[,] _bathroom = new int [0,0];
-        char[,] _bathroomChars = new char[0, 0];
-        List<int> _tlQuadrant = new ();
-        List<int> _trQuadrant = new ();
-        List<int> _blQuadrant = new ();
-        List<int> _brQuadrant = new ();
-        List <Robot> _robots = new List<Robot> ();
+        int _firstResult = 0;
+        int _secondResult = 0;
+        int _raceTime = 0;
+        List<int> _reindeerFinalDistances = new();
+        List<Reindeer> _reindeers = new();
 
         #endregion
 
@@ -42,7 +33,7 @@ namespace AdventOfCode2015.Problems
         }
 
 
-        public long FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -53,7 +44,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public ulong SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -68,12 +59,13 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Constructor
-        public Day14(string inputPath)
+        public Day14(string inputPath, int raceTime)
         {
             _inputPath = inputPath;
+            _raceTime = raceTime;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<long>();
-            SecondResult = SolveSecondProblem<ulong>();
+            FirstResult = SolveFirstProblem<int>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -81,215 +73,124 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            _input = File.ReadAllLines(InputPath);
-            _gridHeight = 103;
-            _gridWidth = 101;
-            _heightCenter = _gridHeight / 2;
-            _widthCenter = _gridWidth / 2;
-            _bathroom = new int[_gridWidth, _gridHeight];
-            _bathroomChars = new char[_gridWidth, _gridHeight];
+            var input = File.ReadAllLines(InputPath);
+            var regex = CommonRegexHelpers.NumberRegex();
+            foreach (var line in input)
+            {
+                var matches = regex.Matches(line);
+                var speed = int.Parse(matches[0].Value);
+                var runningTime = int.Parse(matches[1].Value);
+                var restingTime = int.Parse(matches[2].Value);
 
-            CreateRobots();
+                _reindeers.Add(new Reindeer(speed, runningTime, restingTime)
+                {
+                    TimeLeftRunning = runningTime,
+                    TimeLeftResting = restingTime,
+                    TraversedDistance = 0,
+                    IsResting = false
+                });
+            }
         }
 
         public override void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
-            Console.WriteLine($"Second Solution can be found in the file setup in the output path");
+            Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
         public override T SolveFirstProblem<T>()
         {
-            foreach (var robot in _robots)
+            _reindeerFinalDistances = new();
+            foreach (var reindeer in  _reindeers)
             {
-                var newX = (robot.StartingPosition.startingPosX + robot.Velocity.velocityX * 100) % _gridWidth;
-                var newY = (robot.StartingPosition.startingPosY + robot.Velocity.velocityY * 100) % _gridHeight;
-                if (newX < 0) 
-                    newX += _gridWidth;
-                if (newY < 0)
-                    newY += _gridHeight;
+                var totalRunningCycles = _raceTime / reindeer.TotalTimePerRun;
+                var totalDistanceTraversed = totalRunningCycles * reindeer.TotalRunDistance;
 
-                robot.FinalPosition = (newX, newY);
+                var leftOverTime = _raceTime % reindeer.TotalTimePerRun;
+                int iter = 0;
 
-                _bathroom[newX, newY]++;
+                while (iter < reindeer.RunningTime)
+                {
+                    if (iter >= leftOverTime)
+                        break;
+                    totalDistanceTraversed += reindeer.Speed;
+                    iter++;
+                }
 
+                _reindeerFinalDistances.Add(totalDistanceTraversed);
             }
-            SetupQuadrantValues();
-            long sum = _tlQuadrant.Sum() * _trQuadrant.Sum() * _blQuadrant.Sum() * _brQuadrant.Sum();
+            var result = _reindeerFinalDistances.OrderDescending().First();
 
-            return (T)Convert.ChangeType(sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
+            _reindeerFinalDistances = new();
             int iter = 0;
 
-            while (iter <= 10000)
+            while (iter < _raceTime)
             {
-                for (int i = 0; i <= _bathroomChars.GetLength(1) - 1; i++)
+                _reindeers.ForEach(x =>
                 {
-                    for (int j = 0; j <= _bathroomChars.GetLength(0) - 1; j++)
+                    if (x.TimeLeftRunning == 0)
                     {
-                        _bathroomChars[j, i] = '.';
+                        x.IsResting = true;
+                        x.TimeLeftRunning = x.RunningTime;
                     }
-                }
-
-                foreach (var robot in _robots)
-                {
-                    var newX = (robot.StartingPosition.startingPosX + robot.Velocity.velocityX * iter) % _gridWidth;
-                    var newY = (robot.StartingPosition.startingPosY + robot.Velocity.velocityY * iter) % _gridHeight;
-                    if (newX < 0)
-                        newX += _gridWidth;
-                    if (newY < 0)
-                        newY += _gridHeight;
-
-                    robot.FinalPosition = (newX, newY);
-
-                    _bathroomChars[newX, newY] = '#';
-
-                }
-
-                var stringBuilder = new StringBuilder();
-
-                int rows = _bathroom.GetLength(0);
-                int cols = _bathroom.GetLength(1);
-
-                stringBuilder.AppendLine($"ITERATION {iter}:");
-                for (int i = 0; i < cols; i++)
-                {
-                    for (int j = 0; j < rows; j++)
+                    else if (x.TimeLeftResting == 0)
                     {
-                        stringBuilder.Append(_bathroomChars[j, i].ToString());
+                        x.IsResting = false;
+                        x.TimeLeftResting = x.RestingTime;
                     }
-                    stringBuilder.AppendLine();
-                }
 
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine();
-                File.AppendAllText(_outputPath, stringBuilder.ToString());
+                    if (x.IsResting)
+                        x.TimeLeftResting--;
+                    else
+                    {
+                        x.TimeLeftRunning--;
+                        x.TraversedDistance += x.Speed;
+                    }
+                });
 
+                var currentBestDistance = _reindeers.OrderByDescending(x => x.TraversedDistance).First().TraversedDistance;
+                _reindeers.Where(x => x.TraversedDistance == currentBestDistance).ToList().ForEach(x => x.LeadingPoints++);
                 iter++;
             }
 
-
-            return (T)Convert.ChangeType(0, typeof(T));
-        }
-
-        void CreateRobots() 
-        {
-            var regex = NumbersRegex();
-            foreach (var line in _input)
+            foreach (var reindeer in _reindeers)
             {
-                var matches = regex.Matches(line);
-                var positionString = matches.First().Value.Split(',');
-                var velocityString = matches.Last().Value.Split(',');
-                _robots.Add(new Robot((int.Parse(positionString.First()), int.Parse(positionString.Last())), (int.Parse(velocityString.First()), int.Parse(velocityString.Last()))));
+                _reindeerFinalDistances.Add(reindeer.LeadingPoints);
             }
+            var result = _reindeerFinalDistances.OrderDescending().First();
 
+            return (T)Convert.ChangeType(result, typeof(T));
         }
+        
+        #endregion
 
-        void SetupQuadrantValues()
-        {
-
-            for (int x = 0; x < _gridWidth; x++)
-            {
-                for (int y = 0; y < _gridHeight; y++)
-                {
-                    // Get the value at the current grid position
-                    int value = _bathroom[x, y];
-
-                    if (value > 0)
-                    {
-                        // Check which quadrant the position belongs to
-                        if (x < _widthCenter && y < _heightCenter)
-                        {
-                            _tlQuadrant.Add(value); // Top-left
-                        }
-                        else if (x > _widthCenter && y < _heightCenter)
-                        {
-                            _trQuadrant.Add(value); // Top-right
-                        }
-                        else if (x < _widthCenter && y > _heightCenter)
-                        {
-                            _blQuadrant.Add(value); // Bottom-left
-                        }
-                        else if (x > _widthCenter && y > _heightCenter)
-                        {
-                            _brQuadrant.Add(value); // Bottom-right
-                        }
-                    }
-                }
-            }
-
-        }
-
-        void PrintArray(int[,] array)
-        {
-            int rows = array.GetLength(0);
-            int cols = array.GetLength(1);
-
-            for (int i = 0; i < cols; i++)
-            {
-                for (int j = 0; j < rows; j++)
-                {
-                    Console.Write(array[j, i] + " ");
-                }
-                Console.WriteLine();
-            }
-        }
-
-            #endregion
-
-            [GeneratedRegex(@"-?[0-9]+,-?[0-9]+")]
-        private static partial Regex NumbersRegex();
     }
 
-    public class Robot
+    internal class Reindeer
     {
-        (int _startingPosX, int _startingPosY) _startingPosition;
-        (int _velocityX, int _velocityY) _velocity;
-        (int _finalPosX, int _finalgPosY) _finalPosition;
+        public int Speed { get; init; }
+        public int RunningTime { get; init; }
+        public int RestingTime { get; init; }
+        public bool IsResting { get; set; }
 
-        public (int startingPosX, int startingPosY) StartingPosition
-        {
-            get => _startingPosition;
-            set
-            {
-                if (_startingPosition != value) 
-                {
-                    _startingPosition = value;
-                }
-            }
-        }
+        public int TotalTimePerRun { get => RunningTime + RestingTime; }
+        public int TotalRunDistance { get => RunningTime * Speed; }
 
-        public (int _finalPosX, int _finalgPosY) FinalPosition
-        {
-            get => _finalPosition;
-            set
-            {
-                if (_finalPosition != value)
-                {
-                    _finalPosition = value;
-                }
-            }
-        }
+        public int TraversedDistance { get; set; }
+        public int TimeLeftRunning { get; set; }
+        public int TimeLeftResting { get; set; }
+        public int LeadingPoints { get; set; }
 
-        public (int velocityX, int velocityY) Velocity
+        internal Reindeer(int speed, int runningTime, int restingTime) 
         {
-            get => _velocity;
-            set
-            {
-                if (_velocity != value)
-                {
-                    _velocity = value;
-                }
-            }
-        }
-
-        public Robot((int x, int y) startingPosition, (int x, int y) velocity) 
-        {
-            _startingPosition = startingPosition;
-            _velocity = velocity;
+            Speed = speed;
+            RunningTime = runningTime;
+            RestingTime = restingTime;
         }
     }
 }
