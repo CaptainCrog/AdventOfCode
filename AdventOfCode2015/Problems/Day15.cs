@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Regex;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -8,16 +9,10 @@ namespace AdventOfCode2015.Problems
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        string _input = string.Empty;
-        string[] _lines = new string[0];
-        char[,] _gridChars = new char[0, 0];
-        List<string> _grid = new();
-        string _directions = string.Empty;
-        List<(int row, int col)> _movements = new();
-        (int row, int col) _robotPosition;
-        int _rows = 0;
-        int _cols = 0;
-        List<(int row, int col)> _boxPositions = new();
+        HashSet<long> _ingredientScore = new();
+        HashSet<(long score, long calories)> _calorieScore = new();
+        List<Ingredient> _ingredientTypes = new();
+        List<(int i1, int i2, int i3, int i4)> _combinations = new();
 
         #endregion
 
@@ -74,111 +69,55 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            _input = File.ReadAllText(InputPath);
-            _lines = _input.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-        }
-
-        private void PopulateData(int part)
-        {
-            _grid = new();
-            _directions = string.Empty;
-            if (part == 1)
+            var input = File.ReadAllLines(InputPath);
+            var numberRegex = CommonRegexHelpers.NumberRegex();
+            foreach (var line in input) 
             {
-                foreach (var line in _lines)
+                var matches = numberRegex.Matches(line);
+                _ingredientTypes.Add(new Ingredient()
                 {
-                    if (line.Contains("#") || line.Contains(".") || line.Contains("O") || line.Contains("@"))
-                    {
-                        _grid.Add(line);
-                    }
-                    else
-                    {
-                        _directions += line;
-                    }
-                }
+                    Capacity = int.Parse(matches[0].Value),
+                    Durability = int.Parse(matches[1].Value),
+                    Flavor = int.Parse(matches[2].Value),
+                    Texture = int.Parse(matches[3].Value),
+                    Calories = int.Parse(matches[4].Value)
+                });
             }
-            else
+
+            _combinations = new List<(int i1, int i2, int i3, int i4)>();
+
+            for (int i = 0; i < Enumerable.Range(0, 101).ToArray().Length; i++)
             {
-                foreach (var line in _lines)
+                for (int j = 0; j < Enumerable.Range(0, 101).ToArray().Length; j++)
                 {
-                    string newLine = string.Empty;
-                    if (line.Contains("#") || line.Contains(".") || line.Contains("O") || line.Contains("@"))
+                    for (int k = 0; k < Enumerable.Range(0, 101).ToArray().Length; k++)
                     {
-                        foreach (var character in line)
+                        for (int l = 0; l < Enumerable.Range(0, 101).ToArray().Length; l++)
                         {
-                            if (character == '#')
-                                newLine += "##";
-                            else if (character == '.')
-                                newLine += "..";
-                            else if (character == 'O')
-                                newLine += "[]";
-                            else
-                                newLine += "@.";
+                            if (i + j + k + l == 100)
+                            {
+                                _combinations.Add((i, j, k, l));
+                            }
                         }
-                        _grid.Add(newLine);
-                    }
-                    else
-                    {
-                        _directions += line;
                     }
                 }
             }
 
-            _movements = new();
-            var directionMatches = Regex.Matches(_directions, @"(v|<|>|\^)");
-            foreach (Match direction in directionMatches)
+
+            foreach (var combination in _combinations)
             {
-                switch (direction.Value)
-                {
-                    case
-                        "<":
-                        _movements.Add((0, -1));
-                        break;
-                    case "^":
-                        _movements.Add((-1, 0));
-                        break;
-                    case ">":
-                        _movements.Add((0, 1));
-                        break;
-                    case "v":
-                        _movements.Add((1, 0));
-                        break;
-                }
+                var capacity = CalculateIngredientProperty(IngredientProperty.Capacity, combination);
+                var durability = CalculateIngredientProperty(IngredientProperty.Durability, combination);
+                var flavor = CalculateIngredientProperty(IngredientProperty.Flavor, combination);
+                var texture = CalculateIngredientProperty(IngredientProperty.Texture, combination);
+                var calories = CalculateIngredientProperty(IngredientProperty.Calories, combination);
+
+                long total = capacity * durability * flavor * texture;
+                _ingredientScore.Add(total);
+                if (calories == 500)
+                    _calorieScore.Add((total, calories));
             }
 
-            // Determine grid dimensions
-            _rows = _grid.Count;
-            _cols = _grid[0].Length;
-
-            // Create a 2D array for the grid
-            _gridChars = new char[_rows, _cols];
-
-            // Populate the 2D array
-            for (int i = 0; i < _rows; i++)
-            {
-                for (int j = 0; j < _cols; j++)
-                {
-                    if (_grid[i][j] == '@')
-                        _robotPosition = (i, j);
-
-                    _gridChars[i, j] = _grid[i][j];
-                }
-            }
-
-            // Output the grid
-            Console.WriteLine("Grid (2D Array):");
-            for (int i = 0; i < _rows; i++)
-            {
-                for (int j = 0; j < _cols; j++)
-                {
-                    Console.Write(_gridChars[i, j]);
-                }
-                Console.WriteLine();
-            }
-
-            // Output the directions
-            Console.WriteLine("\nDirections:");
-            Console.WriteLine(_directions);
         }
 
         public override void OutputSolution()
@@ -189,239 +128,57 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            long sum = 0;
+            var result = _ingredientScore.OrderDescending().ToHashSet().First();
 
-            PopulateData(1);
-
-            foreach (var movement in _movements)
-            {
-                ProcessDirection(movement, 1);
-            }
-
-
-            for (int i = 0; i < _rows; i++)
-            {
-                for (int j = 0; j < _cols; j++)
-                {
-                    if (_gridChars[i, j] == 'O')
-                    {
-                        _boxPositions.Add((i, j));
-                    }
-                    Console.Write(_gridChars[i, j]);
-                }
-                Console.WriteLine();
-            }
-
-            _boxPositions.ForEach(x => sum += (x.row * 100) + x.col);
-
-
-            return (T)Convert.ChangeType(sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            long sum = 0;
+            var result = _calorieScore.Where(x => x.calories == 500).OrderByDescending(x => x.score).First().score;
 
-            PopulateData(2);
-
-            foreach (var movement in _movements)
-            {
-                ProcessDirection(movement, 2);
-            }
-
-            List<(int row, int leftCol, int rightCol)> part2BoxPositions = new();
-            for (int i = 0; i < _rows; i++)
-            {
-                for (int j = 0; j < _cols; j++)
-                {
-                    if (_gridChars[i, j] == '[')
-                    {
-                        part2BoxPositions.Add((i, j, j + 1));
-                    }
-                    Console.Write(_gridChars[i, j]);
-                }
-                Console.WriteLine();
-            }
-
-
-
-            part2BoxPositions.ForEach(x => sum += (x.row * 100) + x.leftCol);
-
-            return (T)Convert.ChangeType(sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
-
-        void ProcessDirection((int row, int col) movement, int part)
+        int CalculateIngredientProperty(IngredientProperty property, (int i1, int i2, int i3, int i4) combination)
         {
-            var resetGrid = CreateResetGrid();
-            bool canMove = false;
-            // don't do anything if we hit the bounds of the grid
-            if (part == 1)
-            {
-                canMove = Part1DirectionProcessing(_robotPosition, movement);
-                if (canMove)
-                {
-                    _robotPosition = (_robotPosition.row += movement.row, _robotPosition.col += movement.col);
-                }
-                else
-                    _gridChars = resetGrid;
-            }
+            List<int> propertyValues = new();
+            if (property == IngredientProperty.Capacity)
+                propertyValues = _ingredientTypes.Select(x => x.Capacity).ToList();
+            else if (property == IngredientProperty.Durability)
+                propertyValues = _ingredientTypes.Select(x => x.Durability).ToList();
+            else if (property == IngredientProperty.Flavor)
+                propertyValues = _ingredientTypes.Select(x => x.Flavor).ToList();
+            else if (property == IngredientProperty.Texture)
+                propertyValues = _ingredientTypes.Select(x => x.Texture).ToList();
             else
-            {
-                canMove = Part2DirectionProcessing(_robotPosition, movement);
-                if (canMove)
-                {
-                    _robotPosition = (_robotPosition.row += movement.row, _robotPosition.col += movement.col);
-                }
-                else
-                    _gridChars = resetGrid;
+                propertyValues = _ingredientTypes.Select(x => x.Calories).ToList();
 
-            }
+            var total = (propertyValues[0] * combination.i1) + (propertyValues[1] * combination.i2) + (propertyValues[2] * combination.i3) + (propertyValues[3] * combination.i4);
+            if (total < 0)
+                total = 0;
+
+            return total;
         }
 
-        bool CheckOutOfBounds((int row, int col) position)
-        {
-            return _gridChars[position.row, position.col] == '#';
-        }
-
-        bool Part1DirectionProcessing((int row, int col) robotPosition, (int row, int col) movement)
-        {
-            char currentChar = '#';
-            if (CheckOutOfBounds(robotPosition))
-            {
-                return false;
-            }
-            else
-                currentChar = _gridChars[robotPosition.row, robotPosition.col];
-
-
-            if (currentChar == '@')
-            {
-                (int row, int col) nextRobotPosition = (robotPosition.row + movement.row, robotPosition.col + movement.col);
-                if (Part1DirectionProcessing(nextRobotPosition, movement))
-                {
-                    _gridChars[nextRobotPosition.row, nextRobotPosition.col] = '@';
-                    return true;
-                }
-                else
-                    return false;
-
-            }
-            else if (currentChar == 'O')
-            {
-                (int row, int col) newBoxPosition = (robotPosition.row + movement.row, robotPosition.col + movement.col);
-                if (Part1DirectionProcessing(newBoxPosition, movement))
-                {
-                    _gridChars[newBoxPosition.row, newBoxPosition.col] = 'O';
-                    return true;
-                }
-                else
-                    return false;
-            }
-            _gridChars[_robotPosition.row, _robotPosition.col] = '.';
-            return true;
-        }
-
-
-        bool Part2DirectionProcessing((int row, int col) position, (int row, int col) movement)
-        {
-            if (CheckOutOfBounds(position))
-                return false;
-
-            // Do basic left and right movement since this logic doesnt change
-            if (movement.row == 0 || _gridChars[position.row, position.col] == '@')
-            {
-                // Move the robot
-                if (_gridChars[position.row + movement.row, position.col + movement.col] == '.' || Part2DirectionProcessing((position.row + movement.row, position.col + movement.col), movement))
-                {
-                    _gridChars[position.row + movement.row, position.col + movement.col] = _gridChars[position.row, position.col];
-                    _gridChars[position.row, position.col] = '.';
-                    return true;
-                }
-                return false;
-            }
-
-            var currentChar = _gridChars[position.row, position.col];
-            if (currentChar == '[' || currentChar == ']')
-            {
-                // Force position to Left side of the box
-                if (currentChar == ']')
-                    position = (position.row, position.col -= 1);
-
-                if (IsEmptyPosition(position, movement) || IsNotOffsetBox(position, movement) || IsRightOffsetBox(position, movement) || IsLeftOffsetBox(position, movement) || IsBothHalvesOffSet(position, movement))
-                {
-                    _gridChars[position.row + movement.row, position.col] = '[';
-                    _gridChars[position.row + movement.row, position.col + 1] = ']';
-
-                    _gridChars[position.row, position.col] = '.';
-                    _gridChars[position.row, position.col + 1] = '.';
-
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        char[,] CreateResetGrid()
-        {
-            char[,] resetGrid = new char[_rows, _cols];
-            for (int row = 0; row < _rows; row++)
-            {
-                for (int col = 0; col < _cols; col++)
-                {
-                    resetGrid[row, col] = _gridChars[row, col];
-                }
-            }
-            return resetGrid;
-        }
-
-        /// <summary>
-        /// Checks that the position directly under/over both box halfs is an empty space
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="movement"></param>
-        /// <returns></returns>
-        bool IsEmptyPosition((int row, int col) position, (int row, int col) movement)
-            => _gridChars[position.row + movement.row, position.col] == '.' && _gridChars[position.row + movement.row, position.col + 1] == '.';
-
-        /// <summary>
-        /// Checks that the position directly under/over the left half is another left half and that processing the movement for the next box returns true
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="movement"></param>
-        /// <returns></returns>
-        bool IsNotOffsetBox((int row, int col) position, (int row, int col) movement)
-            => _gridChars[position.row + movement.row, position.col] == '[' && Part2DirectionProcessing((position.row + movement.row, position.col), movement);
-
-        /// <summary>
-        /// Checks that the next position under/over the left half is a '.' and the next position under/over the right half is another left half for a different box, whose movement is then also processed
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="movement"></param>
-        /// <returns></returns>
-        bool IsRightOffsetBox((int row, int col) position, (int row, int col) movement)
-            => _gridChars[position.row + movement.row, position.col] == '.' && _gridChars[position.row + movement.row, position.col + 1] == '[' && Part2DirectionProcessing((position.row + movement.row, position.col + 1), movement);
-
-
-        /// <summary>
-        /// Checks that the next position under/over the left half is another right half for a different box and the next position under/over the right half is a '.', whose movement is then also processed
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="movement"></param>
-        /// <returns></returns>
-        bool IsLeftOffsetBox((int row, int col) position, (int row, int col) movement)
-            => _gridChars[position.row + movement.row, position.col] == ']' && _gridChars[position.row + movement.row, position.col + 1] == '.' && Part2DirectionProcessing((position.row + movement.row, position.col - 1), movement);
-
-
-        /// <summary>
-        /// Checks that the next position under/over the each half is the opposite respectively, each halves' movement is then processed
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="movement"></param>
-        /// <returns></returns>
-        bool IsBothHalvesOffSet((int row, int col) position, (int row, int col) movement)
-            => _gridChars[position.row + movement.row, position.col] == ']' && _gridChars[position.row + movement.row, position.col + 1] == '[' &&
-                Part2DirectionProcessing((position.row + movement.row, position.col - 1), movement) && Part2DirectionProcessing((position.row + movement.row, position.col + 1), movement);
         #endregion
+
+        internal record Ingredient
+        {
+            public required int Capacity { get; init; }
+            public required int Durability { get; init; }
+            public required int Flavor { get; init; }
+            public required int Texture { get; init; }
+            public required int Calories { get; init; }
+        }
+
+        internal enum IngredientProperty
+        {
+            Capacity = 0,
+            Durability = 1,
+            Flavor = 2,
+            Texture = 3,
+            Calories = 4,
+        }
     }
 }
