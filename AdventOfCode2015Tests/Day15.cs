@@ -12,10 +12,10 @@ namespace AdventOfCode2015Tests
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day15/Day15Test1.txt")]
-        public void Part2_ProducesCorrectSumOfBoxCoordinatesFile5_IsTrue()
+        public void Part2_ProducesBestScoreFor500Calories_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day15("Day15Test5.txt");
-            instance.SecondResult.Should().Be(509);
+            var instance = new AdventOfCode2015.Problems.Day15("Day15Test1.txt");
+            instance.SecondResult.Should().Be(57600000);
         }
     }
 }
