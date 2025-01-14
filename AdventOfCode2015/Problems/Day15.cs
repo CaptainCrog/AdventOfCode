@@ -10,7 +10,7 @@ namespace AdventOfCode2015.Problems
         int _firstResult = 0;
         int _secondResult = 0;
         HashSet<long> _ingredientScore = new();
-        List<(long score, long calories)> _calorieScore = new();
+        HashSet<(long score, long calories)> _calorieScore = new();
         List<Ingredient> _ingredientTypes = new();
         List<(int i1, int i2, int i3, int i4)> _combinations = new();
 
@@ -114,7 +114,8 @@ namespace AdventOfCode2015.Problems
 
                 long total = capacity * durability * flavor * texture;
                 _ingredientScore.Add(total);
-                _calorieScore.Add((total, calories));
+                if (calories == 500)
+                    _calorieScore.Add((total, calories));
             }
 
         }
