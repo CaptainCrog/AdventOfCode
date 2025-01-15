@@ -1,33 +1,42 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Enums;
+using CommonTypes.CommonTypes.Regex;
+using System;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
-    public class Day16 : DayBase
+    public partial class Day16 : DayBase
     {
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        (List<List<Node>> paths, int shortestPathScore) _result;
-        string[] _raceMapRaw = [];
-        char[,] _raceMap = new char [0,0];
-        Node _start = new();
-        Node _end = new();
-        List<Node> _djikstrasGraph = new ();
-        (int dx, int dy, Direction direction)[] _directions = new (int, int, Direction)[]
+        Regex _sueRegex;
+        Regex _childrenRegex;
+        Regex _catsRegex;
+        Regex _samoyedsRegex;
+        Regex _pomeraniansRegex;
+        Regex _akitasRegex;
+        Regex _vizslasRegex;
+        Regex _goldfishRegex;
+        Regex _treesRegex;
+        Regex _carsRegex;
+        Regex _perfumesRegex;
+        List<AuntSue> _auntSues = new();
+        AuntSue _sueToSearch = new AuntSue()
         {
-            (0, 1, Direction.East),   // Right
-            (1, 0, Direction.South),  // Down
-            (0, -1, Direction.West),  // Left
-            (-1, 0, Direction.North)  // Up
-        };
-        int[,] _rotationCost = new int[,]
-        {
-            { 0, 1000, 2000, 1000 }, // From North
-            { 1000, 0, 1000, 2000 }, // From East
-            { 2000, 1000, 0, 1000 }, // From South
-            { 1000, 2000, 1000, 0 }  // From West
+            SueId = int.MaxValue,
+            ChildrenCount = 3,
+            CatsCount = 7,
+            SamoyedsCount = 2,
+            PomeraniansCount = 3,
+            AkitasCount = 0,
+            VizslasCount = 0,
+            GoldfishCount = 5,
+            TreesCount = 3,
+            CarsCount = 2,
+            PerfumesCount = 1,
         };
 
         #endregion
@@ -75,6 +84,19 @@ namespace AdventOfCode2015.Problems
         public Day16(string inputPath)
         {
             _inputPath = inputPath;
+
+            _sueRegex = SueRegex();
+            _childrenRegex = ChildrenRegex();
+            _catsRegex = CatsRegex();
+            _samoyedsRegex = SamoyedsRegex();
+            _pomeraniansRegex = PomeraniansRegex();
+            _akitasRegex = AkitasRegex();
+            _vizslasRegex = VizslasRegex();
+            _goldfishRegex = GoldfishRegex();
+            _treesRegex = TreesRegex();
+            _carsRegex = CarsRegex();
+            _perfumesRegex = PerfumesRegex();
+
             InitialiseProblem();
             SolveBothProblems();
             OutputSolution();
@@ -83,49 +105,73 @@ namespace AdventOfCode2015.Problems
 
         #region Methods
         public override void InitialiseProblem()
-        {
-            _raceMapRaw = File.ReadAllLines(InputPath);
-            _raceMap = new char[_raceMapRaw.Length, _raceMapRaw[0].Length];
-
-            for (int i = 0; i < _raceMapRaw.Length; i++) 
+        { 
+            var aunts = File.ReadAllLines(InputPath);
+            foreach (var aunt in aunts) 
             {
-                for (int j = 0; j < _raceMapRaw[0].Length; j++)
-                {
-                    if (_raceMapRaw[i][j] == 'S')
-                    {
-                        _start = new Node { X = i, Y = j, Direction = Direction.East };
-                        _djikstrasGraph.Add(_start);
-                    }
-                    else if (_raceMapRaw[i][j] == 'E')
-                    {
-                        _end = new Node { X = i, Y = j };
-                        _djikstrasGraph.Add(_end);
-                    }
-                    else if (_raceMapRaw[i][j] == '.')
-                    {
-                        _djikstrasGraph.Add(new Node { X = i, Y = j });
-                    }
-
-                    _raceMap[i, j] = _raceMapRaw[i][j];
-                }
+                CreateAuntSue(aunt);
             }
         }
 
         void SolveBothProblems()
         {
-            _result = FindAllShortestPaths(_raceMap, _start, _end);
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();
         }
 
         public override T SolveFirstProblem<T>()
         {
-            return (T)Convert.ChangeType(_result.shortestPathScore, typeof(T));
+            var childrenFilter = _auntSues.Where(x => x.ChildrenCount == _sueToSearch.ChildrenCount || !x.ChildrenCount.HasValue).Select(x => x.SueId).ToList(); 
+            var catFilter = _auntSues.Where(x => x.CatsCount == _sueToSearch.CatsCount || !x.CatsCount.HasValue).Select(x => x.SueId).ToList();
+            var samoyedFilter = _auntSues.Where(x => x.SamoyedsCount == _sueToSearch.SamoyedsCount || !x.SamoyedsCount.HasValue).Select(x => x.SueId).ToList();
+            var pomeranianFilter = _auntSues.Where(x => x.PomeraniansCount == _sueToSearch.PomeraniansCount || !x.PomeraniansCount.HasValue).Select(x => x.SueId).ToList();
+            var akitaFilter = _auntSues.Where(x => x.AkitasCount == _sueToSearch.AkitasCount || !x.AkitasCount.HasValue).Select(x => x.SueId).ToList();
+            var vizslasFilter = _auntSues.Where(x => x.VizslasCount == _sueToSearch.VizslasCount || !x.VizslasCount.HasValue).Select(x => x.SueId).ToList();
+            var goldfishFilter = _auntSues.Where(x => x.GoldfishCount == _sueToSearch.GoldfishCount || !x.GoldfishCount.HasValue).Select(x => x.SueId).ToList();
+            var treeFilter = _auntSues.Where(x => x.TreesCount == _sueToSearch.TreesCount || !x.TreesCount.HasValue).Select(x => x.SueId).ToList();
+            var carsFilter = _auntSues.Where(x => x.CarsCount == _sueToSearch.CarsCount || !x.CarsCount.HasValue).Select(x => x.SueId).ToList();
+            var perfumeFilter = _auntSues.Where(x => x.PerfumesCount == _sueToSearch.PerfumesCount || !x.PerfumesCount.HasValue).Select(x => x.SueId).ToList();
+
+
+            var result = childrenFilter.Intersect(catFilter)
+                                       .Intersect(samoyedFilter)
+                                       .Intersect(pomeranianFilter)
+                                       .Intersect(akitaFilter)
+                                       .Intersect(vizslasFilter)
+                                       .Intersect(goldfishFilter)
+                                       .Intersect(treeFilter)
+                                       .Intersect(carsFilter)
+                                       .Intersect(perfumeFilter).ToList();
+
+            return (T)Convert.ChangeType(result.Single(), typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(_result.paths.SelectMany(x => x.Select(xx => (xx.X, xx.Y))).ToList().Distinct().Count(), typeof(T));
+
+            var childrenFilter = _auntSues.Where(x => x.ChildrenCount == _sueToSearch.ChildrenCount || !x.ChildrenCount.HasValue).Select(x => x.SueId).ToList();
+            var catFilter = _auntSues.Where(x => x.CatsCount > _sueToSearch.CatsCount || !x.CatsCount.HasValue).Select(x => x.SueId).ToList();
+            var samoyedFilter = _auntSues.Where(x => x.SamoyedsCount == _sueToSearch.SamoyedsCount || !x.SamoyedsCount.HasValue).Select(x => x.SueId).ToList();
+            var pomeranianFilter = _auntSues.Where(x => x.PomeraniansCount < _sueToSearch.PomeraniansCount || !x.PomeraniansCount.HasValue).Select(x => x.SueId).ToList();
+            var akitaFilter = _auntSues.Where(x => x.AkitasCount == _sueToSearch.AkitasCount || !x.AkitasCount.HasValue).Select(x => x.SueId).ToList();
+            var vizslasFilter = _auntSues.Where(x => x.VizslasCount == _sueToSearch.VizslasCount || !x.VizslasCount.HasValue).Select(x => x.SueId).ToList();
+            var goldfishFilter = _auntSues.Where(x => x.GoldfishCount < _sueToSearch.GoldfishCount || !x.GoldfishCount.HasValue).Select(x => x.SueId).ToList();
+            var treeFilter = _auntSues.Where(x => x.TreesCount > _sueToSearch.TreesCount || !x.TreesCount.HasValue).Select(x => x.SueId).ToList();
+            var carsFilter = _auntSues.Where(x => x.CarsCount == _sueToSearch.CarsCount || !x.CarsCount.HasValue).Select(x => x.SueId).ToList();
+            var perfumeFilter = _auntSues.Where(x => x.PerfumesCount == _sueToSearch.PerfumesCount || !x.PerfumesCount.HasValue).Select(x => x.SueId).ToList();
+
+
+            var result = childrenFilter.Intersect(catFilter)
+                                       .Intersect(samoyedFilter)
+                                       .Intersect(pomeranianFilter)
+                                       .Intersect(akitaFilter)
+                                       .Intersect(vizslasFilter)
+                                       .Intersect(goldfishFilter)
+                                       .Intersect(treeFilter)
+                                       .Intersect(carsFilter)
+                                       .Intersect(perfumeFilter).ToList();
+
+            return (T)Convert.ChangeType(result.Single(), typeof(T));
         }
 
         public override void OutputSolution()
@@ -133,116 +179,100 @@ namespace AdventOfCode2015.Problems
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
+
+        void CreateAuntSue(string auntDetails)
+        {
+            MatchCollection matches;
+            matches = _sueRegex.Matches(auntDetails);
+            var sueId = int.Parse(CommonRegexHelpers.NumberRegex().Match(matches.First().Value).Value);
+            var childrenCount = GetValueForRegex(_childrenRegex, matches, auntDetails);
+            var catsCount = GetValueForRegex(_catsRegex, matches, auntDetails);
+            var samoyedsCount = GetValueForRegex(_samoyedsRegex, matches, auntDetails);
+            var pomeraniansCount = GetValueForRegex(_pomeraniansRegex, matches, auntDetails);
+            var akitasCount = GetValueForRegex(_akitasRegex, matches, auntDetails);
+            var vizslasCount = GetValueForRegex(_vizslasRegex, matches, auntDetails);
+            var goldfishCount = GetValueForRegex(_goldfishRegex, matches, auntDetails);
+            var treesCount = GetValueForRegex(_treesRegex, matches, auntDetails);
+            var carsCount = GetValueForRegex(_carsRegex, matches, auntDetails);
+            var perfumesCount = GetValueForRegex(_perfumesRegex, matches, auntDetails);
+
+            _auntSues.Add(new AuntSue()
+            {
+                SueId = sueId,
+                ChildrenCount = childrenCount,
+                CatsCount = catsCount,
+                SamoyedsCount = samoyedsCount,
+                PomeraniansCount = pomeraniansCount,
+                AkitasCount = akitasCount,
+                VizslasCount = vizslasCount,
+                GoldfishCount = goldfishCount,
+                TreesCount = treesCount,
+                CarsCount = carsCount,
+                PerfumesCount = perfumesCount,
+            });
+        }
+
+        int? GetValueForRegex(Regex regex, MatchCollection matches, string auntDetails)
+        {
+            matches = regex.Matches(auntDetails);
+            if (matches.Any())
+            {
+                var match = CommonRegexHelpers.NumberRegex().Match(matches.First().Value);
+                return int.Parse(match.Value);
+            }
+            else
+                return null;
+        }
+
+        [GeneratedRegex(@"Sue \d+")]
+        private static partial Regex SueRegex();
+
+        [GeneratedRegex(@"children: \d+")]
+        private static partial Regex ChildrenRegex();
+
+        [GeneratedRegex(@"cats: \d+")]
+        private static partial Regex CatsRegex();
+
+        [GeneratedRegex(@"samoyeds: \d+")]
+        private static partial Regex SamoyedsRegex();
+
+        [GeneratedRegex(@"pomeranians: \d+")]
+        private static partial Regex PomeraniansRegex()
+            ;
+        [GeneratedRegex(@"akitas: \d+")]
+        private static partial Regex AkitasRegex();
+
+        [GeneratedRegex(@"vizslas: \d+")]
+        private static partial Regex VizslasRegex();
+
+        [GeneratedRegex(@"goldfish: \d+")]
+        private static partial Regex GoldfishRegex();
+
+        [GeneratedRegex(@"trees: \d+")]
+        private static partial Regex TreesRegex();
+
+        [GeneratedRegex(@"cars: \d+")]
+        private static partial Regex CarsRegex();
+
+        [GeneratedRegex(@"perfumes: \d+")]
+        private static partial Regex PerfumesRegex();
         #endregion
 
-        public (List<List<Node>> paths, int shortestPathScore) FindAllShortestPaths(char[,] grid, Node start, Node target)
+        internal record AuntSue()
         {
-            int rows = grid.GetLength(0);
-            int cols = grid.GetLength(1);
-            var distances = new Dictionary<(int x, int y, Direction direction), int>();
-            var previousNodes = new Dictionary<(int x, int y, Direction direction), List<Node>>();
-            var priorityQueue = new PriorityQueue<Node, int>();
-
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    foreach (Direction dir in Enum.GetValues(typeof(Direction)))
-                    {
-                        distances[(i, j, dir)] = int.MaxValue;
-                        previousNodes[(i, j, dir)] = new List<Node>();
-                    }
-                }
-            }
-
-            distances[(start.X, start.Y, start.Direction)] = 0;
-            priorityQueue.Enqueue(start, 0);
-
-            while (priorityQueue.Count > 0)
-            {
-                Node current = priorityQueue.Dequeue();
-
-                if (distances[(current.X, current.Y, current.Direction)] < current.Cost)
-                    continue;
-
-                foreach (var (dx, dy, newFacing) in _directions)
-                {
-                    int newX = current.X + dx;
-                    int newY = current.Y + dy;
-
-                    if (IsValid(newX, newY, rows, cols))
-                    {
-                        int rotationCost = _rotationCost[(int)current.Direction, (int)newFacing];
-                        int movementCost = 1;
-                        int newCost = distances[(current.X, current.Y, current.Direction)] + rotationCost + movementCost;
-
-
-                        if (newCost < distances[(newX, newY, newFacing)])
-                        {
-                            distances[(newX, newY, newFacing)] = newCost;
-                            previousNodes[(newX, newY, newFacing)] = new List<Node> { current };
-                            priorityQueue.Enqueue(new Node { X = newX, Y = newY, Direction = newFacing, Cost = newCost }, newCost);
-                        }
-                        else if (newCost == distances[(newX, newY, newFacing)])
-                        {
-                            previousNodes[(newX, newY, newFacing)].Add(current);
-                        }
-                    }
-                }
-            }
-
-            int minCostToTarget = int.MaxValue;
-            foreach (var direction in Enum.GetValues(typeof(Direction)))
-            {
-                var directionEnum = (Direction)direction;
-                minCostToTarget = Math.Min(minCostToTarget, distances[(target.X, target.Y, directionEnum)]);
-            }
-
-            if (minCostToTarget == int.MaxValue)
-            {
-                return (new List<List<Node>>(), 0);
-            }
-
-            var allPaths = new List<List<Node>>();
-            void Backtrack(Node currentNode, List<Node> path)
-            {
-                if (currentNode.X == start.X && currentNode.Y == start.Y)
-                {
-                    path.Add(currentNode);
-                    allPaths.Add(path.AsEnumerable().Reverse().ToList());
-                    return;
-                }
-
-                var key = (currentNode.X, currentNode.Y, currentNode.Direction);
-                foreach (var prevNode in previousNodes[key])
-                {
-                    if (distances[(prevNode.X, prevNode.Y, prevNode.Direction)] + 1 <= minCostToTarget)
-                    {
-                        var newPath = new List<Node>(path) { currentNode };
-                        Backtrack(prevNode, newPath);
-                    }
-                }
-            }
-
-            foreach (var direction in Enum.GetValues(typeof(Direction)))
-            {
-                var directionEnum = (Direction)direction;
-                if (distances[(target.X, target.Y, directionEnum)] == minCostToTarget)
-                {
-                    Backtrack(new Node { X = target.X, Y = target.Y, Direction = directionEnum }, new List<Node>());
-                }
-            }
-
-            return (allPaths, minCostToTarget);
+            public required int SueId { get; init; }
+            public int? ChildrenCount { get; init; }
+            public int? CatsCount { get; init; }
+            public int? SamoyedsCount { get; init; }
+            public int? PomeraniansCount { get; init; }
+            public int? AkitasCount { get; init; }
+            public int? VizslasCount { get; init; }
+            public int? GoldfishCount { get; init; }
+            public int? TreesCount { get; init; }
+            public int? CarsCount { get; init; }
+            public int? PerfumesCount { get; init; }
         }
 
-
-
-
-        private bool IsValid(int x, int y, int rows, int cols)
-        {
-            return x >= 0 && y >= 0 && x < rows && y < cols && _raceMap[x,y] != '#';
-        }
 
     }
 }
