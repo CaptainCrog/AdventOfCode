@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using System.Text.RegularExpressions;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day19 : DayBase
     {
@@ -6,10 +8,10 @@
 
         string _inputPath = string.Empty;
         int _firstResult = 0;
-        long _secondResult = 0;
-        int _sum = 0;
-        List<string> _towelPatterns = [];
-        List<string> _desiredDesigns = [];
+        int _secondResult = 0;
+        string _medicineMolecule = string.Empty;
+        // Change the second string to a List<string>()
+        Dictionary<string, string> _compoundReplacementPairs = new();
 
         #endregion
 
@@ -38,7 +40,7 @@
                 }
             }
         }
-        public long SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -46,18 +48,6 @@
                 if (_secondResult != value)
                 {
                     _secondResult = value;
-                }
-            }
-        }
-
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
                 }
             }
         }
@@ -69,7 +59,7 @@
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<long>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -77,29 +67,17 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            _towelPatterns = new List<string>();
-            _desiredDesigns = new List<string>();
-
-            // READ IN FILE
-            var input  = File.ReadAllLines(InputPath);
+            var input  = File.ReadAllLines(InputPath).Where(x => !string.IsNullOrEmpty(x)).ToArray();
             foreach (var line in input)
             {
-                if (string.IsNullOrEmpty(line))
+                if (line.Contains("=>"))
                 {
-                    continue;
-                }
-                if (line.Contains(","))
-                {
-                    var patterns = line.Split(',');
-                    foreach (var pattern in patterns)
-                    {
-                        _towelPatterns.Add(pattern.Trim());
-                    }
+                    // Adjust this so that we store the key with a List<string>()
+                    var parts = line.Split(" => ");
+                    _compoundReplacementPairs.Add(parts[1], parts[0]);
                 }
                 else
-                {
-                    _desiredDesigns.Add(line);
-                }
+                    _medicineMolecule = line;
             }
         }
 
@@ -111,96 +89,83 @@
 
         public override T SolveFirstProblem<T>()
         {
-            // Calculate the result
-            int possibleCount = CountPossibleDesigns(_towelPatterns, _desiredDesigns);
-            return (T)Convert.ChangeType(possibleCount, typeof(T));
+            var replacements = new List<string>();
+            var distinctMatches = new Dictionary<string, string>();
+
+            // Wrap this in another foreach for each string within the list
+            foreach(var replacementValue in _compoundReplacementPairs)
+            {
+                var replacementKey = replacementValue.Key;
+                var regex = new Regex(replacementValue.Value);
+                var matches = regex.Matches(_medicineMolecule);
+                foreach (Match match in matches) 
+                {
+                    var moleculeCopy = _medicineMolecule.ToString();
+                    moleculeCopy = moleculeCopy.Remove(match.Index, match.Value.Length);
+                    moleculeCopy = moleculeCopy.Insert(match.Index, replacementKey);
+                    replacements.Add(moleculeCopy);
+                    distinctMatches.TryAdd(match.Value, "e");
+                }
+
+            }
+
+            var result = replacements.Distinct().Count();
+            _compoundReplacementPairs = _compoundReplacementPairs.Concat(distinctMatches).ToDictionary();
+            
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            var totalArrangements = CountTotalArrangements(_towelPatterns, _desiredDesigns);
-            return (T)Convert.ChangeType(totalArrangements, typeof(T));
+            var result = BreadthFirstSearch();
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        // Recursive function with memoization to check if a design can be constructed.
-        bool CanConstruct(string design, HashSet<string> towelPatterns, Dictionary<string, bool> memo)
+        int CYKParserAlgorithm()
         {
-            if (memo.ContainsKey(design))
-                return memo[design];
-            if (design == "")
-                return true; // Base case: an empty design is always possible.
 
-            foreach (var pattern in towelPatterns)
+        }
+
+        //Although this would work, the string is too long to do a BFS against it
+        int BreadthFirstSearch()
+        {
+            var queue = new Queue<(int steps, string molecule)>(new[] { (0, "e") });
+            var visitedSequences = new HashSet<(int steps, string currentMolecule, string previousMolecule )>();
+            var previousMolecule = "";
+
+            while (queue.Count() != 0)
             {
-                if (design.StartsWith(pattern))
+                var (steps, currentMolecule) = queue.Dequeue();
+
+                if (currentMolecule == _medicineMolecule)
+                    return steps;
+
+                if (!visitedSequences.Add((steps, currentMolecule, previousMolecule)))
+                    continue;
+
+                previousMolecule = currentMolecule;
+                steps++;
+
+                var accessibleReplacementPairs = _compoundReplacementPairs.Where(x => currentMolecule.Contains(x.Value)).ToList();
+                foreach (var replacementValue in accessibleReplacementPairs)
                 {
-                    // Recursively check the rest of the string.
-                    if (CanConstruct(design.Substring(pattern.Length), towelPatterns, memo))
+                    var replacementKey = replacementValue.Key;
+                    var regex = new Regex(replacementValue.Value);
+                    var matches = regex.Matches(currentMolecule);
+                    foreach (Match match in matches)
                     {
-                        memo[design] = true;
-                        return true;
+                        var currentMoleculeCopy = currentMolecule.ToString();
+                        currentMoleculeCopy = currentMoleculeCopy.Remove(match.Index, match.Value.Length);
+                        currentMoleculeCopy = currentMoleculeCopy.Insert(match.Index, replacementKey);
+
+                        queue.Enqueue((steps, currentMoleculeCopy));
                     }
+
                 }
             }
 
-            memo[design] = false; // If no pattern matches, this design is impossible.
-            return false;
+            return int.MaxValue;
         }
-
-        // Function to count how many designs can be constructed.
-        int CountPossibleDesigns(List<string> towelPatterns, List<string> desiredDesigns)
-        {
-            var towelPatternSet = new HashSet<string>(towelPatterns);
-            var memo = new Dictionary<string, bool>();
-            int count = 0;
-
-            foreach (var design in desiredDesigns)
-            {
-                if (CanConstruct(design, towelPatternSet, memo))
-                    count++;
-            }
-
-            return count;
-        }
-
-
-        long CountArrangements(string design, HashSet<string> towelPatterns, Dictionary<string, long> memo)
-        {
-            if (memo.ContainsKey(design))
-                return memo[design];
-            if (design == "")
-                return 1; // Base case: exactly one way to construct an empty design.
-
-            long totalWays = 0;
-
-            foreach (var pattern in towelPatterns)
-            {
-                if (design.StartsWith(pattern))
-                {
-                    // Count ways to construct the rest of the design
-                    totalWays += CountArrangements(design.Substring(pattern.Length), towelPatterns, memo);
-                }
-            }
-
-            memo[design] = totalWays; // Store result in memo
-            return totalWays;
-        }
-
-        // Function to count the total number of ways to construct all designs.
-        long CountTotalArrangements(List<string> towelPatterns, List<string> desiredDesigns)
-        {
-            var towelPatternSet = new HashSet<string>(towelPatterns);
-            var memo = new Dictionary<string, long>();
-            long totalWays = 0;
-
-            foreach (var design in desiredDesigns)
-            {
-                totalWays += CountArrangements(design, towelPatternSet, memo);
-            }
-
-            return totalWays;
-        }
-
         #endregion
     }
 }
