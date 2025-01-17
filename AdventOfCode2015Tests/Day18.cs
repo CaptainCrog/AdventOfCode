@@ -7,16 +7,16 @@ namespace AdventOfCode2015Tests
         [DeploymentItem("Inputs/Day18/Day18Test1.txt")]
         public void Part1_CalculatesMinimumNumberOfSteps_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day18("Day18Test1.txt", 12);
-            instance.FirstResult.Should().Be(22);
+            var instance = new AdventOfCode2015.Problems.Day18("Day18Test1.txt", 4);
+            instance.FirstResult.Should().Be(4);
         }
 
         [TestMethod]
         [DeploymentItem("Inputs/Day18/Day18Test1.txt")]
         public void Part2_ProducesFirstCoordinateWhichRendersTheEndUnreachable_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day18("Day18Test1.txt", 12);
-            instance.SecondResult.Should().Be((1,6));
+            var instance = new AdventOfCode2015.Problems.Day18("Day18Test1.txt", 5);
+            instance.SecondResult.Should().Be(17);
         }
     }
 }
