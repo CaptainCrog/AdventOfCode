@@ -1,5 +1,6 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Enums;
+using System.Diagnostics;
 
 namespace AdventOfCode2015.Problems
 {
@@ -8,30 +9,10 @@ namespace AdventOfCode2015.Problems
         #region Fields
 
         string _inputPath = string.Empty;
-        int _numberOfBytes = 0;
         int _firstResult = 0;
-        (int row, int col) _secondResult = (0, 0);
-        List<(int row, int col)> _bytePositions = new();
-        char[,] _charPositions = new char [0,0];
-        Node _start = new Node()
-        {
-            X = 0,
-            Y = 0,
-        };
-        Node _end = new Node()
-        {
-            X = 70,
-            Y = 70,
-        };
-        List<Node> _djikstrasGraph = new();
-
-        (int dx, int dy, Direction direction)[] _directions = new (int, int, Direction)[]
-        {
-            (0, 1, Direction.East),   // Right
-            (1, 0, Direction.South),  // Down
-            (0, -1, Direction.West),  // Left
-            (-1, 0, Direction.North)  // Up
-        };
+        int _secondResult = 0;
+        int _numberOfSteps = 0;
+        bool[,] _lightPositions = new bool [0,0];
 
         #endregion
 
@@ -60,7 +41,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public (int row, int col) SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -74,33 +55,15 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Constructor
-        public Day18(string inputPath, int numberOfBytes)
+        public Day18(string inputPath, int numberOfSteps)
         {
             _inputPath = inputPath;
-            _numberOfBytes = numberOfBytes;
-            if (_numberOfBytes == 12)
-            {
-                _charPositions = new char[7, 7];
-                _end = new Node()
-                {
-                    X = 6,
-                    Y = 6,
-                };
-            }
-            else
-            {
-                _charPositions = new char[71, 71];
-                _end = new Node()
-                {
-                    X = 70,
-                    Y = 70,
-                };
-            }
+            _numberOfSteps = numberOfSteps;
 
 
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<(int row, int col)>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -109,15 +72,15 @@ namespace AdventOfCode2015.Problems
         public override void InitialiseProblem()
         {
             var input = File.ReadAllLines(_inputPath);
-            foreach (var line in input) 
+            _lightPositions = new bool[input.Length, input.First().Length];
+            for (int i = 0; i < _lightPositions.GetLength(0); i++)
             {
-                var numbers = line.Split(',');
-                var col = int.Parse(numbers[0]);
-                var row = int.Parse(numbers[1]);
-                _bytePositions.Add((row, col));
-
+                for (int j = 0; j < _lightPositions.GetLength(1); j++)
+                {
+                    var isLightOn = input[i][j] == '#'; 
+                    _lightPositions[i, j] = isLightOn;
+                }
             }
-
         }
 
         public override void OutputSolution()
@@ -126,163 +89,113 @@ namespace AdventOfCode2015.Problems
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        /// <summary>
-        /// Use shortest path algorithm
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public override T SolveFirstProblem<T>()
         {
-            WriteGrid(_numberOfBytes);
-            var result = FindShortestPath(_charPositions, _start, _end);
+            int iterator = 0;
+            var lightPositionsCopy = _lightPositions;
+            while (iterator < _numberOfSteps)
+            {
+                var nextState = new bool[lightPositionsCopy.GetLength(0), lightPositionsCopy.GetLength(1)];
+                for (int i = 0; i < lightPositionsCopy.GetLength(0); i++)
+                {
+                    for (int j = 0; j < lightPositionsCopy.GetLength(1); j++)
+                    {
+                        var lightsNextValue = ProcessLight(i, j, lightPositionsCopy);
+                        nextState[i, j] = lightsNextValue;
+                    }
+                }
 
+                lightPositionsCopy = nextState;
+                iterator++;
+            }
+
+            var result = 0;
+            for (int i = 0; i < lightPositionsCopy.GetLength(0); i++)
+            {
+                for (int j = 0; j < lightPositionsCopy.GetLength(1); j++)
+                {
+                    if (lightPositionsCopy[i, j])
+                        result++;
+                }
+            }
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        /// <summary>
-        /// Use Binary Search algorithm alongside shortest path algorithm
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
         public override T SolveSecondProblem<T>()
         {
-            int low = 0;
-            int high = _bytePositions.Count() - 1;
-            int cutoffIteration = -1;
-            while (low <= high)
+            int iterator = 0;
+            var lightPositionsCopy = _lightPositions;
+            //Although my input already stipulates the corners are on, this will ensure it is on for any other input
+            lightPositionsCopy = SetCorners(lightPositionsCopy);
+            while (iterator < _numberOfSteps)
             {
-                int mid = (low + high) / 2;
-                WriteGrid(mid);
-                var result = FindShortestPath(_charPositions, _start, _end);
-                if (result == int.MaxValue)
+                var nextState = new bool[lightPositionsCopy.GetLength(0), lightPositionsCopy.GetLength(1)];
+                for (int i = 0; i < _lightPositions.GetLength(0); i++)
                 {
-                    // No valid path found, search lower iterations
-                    cutoffIteration = mid;
-                    high = mid - 1;
-                }
-                else
-                {
-                    // Path is valid, search higher iterations
-                    low = mid + 1;
-                }
-            }
-
-
-            // Find the coordinate at the cutoff iteration
-            (int row, int col) cutoffCoordinate = cutoffIteration >= 0 ? _bytePositions[cutoffIteration-1] : default;
-            return (T)Convert.ChangeType(cutoffCoordinate, typeof(T));
-        }
-
-
-        void WriteGrid(int numberOfBytes)
-        {
-            _djikstrasGraph = new List<Node>() { _start, _end };
-
-            for (int i = 0; i < _charPositions.GetLength(0); i++)
-            {
-                for (int j = 0; j < _charPositions.GetLength(1); j++)
-                {
-                    _charPositions[i, j] = '.';
-                    _djikstrasGraph.Add(new Node { X = i, Y = j });
-                }
-            }
-
-            var bytes = _bytePositions.Take(numberOfBytes).ToList();
-            foreach(var item in bytes)
-            {
-                _charPositions[item.row, item.col] = '#';
-                _djikstrasGraph.Remove(_djikstrasGraph.Where(node => node.X == item.row && node.Y == item.col).First());
-            }
-
-            PrintArray();
-        }
-
-        void PrintArray() 
-        {
-            Console.WriteLine();
-            for (int i = 0; i < _charPositions.GetLength(0); i++)
-            {
-                for (int j = 0; j < _charPositions.GetLength(1); j++)
-                {
-                    Console.Write(_charPositions[i,j]);
-                }
-                Console.WriteLine();
-            }
-        }
-
-
-        int FindShortestPath(char[,] grid, Node start, Node target)
-        {
-            int rows = grid.GetLength(0);
-            int cols = grid.GetLength(1);
-            var distances = new Dictionary<(int x, int y, Direction direction), int>();
-            var previousNodes = new Dictionary<(int x, int y, Direction direction), List<Node>>();
-            var priorityQueue = new PriorityQueue<Node, int>();
-
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                {
-                    foreach (Direction dir in Enum.GetValues(typeof(Direction)))
+                    for (int j = 0; j < lightPositionsCopy.GetLength(1); j++)
                     {
-                        distances[(i, j, dir)] = int.MaxValue;
-                        previousNodes[(i, j, dir)] = new List<Node>();
+                        var lightsNextValue = ProcessLight(i, j, lightPositionsCopy);
+                        nextState[i, j] = lightsNextValue;
                     }
                 }
+
+                lightPositionsCopy = nextState;
+                lightPositionsCopy = SetCorners(lightPositionsCopy);
+                iterator++;
             }
 
-            distances[(start.X, start.Y, start.Direction)] = 0;
-            priorityQueue.Enqueue(start, 0);
-
-            while (priorityQueue.Count > 0)
+            var result = 0;
+            for (int i = 0; i < lightPositionsCopy.GetLength(0); i++)
             {
-                Node current = priorityQueue.Dequeue();
-
-                if (distances[(current.X, current.Y, current.Direction)] < current.Cost)
-                    continue;
-
-                foreach (var (dx, dy, newFacing) in _directions)
+                for (int j = 0; j < lightPositionsCopy.GetLength(1); j++)
                 {
-                    int newX = current.X + dx;
-                    int newY = current.Y + dy;
-
-                    if (IsValid(newX, newY, rows, cols))
-                    {
-                        int movementCost = 1;
-                        int newCost = distances[(current.X, current.Y, current.Direction)] + movementCost;
-
-
-                        if (newCost < distances[(newX, newY, newFacing)])
-                        {
-                            distances[(newX, newY, newFacing)] = newCost;
-                            previousNodes[(newX, newY, newFacing)] = new List<Node> { current };
-                            priorityQueue.Enqueue(new Node { X = newX, Y = newY, Direction = newFacing, Cost = newCost }, newCost);
-                        }
-                        else if (newCost == distances[(newX, newY, newFacing)])
-                        {
-                            previousNodes[(newX, newY, newFacing)].Add(current);
-                        }
-                    }
+                    if (lightPositionsCopy[i, j])
+                        result++;
                 }
             }
 
-            int minCostToTarget = int.MaxValue;
-            foreach (var direction in Enum.GetValues(typeof(Direction)))
-            {
-                var directionEnum = (Direction)direction;
-                minCostToTarget = Math.Min(minCostToTarget, distances[(target.X, target.Y, directionEnum)]);
-            }
-
-            return minCostToTarget;
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
-
-
-
-        private bool IsValid(int x, int y, int rows, int cols)
+        bool ProcessLight(int row, int col, bool[,] currentLightGrid)
         {
-            return x >= 0 && y >= 0 && x < rows && y < cols && _charPositions[x, y] != '#';
+            var positionsToCheck = new List<(int row, int col)>()
+            {
+                (row - 1, col -1), (row - 1, col), (row - 1, col + 1),
+                (row, col -1),                     (row, col + 1),
+                (row + 1, col -1), (row + 1, col), (row + 1, col + 1),
+            };
+
+            positionsToCheck = positionsToCheck.Where(x => x.row != -1 && x.row != _lightPositions.GetLength(0)).ToList(); // filter out positions where the row goes out of bounds
+            positionsToCheck = positionsToCheck.Where(x => x.col != -1 && x.col != _lightPositions.GetLength(1)).ToList(); // filter out positions where the col goes out of bounds
+
+            var numberOfNeighboursOn = 0;
+            foreach (var position in positionsToCheck) 
+            {
+                if (currentLightGrid[position.row, position.col])
+                    numberOfNeighboursOn++;
+            }
+            if (currentLightGrid[row, col] && numberOfNeighboursOn <= 3 && numberOfNeighboursOn >= 2)
+            {
+                return true;
+            }
+            else if (!currentLightGrid[row, col] && numberOfNeighboursOn == 3)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        bool[,] SetCorners(bool[,] currentLightGrid)
+        {
+            currentLightGrid[0, 0] = true;
+            currentLightGrid[0, currentLightGrid.GetLength(1)-1] = true;
+            currentLightGrid[currentLightGrid.GetLength(0) - 1, 0] = true;
+            currentLightGrid[currentLightGrid.GetLength(0) - 1, currentLightGrid.GetLength(1) - 1] = true;
+
+            return currentLightGrid;
         }
         #endregion
     }
