@@ -104,7 +104,6 @@ namespace AdventOfCode2015.Problems
                     moleculeCopy = moleculeCopy.Remove(match.Index, match.Value.Length);
                     moleculeCopy = moleculeCopy.Insert(match.Index, replacementKey);
                     replacements.Add(moleculeCopy);
-                    distinctMatches.TryAdd(match.Value, "e");
                 }
 
             }
@@ -117,54 +116,26 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveSecondProblem<T>()
         {
-            var result = BreadthFirstSearch();
+            //My solution is based on this comment in the AOC subreddit. Tried thinking of different algorithms to use, e.g BFS, CYK
+            //But ultimately it looks like this mathematical approach is the best way to go about solving the problem
+            var moleculeCopy = _medicineMolecule.ToString();
+
+            // Rn Y Ar maps directly as ( , )
+            moleculeCopy = moleculeCopy.Replace("Rn", "(")
+                                       .Replace("Y", ",")
+                                       .Replace("Ar", ")");
+
+            var moleculeRegex = new Regex(string.Join("|", _compoundReplacementPairs.Values));
+            var commaRegex = new Regex(@"\,");
+
+
+            var moleculeMatches = moleculeRegex.Matches(moleculeCopy).Count();
+            var commaMatches = commaRegex.Matches(moleculeCopy).Count();
+
+            var result = moleculeMatches - commaMatches - 1;
+
+
             return (T)Convert.ChangeType(result, typeof(T));
-        }
-
-        int CYKParserAlgorithm()
-        {
-
-        }
-
-        //Although this would work, the string is too long to do a BFS against it
-        int BreadthFirstSearch()
-        {
-            var queue = new Queue<(int steps, string molecule)>(new[] { (0, "e") });
-            var visitedSequences = new HashSet<(int steps, string currentMolecule, string previousMolecule )>();
-            var previousMolecule = "";
-
-            while (queue.Count() != 0)
-            {
-                var (steps, currentMolecule) = queue.Dequeue();
-
-                if (currentMolecule == _medicineMolecule)
-                    return steps;
-
-                if (!visitedSequences.Add((steps, currentMolecule, previousMolecule)))
-                    continue;
-
-                previousMolecule = currentMolecule;
-                steps++;
-
-                var accessibleReplacementPairs = _compoundReplacementPairs.Where(x => currentMolecule.Contains(x.Value)).ToList();
-                foreach (var replacementValue in accessibleReplacementPairs)
-                {
-                    var replacementKey = replacementValue.Key;
-                    var regex = new Regex(replacementValue.Value);
-                    var matches = regex.Matches(currentMolecule);
-                    foreach (Match match in matches)
-                    {
-                        var currentMoleculeCopy = currentMolecule.ToString();
-                        currentMoleculeCopy = currentMoleculeCopy.Remove(match.Index, match.Value.Length);
-                        currentMoleculeCopy = currentMoleculeCopy.Insert(match.Index, replacementKey);
-
-                        queue.Enqueue((steps, currentMoleculeCopy));
-                    }
-
-                }
-            }
-
-            return int.MaxValue;
         }
         #endregion
     }

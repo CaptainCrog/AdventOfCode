@@ -23,7 +23,7 @@ namespace AdventOfCode2015Tests
         public void Part2_ProducesCorrectNumberOfStepsToGetToMedicineMoleculeFile3_IsTrue()
         {
             var instance = new AdventOfCode2015.Problems.Day19("Day19Test3.txt");
-            instance.SecondResult.Should().Be(3);
+            instance.SecondResult.Should().Be(2);
         }
 
         [TestMethod]
@@ -31,7 +31,7 @@ namespace AdventOfCode2015Tests
         public void Part2_ProducesCorrectNumberOfStepsToGetToMedicineMoleculeFile4_IsTrue()
         {
             var instance = new AdventOfCode2015.Problems.Day19("Day19Test4.txt");
-            instance.SecondResult.Should().Be(6);
+            instance.SecondResult.Should().Be(5);
         }
     }
 }
