@@ -116,8 +116,8 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveSecondProblem<T>()
         {
-            //My solution is based on this comment in the AOC subreddit. Tried thinking of different algorithms to use, e.g BFS, CYK
-            //But ultimately it looks like this mathematical approach is the best way to go about solving the problem
+            //My solution is based on this comment in the AOC subreddit https://www.reddit.com/r/adventofcode/comments/3xflz8/day_19_solutions/cy4etju/.
+            //Tried thinking of different algorithms to use, e.g BFS, CYK, but ultimately it looks like this mathematical approach is the best way to go about solving the problem
             var moleculeCopy = _medicineMolecule.ToString();
 
             // Rn Y Ar maps directly as ( , )
