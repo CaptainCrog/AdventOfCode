@@ -19,18 +19,18 @@ namespace AdventOfCode2015Tests
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day19/Day19Test1.txt")]
-        public void Part2_ProducesCorrectNumberOfStepsToGetToMedicineMoleculeFile1_IsTrue()
+        [DeploymentItem("Inputs/Day19/Day19Test3.txt")]
+        public void Part2_ProducesCorrectNumberOfStepsToGetToMedicineMoleculeFile3_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day19("Day19Test1.txt");
+            var instance = new AdventOfCode2015.Problems.Day19("Day19Test3.txt");
             instance.SecondResult.Should().Be(3);
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day19/Day19Test2.txt")]
-        public void Part2_ProducesCorrectNumberOfStepsToGetToMedicineMoleculeFile2_IsTrue()
+        [DeploymentItem("Inputs/Day19/Day19Test4.txt")]
+        public void Part2_ProducesCorrectNumberOfStepsToGetToMedicineMoleculeFile4_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day19("Day19Test2.txt");
+            var instance = new AdventOfCode2015.Problems.Day19("Day19Test4.txt");
             instance.SecondResult.Should().Be(6);
         }
     }
