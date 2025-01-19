@@ -1,4 +1,8 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using CommonTypes.CommonTypes.HelperFunctions;
+using CommonTypes.CommonTypes.Regex;
+using System.Text.RegularExpressions;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day21 : DayBase
     {
@@ -7,10 +11,13 @@
         string _inputPath = string.Empty;
         long _firstResult = 0;
         long _secondResult = 0;
-        string[] _codes = [];
+        List<Weapon> _weapons = new List<Weapon>();
+        List<Armor> _armors = new List<Armor>();
+        List<Ring> _rings = new List<Ring>();
+        Boss _boss = null;
+        Player _player = new Player(100, 0, 0);
 
-        (Dictionary<string, int[]>, string) _numericalKeypadLookup = new();
-        (Dictionary<string, int[]>, string) _directionalKeypadLookup = new();
+        Dictionary<(Weapon weapon, Armor? armor, List<Ring>), (int cost, bool success)> _bossAttempts = new();
 
         #endregion
 
@@ -57,6 +64,7 @@
         {
             _inputPath = inputPath;
             InitialiseProblem();
+            AttemptBossRuns();
             FirstResult = SolveFirstProblem<long>();
             SecondResult = SolveSecondProblem<long>();
             OutputSolution();
@@ -66,13 +74,56 @@
         #region Methods
         public override void InitialiseProblem()
         {
-            _codes = File.ReadAllLines(_inputPath);
+            var input = File.ReadAllText(_inputPath);
+            var bossStats = CommonRegexHelpers.NumberRegex().Matches(input);
+            _boss = new Boss(int.Parse(bossStats[0].Value), int.Parse(bossStats[1].Value), int.Parse(bossStats[2].Value));
 
-            var numericPad = new List<string> { "789", "456", "123", " 0A" };
-            var directionalPad = new List<string> { " ^A", "<v>" };
+            _weapons = new List<Weapon>()
+            {
+                new("Dagger", 8, 4),
+                new("Shortsword", 10, 5),
+                new("Warhammer", 25, 6),
+                new("Longsword", 40, 7),
+                new("Greataxe", 74, 8),
+            };
 
-            _numericalKeypadLookup = PadLookup(numericPad);
-            _directionalKeypadLookup = PadLookup(directionalPad);
+            _armors = new List<Armor>()
+            {
+                new("Nothing", 0, 0),
+                new("Leather", 13, 1),
+                new("Chainmail", 31, 2),
+                new("Splintmail", 53, 3),
+                new("Bandedmail", 75, 4),
+                new("Platemail", 102, 5),
+            };
+
+            _rings = new List<Ring>()
+            {
+                new("Damage +1", 25, 1, 0),
+                new("Damage +2", 50, 2, 0),
+                new("Damage +3", 100, 3, 0),
+                new("Defense +1", 20, 0, 1),
+                new("Defense +2", 40, 0, 2),
+                new("Defense +3", 80, 0, 3),
+            };
+        }
+
+        void AttemptBossRuns()
+        {
+            var allRingCombinations = ArrayHelperFunctions.GetAllCombinations(_rings.ToArray()).ToList();
+            allRingCombinations = allRingCombinations.Where(x => x.Count() <= 2).ToList();
+            foreach (var weapon in _weapons)
+            {
+                foreach (var armor in _armors)
+                {
+                    foreach (var ringCombination in allRingCombinations)
+                    {
+                        _player.ChangeGear(weapon, armor, ringCombination.ToList());
+
+                        _bossAttempts.Add((_player.Weapon, _player.Armor, _player.Rings), (_player.GetCost(), AttemptBoss()));
+                    }
+                }
+            }
         }
 
         public override void OutputSolution()
@@ -83,127 +134,211 @@
 
         public override T SolveFirstProblem<T>()
         {
-            var sum = GetComplexity(2);
-            return (T)Convert.ChangeType(sum, typeof(T));
+            var successfulAttempts = _bossAttempts.Where(x => x.Value.success).ToDictionary();
+            var orderedByCost = successfulAttempts.OrderBy(x => x.Value.cost).ToDictionary();
+            var cheapest = orderedByCost.First().Value.cost;
+
+            return (T)Convert.ChangeType(cheapest, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            var sum = GetComplexity(25);
-            return (T)Convert.ChangeType(sum, typeof(T));
+            var failedAttempts = _bossAttempts.Where(x => !x.Value.success).ToDictionary();
+            var orderedByCost = failedAttempts.OrderByDescending(x => x.Value.cost).ToDictionary();
+            var mostExpensive = orderedByCost.First().Value.cost;
+
+            return (T)Convert.ChangeType(mostExpensive, typeof(T));
         }
 
-        #region Part 1 Legacy
-        (Dictionary<string, int[]>, string) PadLookup(List<string> padRows)
+        private bool AttemptBoss()
         {
-            var coords = new Dictionary<string, int[]>();
-            string gap = padRows.Count == 2 ? "0,0" : "3,0";
-
-            for (int row = 0; row < padRows.Count; row++)
+            int iterator = 0;
+            _player.HitPoints = 100;
+            var bossCopy = new Boss(_boss.HitPoints, _boss.Damage, _boss.Defense);
+            while (true)
             {
-                string keys = padRows[row];
-                for (int col = 0; col < keys.Length; col++)
+                Attack(_player, bossCopy);
+                if (bossCopy.HitPoints <= 0)
+                    return true;
+
+                Attack(bossCopy, _player);
+                if (_player.HitPoints <= 0)
+                    return false;
+
+                iterator++;
+            }
+        }
+
+        private void Attack(Character attacker, Character defender)
+        {
+            var totalDamage = attacker.Damage - defender.Defense;
+            if (totalDamage <= 0)
+                totalDamage = 1;
+
+            defender.HitPoints -= totalDamage;
+        }
+
+        #region Internal Classes
+        internal interface IDamage
+        {
+            int Damage { get; init; }
+        }
+        internal interface IDefense
+        {
+            int Defense { get; init; }
+        }
+
+        internal abstract class Wearable
+        {
+            public string Name { get; init; }
+            public int Cost { get; init; }
+        }
+
+        internal class Weapon : Wearable, IDamage
+        {
+            public int Damage { get; init; }
+
+            public Weapon(string name, int cost, int damage)
+            {
+                Name = name;
+                Cost = cost;
+                Damage = damage;
+            }
+        }
+        internal class Armor : Wearable, IDefense
+        {
+            public int Defense { get; init; }
+
+            public Armor(string name, int cost, int defense)
+            {
+                Name = name;
+                Cost = cost;
+                Defense = defense;
+            }
+        }
+        internal class Ring : Wearable, IDamage, IDefense
+        {
+            public int Defense { get; init; }
+            public int Damage { get; init; }
+
+            public Ring(string name, int cost, int damage, int defense)
+            {
+                Name = name;
+                Cost = cost;
+                Damage = damage;
+                Defense = defense;
+            }
+        }
+
+        internal abstract class Character
+        {
+            public int HitPoints { get; set; }
+            public int Damage { get; set; }
+            public int Defense { get; set; }
+        }
+
+        internal class Player : Character
+        {
+            Weapon _weapon;
+            Armor? _armor;
+            List<Ring> _rings;
+
+            public Weapon Weapon
+            {
+                get => _weapon;
+                set
                 {
-                    char key = keys[col];
-                    if (key != ' ')
+                    if (_weapon != value)
                     {
-                        coords[key.ToString()] = [row, col];
+                        _weapon = value;
+                        GetDamage();
+                    }
+                }
+            }
+            public Armor? Armor
+            {
+                get => _armor;
+                set
+                {
+                    if (_armor != value)
+                    {
+                        _armor = value;
+                        GetDefense();
+                    }
+                }
+            }
+            public List<Ring> Rings
+            {
+                get => _rings;
+                set
+                {
+                    if (_rings != value)
+                    {
+                        _rings = value;
+                        if (_rings.Count > 0)
+                        {
+                            GetDamage();
+                            GetDefense();
+                        }
                     }
                 }
             }
 
-            return (coords, gap);
-        }
 
-        string FindShortestPath(string fromKey, string toKey, (Dictionary<string, int[]> coords, string gap) pad)
-        {
-            int[] fromPos = pad.coords[fromKey];
-            int[] toPos = pad.coords[toKey];
-
-            int row1 = fromPos[0], col1 = fromPos[1];
-            int row2 = toPos[0], col2 = toPos[1];
-
-            string verticalDirection = row2 > row1 ? new string('v', row2 - row1) : new string('^', row1 - row2);
-            string horizontalDirection = col2 > col1 ? new string('>', col2 - col1) : new string('<', col1 - col2);
-
-            if (col2 > col1 && $"{row2},{col1}" != pad.gap)
+            public Player(int hitPoints, int damage, int defense)
             {
-                return $"{verticalDirection}{horizontalDirection}A";
+                HitPoints = hitPoints;
+                Damage = damage;
+                Defense = defense;
+                Rings = new();
             }
-            if ($"{row1},{col2}" != pad.gap)
+
+            public int GetCost()
             {
-                return $"{horizontalDirection}{verticalDirection}A";
-            }
-            return $"{verticalDirection}{horizontalDirection}A";
-        }
-
-        List<string> GetSequence(string currentSequence, (Dictionary<string, int[]> coords, string gap) pad)
-        {
-            List<string> keys = [];
-            string prevKey = "A";
-            foreach (var key in currentSequence)
-            {
-                var keyString = key.ToString();
-                keys.Add(FindShortestPath(prevKey, keyString, pad));
-                prevKey = keyString;
-            }
-            return keys;
-        }
-
-        #endregion
-
-        #region Part 1 and Part 2
-
-        long GetComplexity(int numberOfRobots)
-        {
-            var frequencyTables = _codes.Select(code => new Dictionary<string, long> { { string.Join("", GetSequence(code, _numericalKeypadLookup)), 1 } }).ToList();
-
-            for (int i = 0; i < numberOfRobots; i++) 
-            {
-                frequencyTables = frequencyTables.Select(frequencyTable =>
+                var cost = Weapon.Cost;
+                if (Armor != null)
                 {
-                    var subFrequencyTable = new Dictionary<string, long>();
-                    foreach (var entry in frequencyTable)
-                    {
-                        var subCount = GetSequenceCounts(entry.Key, _directionalKeypadLookup);
-                        foreach(var subEntry in subCount)
-                        {
-                            AddToFrequencyTable(subFrequencyTable, subEntry.Key, subEntry.Value * entry.Value);
-                        }
-                    }
-                    return subFrequencyTable;
-                }).ToList();
+                    cost += Armor.Cost;
+                }
+
+                cost += Rings.Select(x => x.Cost).Sum();
+
+                return cost;
             }
 
-            long sum = 0;
-            for (int i = 0; i < _codes.Count(); i++)
+            public void GetDamage()
             {
-                var frequencyTable = frequencyTables[i];
-                long tableComplexity = frequencyTable.Sum(entry => entry.Key.Length * entry.Value);
-                sum += (tableComplexity * Convert.ToInt64(_codes[i].Substring(0, _codes[i].Length - 1)));
+                Damage = Weapon.Damage + Rings.Select(x => x.Damage).Sum();
             }
 
-            return sum;
-        }
-
-        void AddToFrequencyTable(Dictionary<string, long> frequencyTable, string key, long value)
-        {
-            if (frequencyTable.ContainsKey(key))
-                frequencyTable[key] += value;
-            else
-                frequencyTable[key] = value;
-        }
-
-        Dictionary<string, long> GetSequenceCounts(string currentSequence, (Dictionary<string, int[]> coords, string gap) pad)
-        {
-            var frequencyTable = new Dictionary<string, long>();
-            foreach (var subSeq in GetSequence(currentSequence, pad))
+            public void GetDefense()
             {
-                AddToFrequencyTable(frequencyTable, subSeq, 1);
+                var armorDefense = 0;
+                if (Armor != null)
+                    armorDefense = Armor.Defense;
+                Defense = armorDefense + Rings.Select(x => x.Defense).Sum();
             }
-            return frequencyTable;
+
+            public void ChangeGear(Weapon weapon, Armor armor, List<Ring> rings)
+            {
+                Weapon = weapon;
+                Armor = armor;
+                Rings = rings;
+
+                GetDamage();
+                GetDefense();
+            }
         }
 
+        internal class Boss : Character
+        {
+            public Boss(int hitPoints, int damage, int defense)
+            {
+                HitPoints = hitPoints;
+                Damage = damage;
+                Defense = defense;
+            }
+        }
         #endregion
 
         #endregion
