@@ -10,7 +10,6 @@ namespace AdventOfCode2015.Problems
         int _firstResult = 0;
         int _secondResult = 0;
         string _medicineMolecule = string.Empty;
-        // Change the second string to a List<string>()
         Dictionary<string, string> _compoundReplacementPairs = new();
 
         #endregion
@@ -72,7 +71,6 @@ namespace AdventOfCode2015.Problems
             {
                 if (line.Contains("=>"))
                 {
-                    // Adjust this so that we store the key with a List<string>()
                     var parts = line.Split(" => ");
                     _compoundReplacementPairs.Add(parts[1], parts[0]);
                 }
@@ -92,7 +90,6 @@ namespace AdventOfCode2015.Problems
             var replacements = new List<string>();
             var distinctMatches = new Dictionary<string, string>();
 
-            // Wrap this in another foreach for each string within the list
             foreach(var replacementValue in _compoundReplacementPairs)
             {
                 var replacementKey = replacementValue.Key;
