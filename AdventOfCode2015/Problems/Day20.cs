@@ -9,29 +9,7 @@ namespace AdventOfCode2015.Problems
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        int _sum = 0;
-        int _targetCheatTime = 0;
-        Dictionary<Node, int> _initialRun = new();
-        char[,] _charPositions = new char[0, 0];
-        Node _start = new Node()
-        {
-            X = 0,
-            Y = 0,
-        };
-        Node _end = new Node()
-        {
-            X = 0,
-            Y = 0,
-        };
-
-        List<(int dx, int dy)> _directions = new List<(int, int)>
-        {
-            (0, 1),   // Right
-            (1, 0),  // Down
-            (0, -1),  // Left
-            (-1, 0)  // Up
-        };
-
+        int _target = 0;
 
         #endregion
 
@@ -72,24 +50,12 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
         #endregion
 
         #region Constructor
-        public Day20(string inputPath, int targetCheatTime)
+        public Day20(string inputPath)
         {
             _inputPath = inputPath;
-            _targetCheatTime = targetCheatTime;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();
@@ -100,33 +66,7 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-
-
-            var input = File.ReadAllLines(_inputPath);
-
-            var rowLength = input.Length;
-            var colLength = input[0].Length;
-            _charPositions = new char[rowLength, colLength];
-            for (int i = 0; i < rowLength; i++)
-            {
-                for (int j = 0; j < colLength; j++)
-                {
-                    char currentChar = input[i][j];
-
-                    if (currentChar == 'S')
-                    {
-                        _start = new Node { X = i, Y = j };
-                    }
-                    else if (currentChar == 'E')
-                    {
-                        _end = new Node { X = i, Y = j };
-                    }
-
-                    _charPositions[i, j] = currentChar;
-                }
-            }
-
-            _initialRun = CalculateWithoutCheats(_start, _end, _directions);
+            _target = int.Parse(File.ReadAllText(_inputPath));
         }
 
         public override void OutputSolution()
@@ -137,105 +77,62 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            Sum = 0;
-            var results = CalculateWithCheats(2, _initialRun);
-            Sum = results.Where(x => x.timeSaved >= _targetCheatTime).Select(x => x.timeSaved).Count();
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            int houseNumber = 1;
+            while (true)
+            {
+                int presentSum = CalculatePresents(houseNumber, true);
+                if (presentSum >= _target)
+                    break;
+                houseNumber++;
+            }
+
+            return (T)Convert.ChangeType(houseNumber, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            Sum = 0;
-            var results = CalculateWithCheats(20, _initialRun);
-            Sum = results.Where(x => x.timeSaved >= _targetCheatTime).Select(x => x.timeSaved).Count();
-            return (T)Convert.ChangeType(Sum, typeof(T));
-        }
-
-        Dictionary<Node, int> CalculateWithoutCheats(Node start, Node end, List<(int dx, int dy)> directions)
-        {
-            var path = new Dictionary<Node, int>();
-            var current = end;
-            int time = 0;
-
-            path[current] = time;
-
-            while (!(current.X == start.X && current.Y == start.Y))
+            int houseNumber = 1;
+            while (true)
             {
-                var next = directions
-                    .Select(dir => new Node { X = current.X + dir.dx, Y = current.Y + dir.dy })
-                    .Single(pos => IsValid(pos) && !path.ContainsKey(pos));
-
-                time++;
-                path[next] = time;
-                current = next;
-            }
-            return path;
-        }
-
-        List<(int timeSaved, (int cheatDistance, int startingPositionScore) cheatDetails)> CalculateWithCheats(int maxCheatDistance, Dictionary<Node, int> gridScores)
-        {
-            var results = new List<(int timeSaved, (int cheatDistance, int startingPositionScore) cheatDetails)>();
-
-            // Loop through each position in the gridScores dictionary
-            foreach (var (currentPosition, currentScore) in gridScores)
-            {
-                // Get all positions within the maxCheatDistance around the current position
-                var cheatedPositions = GetPositionsWithinRange(gridScores, currentPosition, maxCheatDistance);
-
-                // Loop through each neighboring position and calculate the potential time saved
-                foreach (var (cheatedPosition, cheatDistance) in cheatedPositions)
-                {
-                    // Calculate the time saved by applying the cheat (difference between current score, neighbor score, and cheat distance)
-                    // Add the time saved and cheat details to the results list
-
-                    int timeSaved = currentScore - gridScores[cheatedPosition] - cheatDistance;
-                    results.Add((timeSaved, (cheatDistance, gridScores[currentPosition])));
-                }
+                int presentSum = CalculatePresents(houseNumber, false);
+                if (presentSum >= _target)
+                    break;
+                houseNumber++;
             }
 
-            // Return the list of results
-            return results;
+            return (T)Convert.ChangeType(houseNumber, typeof(T));
         }
 
-        List<(Node neighboringPosition, int distanceFromCurrentPosition)> GetPositionsWithinRange(Dictionary<Node, int> gridPositionsWithScores, Node currentPosition, int maxCheatDistance)
+        // Part 1: P(H) = 10 * sum of divisors of H
+        // Part 2: Amended logic to include D * E <= 50
+        int CalculatePresents(int house, bool isPartOne)
         {
-            var validPositions = new List<(Node, int)>();
+            int sum = 0;
+            int sqrt = (int)Math.Sqrt(house);
 
-            // Loop over all positions within the cheat range
-            for (int row = -maxCheatDistance; row <= maxCheatDistance; row++)
+            for (int i = 1; i <= sqrt; i++)
             {
-                for (int col = -maxCheatDistance; col <= maxCheatDistance; col++)
+                if (house % i == 0)
                 {
-                    // Calculate the Manhattan distance from the current position
-                    int distance = GetManhattanDistance(row, col);
-
-                    // If the position is too far away, skip it
-                    if (distance > maxCheatDistance)
-                        continue;
-
-                    // Calculate the new position to check
-                    var potentialPosition = new Node { X = currentPosition.X + row, Y = currentPosition.Y + col };
-
-                    // If this position is valid (exists in the grid), add it to the results
-                    if (gridPositionsWithScores.ContainsKey(potentialPosition))
+                    if (isPartOne)
                     {
-                        validPositions.Add((potentialPosition, distance));
+                        sum += i * 10;
+                        if (i != house / i)
+                            sum += (house / i) * 10;
                     }
+                    else
+                    {
+                        if (house / i <= 50)
+                            sum += i * 11;
+
+                        if (i <= 50 && i != house / i)
+                            sum += (house / i) * 11;
+                    }
+
                 }
             }
 
-            // Return the list of valid neighboring positions within the cheat range
-            return validPositions;
-        }
-
-        bool IsValid(Node newPosition)
-        {
-            return newPosition.X >= 0 && newPosition.Y >= 0 && newPosition.X < _charPositions.GetLength(0) && newPosition.Y < _charPositions.GetLength(1) && _charPositions[newPosition.X, newPosition.Y] != '#';
-        }
-
-        int GetManhattanDistance(int X, int Y)
-        {
-            return Math.Abs(X) + Math.Abs(Y);
+            return sum;
         }
         #endregion
     }

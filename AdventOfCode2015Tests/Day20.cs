@@ -7,15 +7,15 @@ namespace AdventOfCode2015Tests
         [DeploymentItem("Inputs/Day20/Day20Test1.txt")]
         public void Part1_ProducesCorrectTotalOfCheats_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day20("Day20Test1.txt", 50);
-            instance.FirstResult.Should().Be(1);
+            var instance = new AdventOfCode2015.Problems.Day20("Day20Test1.txt");
+            instance.FirstResult.Should().Be(6);
         }
 
         [TestMethod]
         [DeploymentItem("Inputs/Day20/Day20Test1.txt")]
         public void Part2_ProducesCorrectTotalOfCheats_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day20("Day20Test1.txt", 50);
+            var instance = new AdventOfCode2015.Problems.Day20("Day20Test1.txt");
             instance.SecondResult.Should().Be(285);
         }
     }
