@@ -153,9 +153,6 @@
     <None Update="Inputs\Day20\Day20Test1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Inputs\Day21\Day21Test1.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Inputs\Day22\Day22Test1.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -325,6 +322,7 @@
 
   <ItemGroup>
     <Folder Include="Inputs\Day16\" />
+    <Folder Include="Inputs\Day21\" />
   </ItemGroup>
 
 </Project>
