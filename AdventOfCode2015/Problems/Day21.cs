@@ -1,6 +1,6 @@
-﻿using CommonTypes.CommonTypes.HelperFunctions;
+﻿using AdventOfCode2015.CommonInternalTypes.Classes;
+using CommonTypes.CommonTypes.HelperFunctions;
 using CommonTypes.CommonTypes.Regex;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -14,7 +14,7 @@ namespace AdventOfCode2015.Problems
         List<Weapon> _weapons = new List<Weapon>();
         List<Armor> _armors = new List<Armor>();
         List<Ring> _rings = new List<Ring>();
-        Boss _boss = null;
+        Boss _boss = new();
         Player _player = new Player(100, 0, 0);
 
         Dictionary<(Weapon weapon, Armor? armor, List<Ring>), (int cost, bool success)> _bossAttempts = new();
@@ -179,166 +179,9 @@ namespace AdventOfCode2015.Problems
         }
 
         #region Internal Classes
-        internal interface IDamage
-        {
-            int Damage { get; init; }
-        }
-        internal interface IDefense
-        {
-            int Defense { get; init; }
-        }
 
-        internal abstract class Wearable
-        {
-            public string Name { get; init; }
-            public int Cost { get; init; }
-        }
+       
 
-        internal class Weapon : Wearable, IDamage
-        {
-            public int Damage { get; init; }
-
-            public Weapon(string name, int cost, int damage)
-            {
-                Name = name;
-                Cost = cost;
-                Damage = damage;
-            }
-        }
-        internal class Armor : Wearable, IDefense
-        {
-            public int Defense { get; init; }
-
-            public Armor(string name, int cost, int defense)
-            {
-                Name = name;
-                Cost = cost;
-                Defense = defense;
-            }
-        }
-        internal class Ring : Wearable, IDamage, IDefense
-        {
-            public int Defense { get; init; }
-            public int Damage { get; init; }
-
-            public Ring(string name, int cost, int damage, int defense)
-            {
-                Name = name;
-                Cost = cost;
-                Damage = damage;
-                Defense = defense;
-            }
-        }
-
-        internal abstract class Character
-        {
-            public int HitPoints { get; set; }
-            public int Damage { get; set; }
-            public int Defense { get; set; }
-        }
-
-        internal class Player : Character
-        {
-            Weapon _weapon;
-            Armor? _armor;
-            List<Ring> _rings;
-
-            public Weapon Weapon
-            {
-                get => _weapon;
-                set
-                {
-                    if (_weapon != value)
-                    {
-                        _weapon = value;
-                        GetDamage();
-                    }
-                }
-            }
-            public Armor? Armor
-            {
-                get => _armor;
-                set
-                {
-                    if (_armor != value)
-                    {
-                        _armor = value;
-                        GetDefense();
-                    }
-                }
-            }
-            public List<Ring> Rings
-            {
-                get => _rings;
-                set
-                {
-                    if (_rings != value)
-                    {
-                        _rings = value;
-                        if (_rings.Count > 0)
-                        {
-                            GetDamage();
-                            GetDefense();
-                        }
-                    }
-                }
-            }
-
-
-            public Player(int hitPoints, int damage, int defense)
-            {
-                HitPoints = hitPoints;
-                Damage = damage;
-                Defense = defense;
-                Rings = new();
-            }
-
-            public int GetCost()
-            {
-                var cost = Weapon.Cost;
-                if (Armor != null)
-                {
-                    cost += Armor.Cost;
-                }
-
-                cost += Rings.Select(x => x.Cost).Sum();
-
-                return cost;
-            }
-
-            public void GetDamage()
-            {
-                Damage = Weapon.Damage + Rings.Select(x => x.Damage).Sum();
-            }
-
-            public void GetDefense()
-            {
-                var armorDefense = 0;
-                if (Armor != null)
-                    armorDefense = Armor.Defense;
-                Defense = armorDefense + Rings.Select(x => x.Defense).Sum();
-            }
-
-            public void ChangeGear(Weapon weapon, Armor armor, List<Ring> rings)
-            {
-                Weapon = weapon;
-                Armor = armor;
-                Rings = rings;
-
-                GetDamage();
-                GetDefense();
-            }
-        }
-
-        internal class Boss : Character
-        {
-            public Boss(int hitPoints, int damage, int defense)
-            {
-                HitPoints = hitPoints;
-                Damage = damage;
-                Defense = defense;
-            }
-        }
         #endregion
 
         #endregion
