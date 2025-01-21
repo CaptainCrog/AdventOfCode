@@ -13,7 +13,7 @@ namespace AdventOfCode2015.Problems
         long _secondResult = 0;
         Boss _boss = new();
         Player _player = new(50, 500);
-        Dictionary<int, Spell> _spells = [];
+        Dictionary<string, Spell> _spells = [];
         HashSet<RunDetails> _allRunDetails = new();
         List<RunDetails> _successfulRuns = new();
         List<RunDetails> _failedRuns = new();
@@ -75,13 +75,13 @@ namespace AdventOfCode2015.Problems
             var input = File.ReadAllText(_inputPath);
             var bossStats = CommonRegexHelpers.NumberRegex().Matches(input);
             _boss = new Boss(int.Parse(bossStats[0].Value), int.Parse(bossStats[1].Value), 0);
-            _spells = new Dictionary<int, Spell>()
+            _spells = new Dictionary<string, Spell>()
             {
-                { 1, new Spell("Magic Missile", 53, 4, 0, 0, 0, 0) },
-                { 2, new Spell("Drain", 73, 2, 0, 2, 0, 0) },
-                { 3, new Spell("Shield", 113, 0, 7, 0, 0, 6) },
-                { 4, new Spell("Poison", 173, 3, 0, 0, 0, 6) },
-                { 5, new Spell("Recharge", 229, 0, 0, 0, 101, 5) },
+                { "Magic Missile", new Spell("Magic Missile", 53, 4, 0, 0, 0, 0) },
+                { "Drain", new Spell("Drain", 73, 2, 0, 2, 0, 0) },
+                { "Shield", new Spell("Shield", 113, 0, 7, 0, 0, 6) },
+                { "Poison", new Spell("Poison", 173, 3, 0, 0, 0, 6) },
+                { "Recharge", new Spell("Recharge", 229, 0, 0, 0, 101, 5) },
             };
 
         }
@@ -94,8 +94,7 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-
-
+            BreadthFirstSearch();
             return (T)Convert.ChangeType(0, typeof(T));
         }
 
@@ -104,74 +103,151 @@ namespace AdventOfCode2015.Problems
             return (T)Convert.ChangeType(0, typeof(T));
         }
 
-
-        private void RunTurn(ref RunDetails runDetails)
+        private void BossAttack(RunDetails runDetails)
         {
-            runDetails.GameState = PlayerAttack(runDetails);
-            if (runDetails.GameState == GameState.Success)
-                return;
-
-            runDetails.GameState = BossAttack(runDetails.Boss, runDetails.Player);
-        }
-
-        private GameState BossAttack(Boss boss, Player player)
-        {
-            if (boss.EffectTimer > 0)
+            ApplyDOTEffects(runDetails);
+            if (runDetails.Boss.HitPoints <= 0)
             {
-                boss.HitPoints -= 3;
-                boss.EffectTimer--;
-                if (boss.HitPoints <= 0)
-                    return GameState.Success;
+                runDetails.GameState = GameState.Success;
+                return;
             }
 
-            var totalDamage = boss.Damage - player.Defense;
+            var totalDamage = runDetails.Boss.Damage - runDetails.Player.Defense;
             if (totalDamage <= 0)
                 totalDamage = 1;
-            if (player.HitPoints <= 0)
-                return GameState.Failed;
-
-            player.HitPoints -= totalDamage;
-
-            return GameState.InProgress;
-        }
-
-        private GameState PlayerAttack(RunDetails runDetails)
-        {
-            var newQueue = new Queue<Spell>();
-            foreach (var spell in runDetails.SpellQueue)
+            runDetails.Player.HitPoints -= totalDamage;
+            if (runDetails.Player.HitPoints <= 0)
             {
-                runDetails.TotalManaSpent += spell.ManaCost;
-
-                if (spell.Damage > 0 && spell.EffectTimer > 0)
-                    runDetails.Boss.EffectTimer = spell.EffectTimer;
-                else
-                    runDetails.Boss.HitPoints -= spell.Damage;
-
-                runDetails.Player.HitPoints += spell.Heal;
-
-                runDetails.Player.Defense += spell.Defense;
-                runDetails.Player.Mana += spell.ManaReturn;
+                runDetails.GameState = GameState.Failed;
+                return;
             }
 
-            return GameState.InProgress;
+        }
+
+        private RunDetails AttemptRun(RunDetails runDetails)
+        {
+            foreach (var spell in runDetails.SpellQueue)
+            {
+                ApplySpell(spell, runDetails);
+
+                if (runDetails.GameState == GameState.Success || runDetails.GameState == GameState.Failed)
+                {
+                    return runDetails;
+                }
+
+                BossAttack(runDetails);
+                if (runDetails.GameState == GameState.Success || runDetails.GameState == GameState.Failed)
+                {
+                    return runDetails;
+                }
+            }
+
+            return runDetails;
+        }
+
+
+        void ApplySpell(Spell spell, RunDetails runDetails)
+        {
+
+            ApplyDOTEffects(runDetails);
+
+            // Cant cast spell if we dont have the mana required to cast
+            if (runDetails.Player.Mana - spell.ManaCost >= 0)
+            {
+                runDetails.Player.Mana -= spell.ManaCost;
+                runDetails.TotalManaSpent += spell.ManaCost;
+
+                //Initial Spell Cast
+                switch (spell.Name)
+                {
+                    case "Magic Missile":
+                        runDetails.Boss.HitPoints -= spell.Damage;
+                        break;
+
+                    case "Drain":
+                        runDetails.Boss.HitPoints -= spell.Damage;
+                        runDetails.Player.HitPoints += spell.Heal;
+                        break;
+
+                    case "Shield":
+                        if (runDetails.Player.DefenseTimer == 0)
+                        {
+                            runDetails.Player.Defense = spell.Defense;
+                            runDetails.Player.DefenseTimer = spell.EffectTimer;
+                        }
+                        break;
+
+                    case "Poison":
+                        if (runDetails.Boss.EffectTimer == 0)
+                            runDetails.Boss.EffectTimer = spell.EffectTimer;
+                        break;
+
+                    case "Recharge":
+                        if (runDetails.Player.RechargeTimer == 0)
+                            runDetails.Player.RechargeTimer = spell.EffectTimer;
+                        break;
+                }
+
+                if (runDetails.Boss.HitPoints <= 0)
+                    runDetails.GameState = GameState.Success;
+            }
+            else
+                runDetails.GameState = GameState.Failed;
+        }
+
+        void ApplyDOTEffects(RunDetails runDetails)
+        {
+
+            if (runDetails.Boss.EffectTimer > 0 && runDetails.Boss.EffectTimer <= _spells["Poison"].EffectTimer)
+            {
+                runDetails.Boss.HitPoints -= _spells["Poison"].Damage;
+                runDetails.Boss.EffectTimer--;
+            }
+
+            if (runDetails.Player.RechargeTimer > 0 && runDetails.Player.RechargeTimer <= _spells["Recharge"].EffectTimer)
+            {
+                runDetails.Player.Mana += _spells["Recharge"].ManaReturn;
+                runDetails.Player.RechargeTimer--;
+            }
+
+            if (runDetails.Player.DefenseTimer > 0 && runDetails.Player.DefenseTimer <= _spells["Shield"].EffectTimer)
+            {
+                runDetails.Player.DefenseTimer--;
+                if (runDetails.Player.DefenseTimer <= 0)
+                    runDetails.Player.Defense = 0;
+            }
         }
 
         void BreadthFirstSearch()
         {
-            var queue = new Queue<RunDetails>(new[] 
-            { 
-                new RunDetails() { Player = _player, Boss = _boss, MagicMissileCount = 1, SpellQueue = new Queue<Spell>(new [] { _spells[1] }) },
-                new RunDetails() { Player = _player, Boss = _boss, DrainCount = 1, SpellQueue = new Queue<Spell>(new [] { _spells[2] }) },
-                new RunDetails() { Player = _player, Boss = _boss, ShieldCount = 1, SpellQueue = new Queue<Spell>(new [] { _spells[3] }) },
-                new RunDetails() { Player = _player, Boss = _boss, PoisonCount = 1, SpellQueue = new Queue<Spell>(new [] { _spells[4] }) },
-                new RunDetails() { Player = _player, Boss = _boss, RechargeCount = 1, SpellQueue = new Queue<Spell>(new [] { _spells[5] }) },
+            //var queue = new Queue<RunDetails>(new[] 
+            //{ 
+            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[1] }) },
+            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[2] }) },
+            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[3] }) },
+            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[4] }) },
+            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[5] }) },
+            //});
+
+            var queue = new Queue<Queue<Spell>>(new[]
+            {
+                new Queue<Spell>(new[] { _spells["Magic Missile"] }),
+                new Queue<Spell>(new[] { _spells["Drain"] }),
+                new Queue<Spell>(new[] { _spells["Shield"] }),
+                new Queue<Spell>(new[] { _spells["Poison"] }),
+                new Queue<Spell>(new[] { _spells["Recharge"] }),
             });
-            var visitedSequences = new HashSet<(int magicMissileCount, int drainCount, int shieldCount, int poisonCount, int rechargeCount)>();
+
+
+            var visitedSequences = new HashSet<(int missileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, 
+                                                List<int> shieldCastIndexes, List<int> rechargeCastIndexes, List<int> poisonCastIndexes)>();
 
             while (queue.Count() != 0)
             {
-                var currentRunDetails = queue.Dequeue();
-                RunTurn(ref currentRunDetails);
+                var currentRunDetails = new RunDetails() { Player = new(50, 500), Boss = new(_boss.HitPoints, _boss.Damage, 0) };
+                var currentSpellQueue = queue.Dequeue();
+                currentRunDetails.SpellQueue = currentSpellQueue;
+                AttemptRun(currentRunDetails);
 
                 if (currentRunDetails.GameState == GameState.Success)
                     _successfulRuns.Add(currentRunDetails);
@@ -179,36 +255,52 @@ namespace AdventOfCode2015.Problems
                     _failedRuns.Add(currentRunDetails);
                 else
                 {
+                    var magicMissileCount = currentSpellQueue.Where(x => x.Name == "Magic Missile").Count();
+                    var drainCount = currentSpellQueue.Where(x => x.Name == "Drain").Count();
+                    var shieldCount = currentSpellQueue.Where(x => x.Name == "Shield").Count();
+                    var poisonCount = currentSpellQueue.Where(x => x.Name == "Poison").Count();
+                    var rechargeCount = currentSpellQueue.Where(x => x.Name == "Recharge").Count();
+                    var poisonIndexes = currentSpellQueue.Where(x => x.Name == "Poison").Select((x, i) => i).ToList();
+                    var shieldIndexes = currentSpellQueue.Where(x => x.Name == "Shield").Select((x, i) => i).ToList();
+                    var rechargeIndexes = currentSpellQueue.Where(x => x.Name == "Recharge").Select((x, i) => i).ToList();
 
-                    if (!visitedSequences.Add(currentRunDetails.GetRunHashSet()))
+                    if (!visitedSequences.Add((magicMissileCount, drainCount, shieldCount, rechargeCount, poisonCount, shieldIndexes, rechargeIndexes, poisonIndexes)))
                         continue;
 
-                    RunDetails runCopy = new();
 
-                    runCopy = currentRunDetails;
-                    runCopy.MagicMissileCount++;
-                    runCopy.SpellQueue.Enqueue(_spells[1]);
-                    queue.Enqueue(runCopy);
+                    //Magic Missile
+                    var currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
+                    currentSpellQueueCopy.Enqueue(_spells["Magic Missile"]);
+                    queue.Enqueue(currentSpellQueueCopy);
 
-                    runCopy = currentRunDetails;
-                    runCopy.DrainCount++;
-                    runCopy.SpellQueue.Enqueue(_spells[2]);
-                    queue.Enqueue(runCopy);
+                    //Drain
+                    currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
+                    currentSpellQueueCopy.Enqueue(_spells["Drain"]);
+                    queue.Enqueue(currentSpellQueueCopy);
 
-                    runCopy = currentRunDetails;
-                    runCopy.ShieldCount++;
-                    runCopy.SpellQueue.Enqueue(_spells[3]);
-                    queue.Enqueue(runCopy);
+                    // Apply shield spell only if effect timer is 0
+                    if (currentRunDetails.Player.DefenseTimer == 0)
+                    {
+                        currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
+                        currentSpellQueueCopy.Enqueue(_spells["Shield"]);
+                        queue.Enqueue(currentSpellQueueCopy);
+                    }
 
-                    runCopy = currentRunDetails;
-                    runCopy.PoisonCount++;
-                    runCopy.SpellQueue.Enqueue(_spells[4]);
-                    queue.Enqueue(runCopy);
+                    // Apply poison spell only if effect timer is 0
+                    if (currentRunDetails.Boss.EffectTimer == 0)
+                    {
+                        currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
+                        currentSpellQueueCopy.Enqueue(_spells["Poison"]);
+                        queue.Enqueue(currentSpellQueueCopy);
+                    }
 
-                    runCopy = currentRunDetails;
-                    runCopy.RechargeCount++;
-                    runCopy.SpellQueue.Enqueue(_spells[5]);
-                    queue.Enqueue(runCopy);
+                    // Apply recharge spell only if effect timer is 0
+                    if (currentRunDetails.Player.RechargeTimer == 0)
+                    {
+                        currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
+                        currentSpellQueueCopy.Enqueue(_spells["Recharge"]);
+                        queue.Enqueue(currentSpellQueueCopy);
+                    }
                 }
             }
         }
@@ -221,11 +313,6 @@ namespace AdventOfCode2015.Problems
         /// </summary>
         internal class RunDetails
         {
-            public int MagicMissileCount { get; set; } = 0;
-            public int DrainCount { get; set; } = 0;
-            public int ShieldCount { get; set; } = 0;
-            public int PoisonCount { get; set; } = 0;
-            public int RechargeCount { get; set; } = 0;
             public int TotalManaSpent { get; set; } = 0;
 
             public Player Player { get; set; }
@@ -237,11 +324,6 @@ namespace AdventOfCode2015.Problems
             {
                 GameState = GameState.InProgress;
                 SpellQueue = new Queue<Spell>();
-            }
-
-            public (int, int, int, int, int) GetRunHashSet()
-            {
-                return (MagicMissileCount, DrainCount, ShieldCount, PoisonCount, RechargeCount);
             }
         }
 

@@ -5,6 +5,9 @@
         Weapon _weapon;
         Armor? _armor;
         List<Ring> _rings;
+        int _defenseTimer { get; set; }
+        int _rechargeTimer { get; set; }
+
 
         public Weapon Weapon
         {
@@ -46,7 +49,28 @@
                 }
             }
         }
-
+        public int DefenseTimer
+        {
+            get => _defenseTimer;
+            set
+            {
+                if (_defenseTimer != value)
+                {
+                    _defenseTimer = value;
+                }
+            }
+        }
+        public int RechargeTimer
+        {
+            get => _rechargeTimer;
+            set
+            {
+                if (_rechargeTimer != value)
+                {
+                    _rechargeTimer = value;
+                }
+            }
+        }
 
         public Player(int hitPoints, int damage, int defense)
         {
