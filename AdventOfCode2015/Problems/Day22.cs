@@ -9,8 +9,9 @@ namespace AdventOfCode2015.Problems
         #region Fields
 
         string _inputPath = string.Empty;
-        long _firstResult = 0;
-        long _secondResult = 0;
+        int _firstResult = 0;
+        int _secondResult = 0;
+        bool _hardMode = false;
         Boss _boss = new();
         Player _player = new(50, 500);
         Dictionary<string, Spell> _spells = [];
@@ -34,7 +35,7 @@ namespace AdventOfCode2015.Problems
         }
 
 
-        public long FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -45,7 +46,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public long SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -63,8 +64,8 @@ namespace AdventOfCode2015.Problems
         {
             _inputPath = inputPath;
             InitialiseProblem();
-            FirstResult = SolveFirstProblem<long>();
-            SecondResult = SolveSecondProblem<long>();
+            //FirstResult = SolveFirstProblem<int>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -94,15 +95,24 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            BreadthFirstSearch();
-            return (T)Convert.ChangeType(0, typeof(T));
+            _successfulRuns = new();
+            _failedRuns = new();
+
+            _hardMode = false;
+            var totalManaSpent = BreadthFirstSearch();
+            return (T)Convert.ChangeType(totalManaSpent, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
-        }
+            _successfulRuns = new();
+            _failedRuns = new();
 
+            _hardMode = true;
+            var totalManaSpent = BreadthFirstSearch();
+            return (T)Convert.ChangeType(totalManaSpent, typeof(T));
+        }
+        //1295 too high
         private void BossAttack(RunDetails runDetails)
         {
             ApplyDOTEffects(runDetails);
@@ -128,6 +138,12 @@ namespace AdventOfCode2015.Problems
         {
             foreach (var spell in runDetails.SpellQueue)
             {
+                if (_hardMode && --runDetails.Player.HitPoints <= 0)
+                {
+                    runDetails.GameState = GameState.Failed;
+                    return runDetails;
+                }
+
                 ApplySpell(spell, runDetails);
 
                 if (runDetails.GameState == GameState.Success || runDetails.GameState == GameState.Failed)
@@ -198,19 +214,19 @@ namespace AdventOfCode2015.Problems
         void ApplyDOTEffects(RunDetails runDetails)
         {
 
-            if (runDetails.Boss.EffectTimer > 0 && runDetails.Boss.EffectTimer <= _spells["Poison"].EffectTimer)
+            if (runDetails.Boss.EffectTimer > 0)
             {
                 runDetails.Boss.HitPoints -= _spells["Poison"].Damage;
                 runDetails.Boss.EffectTimer--;
             }
 
-            if (runDetails.Player.RechargeTimer > 0 && runDetails.Player.RechargeTimer <= _spells["Recharge"].EffectTimer)
+            if (runDetails.Player.RechargeTimer > 0)
             {
                 runDetails.Player.Mana += _spells["Recharge"].ManaReturn;
                 runDetails.Player.RechargeTimer--;
             }
 
-            if (runDetails.Player.DefenseTimer > 0 && runDetails.Player.DefenseTimer <= _spells["Shield"].EffectTimer)
+            if (runDetails.Player.DefenseTimer > 0)
             {
                 runDetails.Player.DefenseTimer--;
                 if (runDetails.Player.DefenseTimer <= 0)
@@ -218,17 +234,8 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        void BreadthFirstSearch()
+        int BreadthFirstSearch()
         {
-            //var queue = new Queue<RunDetails>(new[] 
-            //{ 
-            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[1] }) },
-            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[2] }) },
-            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[3] }) },
-            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[4] }) },
-            //    new RunDetails() { Player = _player, Boss = _boss, SpellQueue = new Queue<Spell>(new [] { _spells[5] }) },
-            //});
-
             var queue = new Queue<Queue<Spell>>(new[]
             {
                 new Queue<Spell>(new[] { _spells["Magic Missile"] }),
@@ -239,8 +246,8 @@ namespace AdventOfCode2015.Problems
             });
 
 
-            var visitedSequences = new HashSet<(int missileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, 
-                                                List<int> shieldCastIndexes, List<int> rechargeCastIndexes, List<int> poisonCastIndexes)>();
+            var visitedSequences = new HashSet<(int missileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount,
+                                                List<int> shieldCastIndexes, List<int> rechargeCastIndexes, List<int> poisonCastIndexes)>(new RunComparer());
 
             while (queue.Count() != 0)
             {
@@ -250,19 +257,22 @@ namespace AdventOfCode2015.Problems
                 AttemptRun(currentRunDetails);
 
                 if (currentRunDetails.GameState == GameState.Success)
+                {
                     _successfulRuns.Add(currentRunDetails);
+                }
                 else if (currentRunDetails.GameState == GameState.Failed)
                     _failedRuns.Add(currentRunDetails);
                 else
                 {
+
                     var magicMissileCount = currentSpellQueue.Where(x => x.Name == "Magic Missile").Count();
                     var drainCount = currentSpellQueue.Where(x => x.Name == "Drain").Count();
                     var shieldCount = currentSpellQueue.Where(x => x.Name == "Shield").Count();
                     var poisonCount = currentSpellQueue.Where(x => x.Name == "Poison").Count();
                     var rechargeCount = currentSpellQueue.Where(x => x.Name == "Recharge").Count();
-                    var poisonIndexes = currentSpellQueue.Where(x => x.Name == "Poison").Select((x, i) => i).ToList();
-                    var shieldIndexes = currentSpellQueue.Where(x => x.Name == "Shield").Select((x, i) => i).ToList();
-                    var rechargeIndexes = currentSpellQueue.Where(x => x.Name == "Recharge").Select((x, i) => i).ToList();
+                    var poisonIndexes = currentSpellQueue.Select((spell, index) => new { spell, index }).Where(xx => xx.spell.Name == "Poison").Select(x => x.index).ToList();
+                    var shieldIndexes = currentSpellQueue.Select((spell, index) => new { spell, index }).Where(xx => xx.spell.Name == "Shield").Select(x => x.index).ToList();
+                    var rechargeIndexes = currentSpellQueue.Select((spell, index) => new { spell, index }).Where(xx => xx.spell.Name == "Recharge").Select(x => x.index).ToList();
 
                     if (!visitedSequences.Add((magicMissileCount, drainCount, shieldCount, rechargeCount, poisonCount, shieldIndexes, rechargeIndexes, poisonIndexes)))
                         continue;
@@ -303,6 +313,10 @@ namespace AdventOfCode2015.Problems
                     }
                 }
             }
+            var temp = _successfulRuns.DistinctBy(x => x.TotalManaSpent).ToList();
+            var temp1 = temp.OrderBy(x => x.TotalManaSpent).ToList();
+
+            return _successfulRuns.DistinctBy(x => x.TotalManaSpent).Select(x => x.TotalManaSpent).Min();
         }
 
         /// <summary>
@@ -333,6 +347,36 @@ namespace AdventOfCode2015.Problems
             Success = 1,
             Failed = 2,
         }
+
+        internal class RunComparer : IEqualityComparer<(int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes)>
+        {
+            public bool Equals((int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes) x, 
+                               (int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes) y)
+            {
+                // Compare all non-list fields
+                if (x.magicMissileCount != y.magicMissileCount || x.drainCount != y.drainCount ||
+                    x.shieldCount != y.shieldCount || x.rechargeCount != y.rechargeCount || x.poisonCount != y.poisonCount)
+                    return false;
+
+                // Compare lists (content equality)
+                return x.shieldIndexes.SequenceEqual(y.shieldIndexes) &&
+                       x.rechargeIndexes.SequenceEqual(y.rechargeIndexes) &&
+                       x.poisonIndexes.SequenceEqual(y.poisonIndexes);
+            }
+
+            public int GetHashCode((int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes) obj)
+            {
+                int hash = HashCode.Combine(obj.magicMissileCount, obj.drainCount, obj.shieldCount, obj.rechargeCount, obj.poisonCount);
+
+                // Include hash codes of lists
+                foreach (var index in obj.shieldIndexes) hash = HashCode.Combine(hash, index);
+                foreach (var index in obj.rechargeIndexes) hash = HashCode.Combine(hash, index);
+                foreach (var index in obj.poisonIndexes) hash = HashCode.Combine(hash, index);
+
+                return hash;
+            }
+        }
+
         #endregion
     }
 }
