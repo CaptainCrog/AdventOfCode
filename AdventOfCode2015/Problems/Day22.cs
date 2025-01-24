@@ -64,7 +64,7 @@ namespace AdventOfCode2015.Problems
         {
             _inputPath = inputPath;
             InitialiseProblem();
-            //FirstResult = SolveFirstProblem<int>();
+            FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
@@ -112,7 +112,7 @@ namespace AdventOfCode2015.Problems
             var totalManaSpent = BreadthFirstSearch();
             return (T)Convert.ChangeType(totalManaSpent, typeof(T));
         }
-        //1295 too high
+
         private void BossAttack(RunDetails runDetails)
         {
             ApplyDOTEffects(runDetails);
@@ -258,7 +258,10 @@ namespace AdventOfCode2015.Problems
 
                 if (currentRunDetails.GameState == GameState.Success)
                 {
-                    _successfulRuns.Add(currentRunDetails);
+                    if (_successfulRuns.Count != 1000)
+                        _successfulRuns.Add(currentRunDetails);
+                    else
+                        break;
                 }
                 else if (currentRunDetails.GameState == GameState.Failed)
                     _failedRuns.Add(currentRunDetails);
@@ -289,7 +292,7 @@ namespace AdventOfCode2015.Problems
                     queue.Enqueue(currentSpellQueueCopy);
 
                     // Apply shield spell only if effect timer is 0
-                    if (currentRunDetails.Player.DefenseTimer == 0)
+                    if (currentRunDetails.Player.DefenseTimer == 0 || currentRunDetails.Player.DefenseTimer == 1)
                     {
                         currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
                         currentSpellQueueCopy.Enqueue(_spells["Shield"]);
@@ -297,7 +300,7 @@ namespace AdventOfCode2015.Problems
                     }
 
                     // Apply poison spell only if effect timer is 0
-                    if (currentRunDetails.Boss.EffectTimer == 0)
+                    if (currentRunDetails.Boss.EffectTimer == 0 || currentRunDetails.Boss.EffectTimer == 1)
                     {
                         currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
                         currentSpellQueueCopy.Enqueue(_spells["Poison"]);
@@ -305,7 +308,7 @@ namespace AdventOfCode2015.Problems
                     }
 
                     // Apply recharge spell only if effect timer is 0
-                    if (currentRunDetails.Player.RechargeTimer == 0)
+                    if (currentRunDetails.Player.RechargeTimer == 0 || currentRunDetails.Player.RechargeTimer == 1)
                     {
                         currentSpellQueueCopy = new Queue<Spell>(currentSpellQueue);
                         currentSpellQueueCopy.Enqueue(_spells["Recharge"]);
@@ -313,8 +316,6 @@ namespace AdventOfCode2015.Problems
                     }
                 }
             }
-            var temp = _successfulRuns.DistinctBy(x => x.TotalManaSpent).ToList();
-            var temp1 = temp.OrderBy(x => x.TotalManaSpent).ToList();
 
             return _successfulRuns.DistinctBy(x => x.TotalManaSpent).Select(x => x.TotalManaSpent).Min();
         }
