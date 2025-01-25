@@ -8,8 +8,8 @@ namespace AdventOfCode2015.Problems
 
         string _inputPath = string.Empty;
         int _firstResult = 0;
-        string _secondResult = string.Empty;
-        Dictionary<string, HashSet<string>> _lanGroupGraph = new();
+        int _secondResult = 0;
+        string[] _instructions = [];
 
 
         #endregion
@@ -39,7 +39,7 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-        public string SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -58,7 +58,7 @@ namespace AdventOfCode2015.Problems
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -66,21 +66,7 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            var connections = File.ReadAllLines(_inputPath);
-            foreach (var connection in connections) 
-            {
-                var computers = connection.Split('-');
-                var computer1 = computers[0];
-                var computer2 = computers[1];
-
-                if (!_lanGroupGraph.ContainsKey(computer1))
-                    _lanGroupGraph[computer1] = new HashSet<string>();
-                if (!_lanGroupGraph.ContainsKey(computer2))
-                    _lanGroupGraph[computer2] = new HashSet<string>();
-
-                _lanGroupGraph[computer1].Add(computer2);
-                _lanGroupGraph[computer2].Add(computer1);
-            }
+            _instructions = File.ReadAllLines(_inputPath);
         }
 
         public override void OutputSolution()
@@ -91,47 +77,113 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            HashSet<string> triangles = new HashSet<string>();
-
-            foreach (var computer1 in _lanGroupGraph.Keys)
-            {
-                foreach (var computer2 in _lanGroupGraph[computer1])
-                {
-                    if (string.Compare(computer2, computer1) > 0) // Ensure uniqueness
-                    {
-                        foreach (var computer3 in _lanGroupGraph[computer2])
-                        {
-                            if (string.Compare(computer3, computer2) > 0 && _lanGroupGraph[computer1].Contains(computer3)) // Check for triangle
-                            {
-                                var triangle = new List<string> { computer1, computer2, computer3 };
-                                triangle.Sort(); // Ensure order
-                                triangles.Add(string.Join(",", triangle));
-                            }
-                        }
-                    }
-                }
-            }
-
-            //Filter triangles containing 't'
-            var tTriangles = triangles.Where(tri => tri.Split(',').Any(node => node.StartsWith("t"))).ToList();
-
-            return (T)Convert.ChangeType(tTriangles.Count, typeof(T));
+            var result = RunProgram(0, 0);
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            //Find the largest clique using Bron-Kerbosch algorithm
-            List<string> largestClique = new List<string>();
-            BronKerboschAlgorithm.RunBronKerboschAlgorithm(new List<string>(), _lanGroupGraph.Keys.ToList(), new List<string>(), _lanGroupGraph, ref largestClique);
-
-            //Generate the password
-            largestClique.Sort();
-            SecondResult = string.Join(",", largestClique);
-
-            return (T)Convert.ChangeType(0, typeof(T));
+            var result = RunProgram(1, 0);
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        
+        uint RunProgram(uint registerA, uint registerB)
+        {
+            var programFinished = false;
+            var iter = 0;
+
+            while (true)
+            {
+
+                if (programFinished)
+                    break;
+
+                var instruction = _instructions[iter];
+                var parts = instruction.Split(' ');
+                var isRegisterA = parts[1].Contains('a');
+                var isRegisterB = parts[1].Contains('b');
+
+                uint register = 0;
+                if (isRegisterA)
+                    register = registerA;
+                else if (isRegisterB)
+                    register = registerB;
+
+                int newIndex;
+                switch (parts[0])
+                {
+                    case "hlf":
+                        register = Hlf(register);
+                        iter++;
+                        break;
+                    case "tpl":
+                        register = Tpl(register);
+                        iter++;
+                        break;
+                    case "inc":
+                        register = Inc(register);
+                        iter++;
+                        break;
+                    case "jmp":
+                        newIndex = Jmp(iter, int.Parse(parts[1]));
+                        if (newIndex >= _instructions.Length)
+                            programFinished = true;
+                        else
+                            iter = newIndex;
+                        break;
+                    case "jie":
+                        newIndex = Jie(iter, register, int.Parse(parts[2]));
+                        if (newIndex >= _instructions.Length)
+                            programFinished = true;
+                        else
+                            iter = newIndex;
+                        break;
+                    case "jio":
+                        newIndex = Jio(iter, register, int.Parse(parts[2]));
+                        if (newIndex >= _instructions.Length)
+                            programFinished = true;
+                        else
+                            iter = newIndex;
+                        break;
+                }
+
+
+                if (isRegisterA)
+                    registerA = register;
+                else if (isRegisterB)
+                    registerB = register;
+            }
+
+            return registerB;
+        }
+
+        uint Hlf(uint register)
+            => register / 2;
+
+        uint Tpl(uint register)
+            => register * 3;
+
+        uint Inc(uint register)
+            => ++register;
+
+        int Jmp(int instructionIndex, int offset)
+            => instructionIndex + offset;
+
+        int Jie(int instructionIndex, uint register, int offset)
+        {
+            if (register % 2 != 0)
+                return ++instructionIndex;
+
+            return instructionIndex + offset;
+        }
+
+        int Jio(int instructionIndex, uint register, int offset)
+        {
+            if (register != 1)
+                return ++instructionIndex;
+
+            return instructionIndex + offset;
+        }
 
         #endregion
     }
