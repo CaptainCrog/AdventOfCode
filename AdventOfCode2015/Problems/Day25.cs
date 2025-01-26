@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Regex;
+using System.Reflection;
 
 namespace AdventOfCode2015.Problems
 {
@@ -15,9 +11,10 @@ namespace AdventOfCode2015.Problems
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        int _sum = 0;
-        List<int[]> _locks = new();
-        List<int[]> _keys = new();
+        const ulong _firstCode = 20151125;
+        const ulong _multiplier = 252533;
+        const ulong _divider = 33554393;
+        Node _target = new();
 
         #endregion
 
@@ -57,18 +54,6 @@ namespace AdventOfCode2015.Problems
                 }
             }
         }
-
-        int Sum
-        {
-            get => _sum;
-            set
-            {
-                if (_sum != value)
-                {
-                    _sum = value;
-                }
-            }
-        }
         #endregion
 
         #region Constructor
@@ -84,11 +69,14 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            var inputGrids = File.ReadAllText(_inputPath).Split("\r\n\r\n", StringSplitOptions.RemoveEmptyEntries);
-            foreach (var grid in inputGrids)
+            var input = File.ReadAllText(_inputPath);
+            var regex = CommonRegexHelpers.NumberRegex();
+            var matches = regex.Matches(input);
+            _target = new Node()
             {
-                ProcessGrid(grid);
-            }
+                X = int.Parse(matches[0].Value),
+                Y = int.Parse(matches[1].Value),
+            };
         }
 
         public override void OutputSolution()
@@ -99,81 +87,22 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            Sum = 0;
-            foreach (var fivePinLock in _locks)
+            ulong result = _firstCode;
+
+            var targetIndex = (_target.X + _target.Y) - 1;
+            targetIndex = ((targetIndex - 1) * targetIndex / 2) + _target.Y;
+
+            for (int i = 1; i < targetIndex; i++)
             {
-                foreach (var key in _keys)
-                {
-                    var isValid = true;
-                    for (int i = 0; i < fivePinLock.Length; i++)
-                    {
-                        if (fivePinLock[i] + key[i] > 5)
-                        {
-                            isValid = false;
-                            break;
-                        }
-                    }
-                    if (isValid)
-                    {
-                        Sum++;
-                    }
-                }
+                result = (result * _multiplier) % _divider;
             }
 
-            return (T)Convert.ChangeType(Sum, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public override T SolveSecondProblem<T>()
         {
-            Sum = 0;
-            return (T)Convert.ChangeType(Sum, typeof(T));
-        }
-
-        void ProcessGrid(string stringGridRaw) 
-        {
-            var stringGrid = stringGridRaw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            if (stringGrid[0].Contains('#')) //LOCK
-            {
-                //var grid = new char[stringGrid.GetLength(0), stringGrid.GetLength(1)];
-                var positions = new int[5];
-
-                // foreach column, go through all rows till we hit a '.'
-                for (int i = 0; i < positions.Length; i++)
-                {
-                    for (int j = 0; j < stringGrid.GetLength(0); j++)
-                    {
-                        if (stringGrid[j][i] == '.')
-                        {
-                            positions[i] = j-1;
-                            break;
-                        }
-                    }
-                }
-
-                _locks.Add(positions);
-            }
-            else //KEY
-            {
-                //var grid = new char[stringGrid.GetLength(0), stringGrid.GetLength(1)];
-                var positions = new int[5];
-
-                // foreach column, go through all rows backwards till we hit a '.'
-                for (int i = 0; i < positions.Length; i++)
-                {
-                    int iterator = 0;
-                    for (int j = stringGrid.GetLength(0)-1; j >= 0; j--)
-                    {
-                        if (stringGrid[j][i] == '.')
-                        {
-                            positions[i] = iterator-1;
-                            break;
-                        }
-                        iterator++;
-                    }
-                }
-
-                _keys.Add(positions);
-            }
+            return (T)Convert.ChangeType(0, typeof(T));
         }
         #endregion
     }
