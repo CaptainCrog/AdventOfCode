@@ -11,4 +11,5 @@ namespace AdventOfCode2015Tests
             instance.FirstResult.Should().Be(6);
         }
         //No example for Part 2 to test against
+    }
 }
