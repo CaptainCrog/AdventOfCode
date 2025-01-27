@@ -5,28 +5,28 @@ namespace AdventOfCode2016Tests
     {
         [TestMethod]
         [DeploymentItem("Inputs/Day1/Day1Test1.txt")]
-        public void Part1_OutputsCorrectFloorFile1_IsTrue()
+        public void Part1_OutputsCorrectBlockDistanceFile1_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day1("Day1Test1.txt");
             instance.FirstResult.Should().Be(5);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day1/Day1Test2.txt")]
-        public void Part1_OutputsCorrectFloorFile2_IsTrue()
+        public void Part1_OutputsCorrectBlockDistanceFile2_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day1("Day1Test2.txt");
             instance.FirstResult.Should().Be(2);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day1/Day1Test3.txt")]
-        public void Part1_OutputsCorrectFloorFile3_IsTrue()
+        public void Part1_OutputsCorrectBlockDistanceFile3_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day1("Day1Test3.txt");
             instance.FirstResult.Should().Be(12);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day1/Day1Test4.txt")]
-        public void Part1_OutputsCorrectFloorFile4_IsTrue()
+        public void Part2_OutputsCorrectBlockDistanceFile4_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day1("Day1Test4.txt");
             instance.SecondResult.Should().Be(4);
