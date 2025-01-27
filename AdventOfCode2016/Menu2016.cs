@@ -17,7 +17,7 @@ public static class Menu2016
                     switch (choiceSanitised)
                     {
                         case 1:
-                            _ = new Day1(@"..\..\..\..\AdventOfCode2015\Inputs\Puzzles\Day1Puzzle.txt");
+                            _ = new Day1(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day1Puzzle.txt");
                             break;
                         case 2:
                         case 3:
