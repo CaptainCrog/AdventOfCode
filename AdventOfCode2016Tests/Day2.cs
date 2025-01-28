@@ -8,14 +8,14 @@ namespace AdventOfCode2016Tests
         public void Part1_OutputsCorrectKeyCodeFile1_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day2("Day2Test1.txt");
-            instance.FirstResult.Should().Be(1985);
+            instance.FirstResult.ResultValue.Should().Be(1985);
         }
         [TestMethod]
         [DeploymentItem("Inputs/Day2/Day2Test1.txt")]
         public void Part2_OutputsCorrectKeyCodeFile1_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day2("Day2Test1.txt");
-            instance.SecondResult.Should().Be("5DB3");
+            instance.SecondResult.ResultValue.Should().Be("5DB3");
         }
     }
 }
