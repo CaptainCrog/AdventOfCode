@@ -100,7 +100,7 @@ namespace AdventOfCode2024.Problems
 
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<(int row, int col)>();
+            SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -170,8 +170,8 @@ namespace AdventOfCode2024.Problems
 
 
             // Find the coordinate at the cutoff iteration
-            (int row, int col) cutoffCoordinate = cutoffIteration >= 0 ? _bytePositions[cutoffIteration - 1] : default;
-            return (T)Convert.ChangeType(cutoffCoordinate, typeof(T));
+            SecondResult = cutoffIteration >= 0 ? _bytePositions[cutoffIteration - 1] : default;
+            return (T)Convert.ChangeType(0, typeof(T));
         }
 
 
