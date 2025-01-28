@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day21 : DayBase
     {
@@ -158,7 +160,7 @@
         {
             var frequencyTables = _codes.Select(code => new Dictionary<string, long> { { string.Join("", GetSequence(code, _numericalKeypadLookup)), 1 } }).ToList();
 
-            for (int i = 0; i < numberOfRobots; i++) 
+            for (int i = 0; i < numberOfRobots; i++)
             {
                 frequencyTables = frequencyTables.Select(frequencyTable =>
                 {
@@ -166,7 +168,7 @@
                     foreach (var entry in frequencyTable)
                     {
                         var subCount = GetSequenceCounts(entry.Key, _directionalKeypadLookup);
-                        foreach(var subEntry in subCount)
+                        foreach (var subEntry in subCount)
                         {
                             AddToFrequencyTable(subFrequencyTable, subEntry.Key, subEntry.Value * entry.Value);
                         }

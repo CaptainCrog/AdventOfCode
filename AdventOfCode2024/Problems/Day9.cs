@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day9 : DayBase
     {
@@ -266,7 +268,7 @@
                                 if (diskMapDecodedPart2Copy[j].length - diskMapDecodedPart2Copy[i].length != 0)
                                 {
                                     leftOverFreeSpaceLength = diskMapDecodedPart2Copy[j].length - diskMapDecodedPart2Copy[i].length;
-                                    for (int k = diskMapDecodedPart2Copy[i].length; k <= diskMapDecodedPart2Copy[j].length-1; k++)
+                                    for (int k = diskMapDecodedPart2Copy[i].length; k <= diskMapDecodedPart2Copy[j].length - 1; k++)
                                     {
                                         diskMapDecodedPart2Copy[j + k] = new(diskMapDecodedPart2Copy[j + k].id, leftOverFreeSpaceLength);
                                     }

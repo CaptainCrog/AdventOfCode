@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -66,7 +67,7 @@ namespace AdventOfCode2015.Problems
         #region Methods
         public override void InitialiseProblem()
         {
-            var input  = File.ReadAllLines(InputPath).Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var input = File.ReadAllLines(InputPath).Where(x => !string.IsNullOrEmpty(x)).ToArray();
             foreach (var line in input)
             {
                 if (line.Contains("=>"))
@@ -90,12 +91,12 @@ namespace AdventOfCode2015.Problems
             var replacements = new List<string>();
             var distinctMatches = new Dictionary<string, string>();
 
-            foreach(var replacementValue in _compoundReplacementPairs)
+            foreach (var replacementValue in _compoundReplacementPairs)
             {
                 var replacementKey = replacementValue.Key;
                 var regex = new Regex(replacementValue.Value);
                 var matches = regex.Matches(_medicineMolecule);
-                foreach (Match match in matches) 
+                foreach (Match match in matches)
                 {
                     var moleculeCopy = _medicineMolecule.ToString();
                     moleculeCopy = moleculeCopy.Remove(match.Index, match.Value.Length);
@@ -107,7 +108,7 @@ namespace AdventOfCode2015.Problems
 
             var result = replacements.Distinct().Count();
             _compoundReplacementPairs = _compoundReplacementPairs.Concat(distinctMatches).ToDictionary();
-            
+
             return (T)Convert.ChangeType(result, typeof(T));
         }
 

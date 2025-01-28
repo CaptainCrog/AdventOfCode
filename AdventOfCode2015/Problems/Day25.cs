@@ -1,6 +1,5 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Regex;
-using System.Reflection;
 
 namespace AdventOfCode2015.Problems
 {

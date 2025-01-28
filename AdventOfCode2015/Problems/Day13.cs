@@ -1,6 +1,6 @@
-﻿using CommonTypes.CommonTypes.HelperFunctions;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.HelperFunctions;
 using CommonTypes.CommonTypes.Regex;
-using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -73,7 +73,7 @@ namespace AdventOfCode2015.Problems
             var initialsRegex = CommonRegexHelpers.CapitalLettersRegex();
             var numberRegex = CommonRegexHelpers.NumberRegex();
 
-            foreach (var line in input) 
+            foreach (var line in input)
             {
                 var initialMatches = initialsRegex.Matches(line);
                 var numberMatches = numberRegex.Matches(line);

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
@@ -175,7 +176,7 @@ namespace AdventOfCode2024.Problems
         // Obviously part 2 gives us a reusable function that can work across any variety of numbers, making it more scalable
         (int buttonAPressedCount, int buttonBPressedCount) BreadthFirstSearch(ClawMachine clawMachine)
         {
-            var queue = new Queue<(long x, long y, int buttonAPressedCount, int buttonBPressedCount)>(new[] {(0L,0L,0,0)});
+            var queue = new Queue<(long x, long y, int buttonAPressedCount, int buttonBPressedCount)>(new[] { (0L, 0L, 0, 0) });
             var visitedSequences = new HashSet<(long x, long y)>();
 
             while (queue.Count() != 0)
@@ -199,12 +200,12 @@ namespace AdventOfCode2024.Problems
         {
             var determinants = GetDeterminants(clawMachine);
             var fullDet = determinants.det1 - determinants.det2;
-            if (fullDet == 0) 
+            if (fullDet == 0)
                 return (-1, -1);
 
             var x = clawMachine.Prize.xValue * clawMachine.ButtonB.YMovement - clawMachine.Prize.yValue * clawMachine.ButtonB.XMovement;
             var y = clawMachine.Prize.yValue * clawMachine.ButtonA.XMovement - clawMachine.Prize.xValue * clawMachine.ButtonA.YMovement;
-            if (x % fullDet != 0 || y % fullDet != 0) 
+            if (x % fullDet != 0 || y % fullDet != 0)
                 return (-1, -1);
 
             var xResult = x / fullDet;

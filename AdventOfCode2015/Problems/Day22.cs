@@ -1,6 +1,6 @@
 ﻿using AdventOfCode2015.CommonInternalTypes.Classes;
+using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Regex;
-using static AdventOfCode2015.Problems.Day22;
 
 namespace AdventOfCode2015.Problems
 {
@@ -351,7 +351,7 @@ namespace AdventOfCode2015.Problems
 
         internal class RunComparer : IEqualityComparer<(int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes)>
         {
-            public bool Equals((int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes) x, 
+            public bool Equals((int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes) x,
                                (int magicMissileCount, int drainCount, int shieldCount, int rechargeCount, int poisonCount, List<int> shieldIndexes, List<int> rechargeIndexes, List<int> poisonIndexes) y)
             {
                 // Compare all non-list fields

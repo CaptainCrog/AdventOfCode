@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using CommonTypes.CommonTypes.Classes;
 
 namespace AdventOfCode2024.Problems
 {
@@ -129,7 +123,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
 
-        void ProcessGrid(string stringGridRaw) 
+        void ProcessGrid(string stringGridRaw)
         {
             var stringGrid = stringGridRaw.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             if (stringGrid[0].Contains('#')) //LOCK
@@ -144,7 +138,7 @@ namespace AdventOfCode2024.Problems
                     {
                         if (stringGrid[j][i] == '.')
                         {
-                            positions[i] = j-1;
+                            positions[i] = j - 1;
                             break;
                         }
                     }
@@ -161,11 +155,11 @@ namespace AdventOfCode2024.Problems
                 for (int i = 0; i < positions.Length; i++)
                 {
                     int iterator = 0;
-                    for (int j = stringGrid.GetLength(0)-1; j >= 0; j--)
+                    for (int j = stringGrid.GetLength(0) - 1; j >= 0; j--)
                     {
                         if (stringGrid[j][i] == '.')
                         {
-                            positions[i] = iterator-1;
+                            positions[i] = iterator - 1;
                             break;
                         }
                         iterator++;

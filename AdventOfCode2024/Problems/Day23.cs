@@ -1,4 +1,5 @@
 ﻿using CommonTypes.CommonTypes.Algorithms;
+using CommonTypes.CommonTypes.Classes;
 
 namespace AdventOfCode2024.Problems
 {
@@ -58,7 +59,7 @@ namespace AdventOfCode2024.Problems
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<string>();
             OutputSolution();
         }
         #endregion
@@ -67,7 +68,7 @@ namespace AdventOfCode2024.Problems
         public override void InitialiseProblem()
         {
             var connections = File.ReadAllLines(_inputPath);
-            foreach (var connection in connections) 
+            foreach (var connection in connections)
             {
                 var computers = connection.Split('-');
                 var computer1 = computers[0];
@@ -126,12 +127,12 @@ namespace AdventOfCode2024.Problems
 
             //Generate the password
             largestClique.Sort();
-            SecondResult = string.Join(",", largestClique);
+            var result = string.Join(",", largestClique);
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        
+
 
         #endregion
     }

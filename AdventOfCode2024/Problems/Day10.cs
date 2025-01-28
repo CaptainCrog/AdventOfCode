@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day10 : DayBase
     {
@@ -177,7 +179,7 @@
 
         private bool CheckDirectionIsInMapBounds(int trailHeadRow, int trailHeadCol, int rowDirection, int colDirection)
         {
-            return !(trailHeadRow + rowDirection > Map.Length-1 || trailHeadRow + rowDirection < 0 || trailHeadCol + colDirection > Map.Length-1 || trailHeadCol + colDirection < 0);
+            return !(trailHeadRow + rowDirection > Map.Length - 1 || trailHeadRow + rowDirection < 0 || trailHeadCol + colDirection > Map.Length - 1 || trailHeadCol + colDirection < 0);
         }
 
         private bool IsNextPositionValidPeakAdjustment(int row, int directionRow, int col, int directionCol, int currentPeakLevel)
@@ -191,7 +193,7 @@
                 {
                     if (!CurrentTrail.AllPeaksFound.Contains((row + directionRow, col + directionCol)))
                     {
-                        CurrentTrail.AllPeaksFound.Add((row + directionRow,col + directionCol));
+                        CurrentTrail.AllPeaksFound.Add((row + directionRow, col + directionCol));
                         TrailHeadScore++;
                         TopographicRating++;
                     }
@@ -225,17 +227,17 @@
 
             int row = trailHead.row;
             int col = trailHead.col;
-            var upIsValid = CheckDirectionIsInMapBounds(row, col, - 1, 0) && IsNextPositionValidPeakAdjustment(row, - 1, col, 0, trailHeadPath.CurrentPeakLevel);
+            var upIsValid = CheckDirectionIsInMapBounds(row, col, -1, 0) && IsNextPositionValidPeakAdjustment(row, -1, col, 0, trailHeadPath.CurrentPeakLevel);
             var downIsValid = CheckDirectionIsInMapBounds(row, col, 1, 0) && IsNextPositionValidPeakAdjustment(row, 1, col, 0, trailHeadPath.CurrentPeakLevel);
             var leftIsValid = CheckDirectionIsInMapBounds(row, col, 0, -1) && IsNextPositionValidPeakAdjustment(row, 0, col, -1, trailHeadPath.CurrentPeakLevel);
-            var rightIsValid = CheckDirectionIsInMapBounds(row, col, 0, 1) && IsNextPositionValidPeakAdjustment(row, 0, col,  1, trailHeadPath.CurrentPeakLevel);
+            var rightIsValid = CheckDirectionIsInMapBounds(row, col, 0, 1) && IsNextPositionValidPeakAdjustment(row, 0, col, 1, trailHeadPath.CurrentPeakLevel);
 
             if (upIsValid)
             {
                 var newTrailHeadPath = new TrailHeadPath()
                 {
                     Direction = (-1, 0),
-                    CurrentPeakLevel = trailHeadPath.CurrentPeakLevel+1,
+                    CurrentPeakLevel = trailHeadPath.CurrentPeakLevel + 1,
                 };
                 forkedTrailHeadPaths.Add(newTrailHeadPath);
             }
@@ -348,8 +350,8 @@
         }
 
 
-        public Trail() 
-        { 
+        public Trail()
+        {
         }
     }
 }

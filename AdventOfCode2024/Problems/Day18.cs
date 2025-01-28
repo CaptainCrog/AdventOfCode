@@ -12,7 +12,7 @@ namespace AdventOfCode2024.Problems
         int _firstResult = 0;
         (int row, int col) _secondResult = (0, 0);
         List<(int row, int col)> _bytePositions = new();
-        char[,] _charPositions = new char [0,0];
+        char[,] _charPositions = new char[0, 0];
         Node _start = new Node()
         {
             X = 0,
@@ -109,7 +109,7 @@ namespace AdventOfCode2024.Problems
         public override void InitialiseProblem()
         {
             var input = File.ReadAllLines(_inputPath);
-            foreach (var line in input) 
+            foreach (var line in input)
             {
                 var numbers = line.Split(',');
                 var col = int.Parse(numbers[0]);
@@ -170,7 +170,7 @@ namespace AdventOfCode2024.Problems
 
 
             // Find the coordinate at the cutoff iteration
-            (int row, int col) cutoffCoordinate = cutoffIteration >= 0 ? _bytePositions[cutoffIteration-1] : default;
+            (int row, int col) cutoffCoordinate = cutoffIteration >= 0 ? _bytePositions[cutoffIteration - 1] : default;
             return (T)Convert.ChangeType(cutoffCoordinate, typeof(T));
         }
 
@@ -189,7 +189,7 @@ namespace AdventOfCode2024.Problems
             }
 
             var bytes = _bytePositions.Take(numberOfBytes).ToList();
-            foreach(var item in bytes)
+            foreach (var item in bytes)
             {
                 _charPositions[item.row, item.col] = '#';
                 _djikstrasGraph.Remove(_djikstrasGraph.Where(node => node.X == item.row && node.Y == item.col).First());
@@ -198,14 +198,14 @@ namespace AdventOfCode2024.Problems
             PrintArray();
         }
 
-        void PrintArray() 
+        void PrintArray()
         {
             Console.WriteLine();
             for (int i = 0; i < _charPositions.GetLength(0); i++)
             {
                 for (int j = 0; j < _charPositions.GetLength(1); j++)
                 {
-                    Console.Write(_charPositions[i,j]);
+                    Console.Write(_charPositions[i, j]);
                 }
                 Console.WriteLine();
             }

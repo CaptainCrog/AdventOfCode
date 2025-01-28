@@ -1,6 +1,5 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using System.Text.RegularExpressions;
-using System.Linq;
 
 namespace AdventOfCode2015.Problems
 {
@@ -10,7 +9,7 @@ namespace AdventOfCode2015.Problems
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        bool[,] _lightGrid = new bool [1000,1000];
+        bool[,] _lightGrid = new bool[1000, 1000];
         int[,] _brightnessGrid = new int[1000, 1000];
         List<LightChange> _lightChanges = new();
 
@@ -69,7 +68,7 @@ namespace AdventOfCode2015.Problems
         public override void InitialiseProblem()
         {
             var input = File.ReadLines(_inputPath).ToArray();
-            foreach (var line in input) 
+            foreach (var line in input)
             {
                 var numberRegex = new Regex(@"\d+");
                 var matches = numberRegex.Matches(line);
@@ -166,7 +165,7 @@ namespace AdventOfCode2015.Problems
             {
                 for (int j = 0; j < _brightnessGrid.GetLength(1); j++)
                 {
-                    lightsTotalBrightness += _brightnessGrid[i,j];
+                    lightsTotalBrightness += _brightnessGrid[i, j];
                 }
             }
 
@@ -195,7 +194,7 @@ namespace AdventOfCode2015.Problems
             get => _lightCommand;
             private set
             {
-                if ( _lightCommand != value ) 
+                if (_lightCommand != value)
                 {
                     _lightCommand = value;
                 }
@@ -228,8 +227,8 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        public LightChange(LightCommand lightCommand, int fromX, int fromY, int toX, int toY) 
-        { 
+        public LightChange(LightCommand lightCommand, int fromX, int fromY, int toX, int toY)
+        {
             LightCommand = lightCommand;
             From = new Node() { X = fromX, Y = fromY };
             To = new Node() { X = toX, Y = toY };

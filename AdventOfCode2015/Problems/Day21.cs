@@ -1,4 +1,5 @@
 ﻿using AdventOfCode2015.CommonInternalTypes.Classes;
+using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.HelperFunctions;
 using CommonTypes.CommonTypes.Regex;
 
@@ -180,7 +181,7 @@ namespace AdventOfCode2015.Problems
 
         #region Internal Classes
 
-       
+
 
         #endregion
 

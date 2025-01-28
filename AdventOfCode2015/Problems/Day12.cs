@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
@@ -136,7 +137,7 @@ namespace AdventOfCode2015.Problems
                     depth++;
                 }
 
-                if (inputCopy[indexCopy] == ']' || inputCopy[indexCopy] == '}' )
+                if (inputCopy[indexCopy] == ']' || inputCopy[indexCopy] == '}')
                 {
                     if (depth == 0)
                     {

@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day2 : DayBase
     {
@@ -133,11 +135,11 @@
 
             for (int i = 0; i <= reportValuesCopy.Count() - 1; i++)
             {
-                dampenedReport = reportValuesCopy.Select((value, index) => new {value, index})
+                dampenedReport = reportValuesCopy.Select((value, index) => new { value, index })
                                                     .Where(x => x.index != i)
                                                     .Select(xx => xx.value)
                                                     .ToList();
-                if(ProcessReport(dampenedReport.ToArray(), isAscending))
+                if (ProcessReport(dampenedReport.ToArray(), isAscending))
                     return true;
 
             }

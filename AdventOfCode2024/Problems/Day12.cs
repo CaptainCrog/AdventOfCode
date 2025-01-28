@@ -1,10 +1,12 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day12 : DayBase
     {
 
         #region Fields
-        string _inputPath = string.Empty; 
+        string _inputPath = string.Empty;
         int _firstResult = 0;
         ulong _secondResult = 0;
         string[] _gardenPlot = [];

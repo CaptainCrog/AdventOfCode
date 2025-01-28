@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -82,11 +83,11 @@ namespace AdventOfCode2015.Problems
             var vowelRegex = VowelRegex();
             var doubleLetterRegex = DoubleLetterRegex();
             var invalidStringRegex = InvalidStringRegex();
-            foreach ( var line in _textFile ) 
+            foreach (var line in _textFile)
             {
-                var containsAtLeast3Vowels = vowelRegex.Matches( line ).Count >= 3;
+                var containsAtLeast3Vowels = vowelRegex.Matches(line).Count >= 3;
                 var containsAtLeast1DoubleCharacter = doubleLetterRegex.Matches(line).Count >= 1;
-                var containsNoInvalidStrings = invalidStringRegex.Matches( line ).Count == 0;
+                var containsNoInvalidStrings = invalidStringRegex.Matches(line).Count == 0;
 
                 if (containsAtLeast3Vowels && containsAtLeast1DoubleCharacter && containsNoInvalidStrings)
                     niceStringsCount++;

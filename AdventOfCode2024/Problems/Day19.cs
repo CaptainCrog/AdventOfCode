@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day19 : DayBase
     {
@@ -81,7 +83,7 @@
             _desiredDesigns = new List<string>();
 
             // READ IN FILE
-            var input  = File.ReadAllLines(InputPath);
+            var input = File.ReadAllLines(InputPath);
             foreach (var line in input)
             {
                 if (string.IsNullOrEmpty(line))

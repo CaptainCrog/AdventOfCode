@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day1 : DayBase
     {
@@ -15,7 +17,7 @@
             get => _inputPath;
             set
             {
-                if (_inputPath != value) 
+                if (_inputPath != value)
                 {
                     _inputPath = value;
                 }
@@ -26,7 +28,7 @@
             get => _firstResult;
             set
             {
-                if (_firstResult != value) 
+                if (_firstResult != value)
                 {
                     _firstResult = value;
                 }
@@ -73,7 +75,7 @@
             _input = File.ReadAllText(_inputPath);
         }
 
-        public override T SolveFirstProblem<T>() where T : struct
+        public override T SolveFirstProblem<T>()
         {
             var floor = _startingFloor;
             foreach (var parenthesis in _input)
@@ -100,7 +102,7 @@
                     floor--;
                     if (floor == -1)
                     {
-                        position = i+1; // Result isn't 0 indexed
+                        position = i + 1; // Result isn't 0 indexed
                         break;
                     }
                 }
