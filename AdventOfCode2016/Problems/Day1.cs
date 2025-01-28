@@ -1,5 +1,5 @@
-﻿using CommonTypes.CommonTypes.Enums;
-using System.Drawing;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Enums;
 
 namespace AdventOfCode2016.Problems
 {

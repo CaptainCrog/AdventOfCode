@@ -1,5 +1,4 @@
-﻿using CommonTypes.CommonTypes.Enums;
-using System.Drawing;
+﻿using CommonTypes.CommonTypes.Classes;
 
 namespace AdventOfCode2016.Problems
 {
@@ -8,9 +7,9 @@ namespace AdventOfCode2016.Problems
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
-        int _secondResult = 0;
-        string[][] _keypad = [];
-        (int x, int y) _currentPosition = (1, 1);
+        string _secondResult = string.Empty;
+        string[,] _keypad = new string [0,0];
+        (int x, int y) _currentPosition = (0,0);
         string[] _instructionSets = [];
 
 
@@ -28,7 +27,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public int FirstResult
+        public Result<int> FirstResult
         {
             get => _firstResult;
             set
@@ -39,7 +38,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public int SecondResult
+        public Result<string> SecondResult
         {
             get => _secondResult;
             set
@@ -58,7 +57,7 @@ namespace AdventOfCode2016.Problems
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<string>();
             OutputSolution();
         }
         #endregion
@@ -77,7 +76,9 @@ namespace AdventOfCode2016.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            _keypad = [[ "1", "2", "3" ], [ "4", "5", "6" ], [ "7", "8", "9" ]];
+            _keypad = new string[,] { { "1", "2", "3" }, { "4", "5", "6" }, { "7", "8", "9" } };
+            _currentPosition = (1, 1);
+
             var result = 0;
             foreach ( var instructionSet in _instructionSets) 
             {
@@ -85,7 +86,7 @@ namespace AdventOfCode2016.Problems
                 {
                     ProcessInstruction(instruction);
                 }
-                var number = int.Parse(_keypad[_currentPosition.x][_currentPosition.y]);
+                var number = int.Parse(_keypad[_currentPosition.x, _currentPosition.y]);
                 result = result * 10 + number;
             }
             return (T)Convert.ChangeType(result, typeof(T));
@@ -93,15 +94,21 @@ namespace AdventOfCode2016.Problems
 
         public override T SolveSecondProblem<T>()
         {
+            // # # 1 # #
+            // # 2 3 4 #
+            // 5 6 7 8 9
+            // # A B C #
+            // # # D # #
 
-            _keypad = 
-                [
-                            ["1"], 
-                        ["2", "3", "4"], 
-                    ["5", "6", "7", "8", "9"],
-                        ["A", "B", "C"],
-                            ["D"],
-                ];
+            _keypad = new string[,] 
+            { 
+                { $"{int.MaxValue}", $"{int.MaxValue}", "1", $"{int.MaxValue}", $"{int.MaxValue}" }, 
+                { $"{int.MaxValue}", "2", "3", "4", $"{int.MaxValue}" }, 
+                { "5", "6", "7", "8", "9" },
+                { $"{int.MaxValue}", "A", "B", "C", $"{int.MaxValue}" },
+                { $"{int.MaxValue}", $"{int.MaxValue}", "D", $"{int.MaxValue}", $"{int.MaxValue}" },
+            };
+            _currentPosition = (2, 0);
 
 
             var result = string.Empty;
@@ -111,39 +118,48 @@ namespace AdventOfCode2016.Problems
                 {
                     ProcessInstruction(instruction);
                 }
-                var input = _keypad[_currentPosition.x][_currentPosition.y];
+                var input = _keypad[_currentPosition.x, _currentPosition.y];
                 result += input;
             }
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
 
         void ProcessInstruction(char instruction) 
         {
+            var nextPosition = _currentPosition;
             switch (instruction) 
             {
                 case 'U':
-                    _currentPosition = (_currentPosition.x - 1, _currentPosition.y);
-                    if (_currentPosition.x < 0)
-                        _currentPosition.x = 0;
+                    nextPosition = (_currentPosition.x - 1, _currentPosition.y);
+                    if (nextPosition.x < 0)
+                        nextPosition.x = 0;
                     break;
                 case 'L':
-                    _currentPosition = (_currentPosition.x, _currentPosition.y - 1);
-                    if (_currentPosition.y < 0)
-                        _currentPosition.y = 0;
+                    nextPosition = (_currentPosition.x, _currentPosition.y - 1);
+                    if (nextPosition.y < 0)
+                        nextPosition.y = 0;
                     break;
                 case 'D':
-                    _currentPosition = (_currentPosition.x + 1, _currentPosition.y);
-                    if (_currentPosition.x >= _keypad[0].GetLength(0))
-                        _currentPosition.x = _keypad[0].GetLength(0) - 1;
+                    nextPosition = (_currentPosition.x + 1, _currentPosition.y);
+                    if (nextPosition.x >= _keypad.GetLength(0))
+                        nextPosition.x = _keypad.GetLength(0) - 1;
                     break;
                 case 'R':
-                    _currentPosition = (_currentPosition.x, _currentPosition.y + 1);
-                    if (_currentPosition.y >= _keypad[0].GetLength(0))
-                        _currentPosition.y = _keypad[0].GetLength(0) - 1;
+                    nextPosition = (_currentPosition.x, _currentPosition.y + 1);
+                    if (nextPosition.y >= _keypad.GetLength(1))
+                        nextPosition.y = _keypad.GetLength(1) - 1;
                     break;
             }
+
+            var isNumber = int.TryParse(_keypad[nextPosition.x, nextPosition.y], out var number);
+
+            if (!isNumber || (isNumber && number != int.MaxValue))
+            {
+                _currentPosition = nextPosition;
+            }
+
         }
         #endregion
     }
