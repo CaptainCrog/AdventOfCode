@@ -1,6 +1,5 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Classes.Shapes;
-using System.Diagnostics;
 
 namespace AdventOfCode2016.Problems
 {

@@ -8,8 +8,15 @@ namespace CommonTypes.CommonTypes.Regex
         [GeneratedRegex(@"-?\d+")]
         public static partial System.Text.RegularExpressions.Regex NumberRegex();
 
+        [GeneratedRegex(@"\d+")]
+        public static partial System.Text.RegularExpressions.Regex PositiveNumberRegex();
+
         // https://regex101.com/r/pWTTgy/2
         [GeneratedRegex(@"[A-Z]")]
         public static partial System.Text.RegularExpressions.Regex CapitalLettersRegex();
+
+        [GeneratedRegex(@"[a-z]")]
+        public static partial System.Text.RegularExpressions.Regex AnyLowercaseLetters();
+
     }
 }
