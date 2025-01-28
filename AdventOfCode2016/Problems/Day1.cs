@@ -1,10 +1,11 @@
-﻿using CommonTypes.CommonTypes.Enums;
-using System.Drawing;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Enums;
 
 namespace AdventOfCode2016.Problems
 {
     public class Day1 : DayBase
     {
+        #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
@@ -24,6 +25,9 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
+        #endregion
+
+        #region Properties
         public int FirstResult
         {
             get => _firstResult;
@@ -46,7 +50,9 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
+        #endregion
 
+        #region Constructor
         public Day1(string inputPath)
         {
             _inputPath = inputPath;
@@ -55,7 +61,9 @@ namespace AdventOfCode2016.Problems
             SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
+        #endregion
 
+        #region Methods
         public override void InitialiseProblem()
         {
             _directions = File.ReadAllText(_inputPath).Split(", ");
@@ -180,6 +188,7 @@ namespace AdventOfCode2016.Problems
                     iterator++;
                 }
             }
+            #endregion
         }
     }
 }
