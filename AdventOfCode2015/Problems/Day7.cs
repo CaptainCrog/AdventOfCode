@@ -1,6 +1,5 @@
-﻿using CommonTypes.CommonTypes.Constants;
-using System.Text.RegularExpressions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Constants;
 
 namespace AdventOfCode2015.Problems
 {

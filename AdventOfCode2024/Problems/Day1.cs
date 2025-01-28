@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2024.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2024.Problems
 {
     public class Day1 : DayBase
     {
@@ -13,7 +15,7 @@
             get => _inputPath;
             set
             {
-                if (_inputPath != value) 
+                if (_inputPath != value)
                 {
                     _inputPath = value;
                 }
@@ -24,7 +26,7 @@
             get => _firstResult;
             set
             {
-                if (_firstResult != value) 
+                if (_firstResult != value)
                 {
                     _firstResult = value;
                 }
@@ -80,7 +82,7 @@
             }
         }
 
-        public override T SolveFirstProblem<T>() where T : struct
+        public override T SolveFirstProblem<T>()
         {
             var orderedFirstList = FirstList.OrderBy(x => x);
             var orderedSecondList = SecondList.OrderBy(x => x);

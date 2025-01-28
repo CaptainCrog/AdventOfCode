@@ -1,9 +1,5 @@
-﻿using CommonTypes.CommonTypes.Regex;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Regex;
 
 namespace AdventOfCode2015.Problems
 {
@@ -101,7 +97,7 @@ namespace AdventOfCode2015.Problems
         public override T SolveFirstProblem<T>()
         {
             _reindeerFinalDistances = new();
-            foreach (var reindeer in  _reindeers)
+            foreach (var reindeer in _reindeers)
             {
                 var totalRunningCycles = _raceTime / reindeer.TotalTimePerRun;
                 var totalDistanceTraversed = totalRunningCycles * reindeer.TotalRunDistance;
@@ -166,7 +162,7 @@ namespace AdventOfCode2015.Problems
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
-        
+
         #endregion
 
     }
@@ -186,7 +182,7 @@ namespace AdventOfCode2015.Problems
         public int TimeLeftResting { get; set; }
         public int LeadingPoints { get; set; }
 
-        internal Reindeer(int speed, int runningTime, int restingTime) 
+        internal Reindeer(int speed, int runningTime, int restingTime)
         {
             Speed = speed;
             RunningTime = runningTime;

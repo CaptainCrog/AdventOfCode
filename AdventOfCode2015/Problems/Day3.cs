@@ -88,22 +88,22 @@ namespace AdventOfCode2015.Problems
                 if (movement == '^')
                 {
                     nextNode.X = currentNode.X + 1;
-                    _santaPositions[i+1] = nextNode;
+                    _santaPositions[i + 1] = nextNode;
                 }
                 else if (movement == '>')
                 {
                     nextNode.Y = currentNode.Y + 1;
-                    _santaPositions[i+1] = nextNode;
+                    _santaPositions[i + 1] = nextNode;
                 }
                 else if (movement == 'v')
                 {
                     nextNode.X = currentNode.X - 1;
-                    _santaPositions[i+1] = nextNode;
+                    _santaPositions[i + 1] = nextNode;
                 }
                 else
                 {
                     nextNode.Y = currentNode.Y - 1;
-                    _santaPositions[i+1] = nextNode;
+                    _santaPositions[i + 1] = nextNode;
                 }
                 currentNode = nextNode;
             }
@@ -116,7 +116,7 @@ namespace AdventOfCode2015.Problems
         public override T SolveSecondProblem<T>()
         {
 
-            _santaPositions = new Node[_movements.Length/2 + 1];
+            _santaPositions = new Node[_movements.Length / 2 + 1];
             _roboSantaPositions = new Node[_movements.Length / 2 + 1];
             var currentSantaNode = new Node() { X = 0, Y = 0 };
             var currentRoboSantaNode = new Node() { X = 0, Y = 0 };

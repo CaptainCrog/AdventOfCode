@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
 
 namespace AdventOfCode2015.Problems
 {
@@ -73,7 +72,7 @@ namespace AdventOfCode2015.Problems
         {
             var input = File.ReadAllLines(_inputPath);
             _containers = new int[input.Length];
-            for (int i = 0; i < _containers.Length; i++) 
+            for (int i = 0; i < _containers.Length; i++)
             {
                 _containers[i] = int.Parse(input[i]);
             }

@@ -82,7 +82,7 @@
 
         public Player(int hitPoints, int mana)
         {
-            HitPoints= hitPoints;
+            HitPoints = hitPoints;
             Mana = mana;
         }
 

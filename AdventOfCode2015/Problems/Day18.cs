@@ -1,6 +1,4 @@
 ﻿using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.Enums;
-using System.Diagnostics;
 
 namespace AdventOfCode2015.Problems
 {
@@ -12,7 +10,7 @@ namespace AdventOfCode2015.Problems
         int _firstResult = 0;
         int _secondResult = 0;
         int _numberOfSteps = 0;
-        bool[,] _lightPositions = new bool [0,0];
+        bool[,] _lightPositions = new bool[0, 0];
 
         #endregion
 
@@ -77,7 +75,7 @@ namespace AdventOfCode2015.Problems
             {
                 for (int j = 0; j < _lightPositions.GetLength(1); j++)
                 {
-                    var isLightOn = input[i][j] == '#'; 
+                    var isLightOn = input[i][j] == '#';
                     _lightPositions[i, j] = isLightOn;
                 }
             }
@@ -171,7 +169,7 @@ namespace AdventOfCode2015.Problems
             positionsToCheck = positionsToCheck.Where(x => x.col != -1 && x.col != _lightPositions.GetLength(1)).ToList(); // filter out positions where the col goes out of bounds
 
             var numberOfNeighboursOn = 0;
-            foreach (var position in positionsToCheck) 
+            foreach (var position in positionsToCheck)
             {
                 if (currentLightGrid[position.row, position.col])
                     numberOfNeighboursOn++;
@@ -191,7 +189,7 @@ namespace AdventOfCode2015.Problems
         bool[,] SetCorners(bool[,] currentLightGrid)
         {
             currentLightGrid[0, 0] = true;
-            currentLightGrid[0, currentLightGrid.GetLength(1)-1] = true;
+            currentLightGrid[0, currentLightGrid.GetLength(1) - 1] = true;
             currentLightGrid[currentLightGrid.GetLength(0) - 1, 0] = true;
             currentLightGrid[currentLightGrid.GetLength(0) - 1, currentLightGrid.GetLength(1) - 1] = true;
 

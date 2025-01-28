@@ -1,5 +1,5 @@
-﻿using CommonTypes.CommonTypes.Regex;
-using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Regex;
 
 namespace AdventOfCode2015.Problems
 {
@@ -71,7 +71,7 @@ namespace AdventOfCode2015.Problems
         {
             var input = File.ReadAllLines(InputPath);
             var numberRegex = CommonRegexHelpers.NumberRegex();
-            foreach (var line in input) 
+            foreach (var line in input)
             {
                 var matches = numberRegex.Matches(line);
                 _ingredientTypes.Add(new Ingredient()

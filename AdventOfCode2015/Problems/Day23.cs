@@ -1,4 +1,4 @@
-﻿using CommonTypes.CommonTypes.Algorithms;
+﻿using CommonTypes.CommonTypes.Classes;
 
 namespace AdventOfCode2015.Problems
 {

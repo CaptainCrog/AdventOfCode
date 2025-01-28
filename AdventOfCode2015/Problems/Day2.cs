@@ -65,8 +65,8 @@ namespace AdventOfCode2015.Problems
         public override void InitialiseProblem()
         {
             var input = File.ReadLines(_inputPath).ToArray();
-            _allMeasurements = new ThreeDimensionalObject [input.Count()];
-            for (int i = 0; i < input.Count(); i++) 
+            _allMeasurements = new ThreeDimensionalObject[input.Count()];
+            for (int i = 0; i < input.Count(); i++)
             {
                 var stringMeasurements = input[i].Split(['x']);
                 _allMeasurements[i] = new ThreeDimensionalObject(int.Parse(stringMeasurements[0]), int.Parse(stringMeasurements[1]), int.Parse(stringMeasurements[2]));

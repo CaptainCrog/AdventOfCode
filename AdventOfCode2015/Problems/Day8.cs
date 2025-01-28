@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
@@ -104,7 +105,7 @@ namespace AdventOfCode2015.Problems
                 var inputCopy = input;
                 var backslashMatches = backslashRegex.Matches(inputCopy);
                 var quoteMatches = quoteRegex.Matches(inputCopy);
-                foreach (Match match in backslashMatches) 
+                foreach (Match match in backslashMatches)
                 {
                     encodedStringLength += 2;
                 }

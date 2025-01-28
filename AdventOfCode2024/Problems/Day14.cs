@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CommonTypes.CommonTypes.Classes;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -18,13 +16,13 @@ namespace AdventOfCode2024.Problems
         int _gridHeight = 0;
         int _heightCenter = 0;
         int _widthCenter = 0;
-        int[,] _bathroom = new int [0,0];
+        int[,] _bathroom = new int[0, 0];
         char[,] _bathroomChars = new char[0, 0];
-        List<int> _tlQuadrant = new ();
-        List<int> _trQuadrant = new ();
-        List<int> _blQuadrant = new ();
-        List<int> _brQuadrant = new ();
-        List <Robot> _robots = new List<Robot> ();
+        List<int> _tlQuadrant = new();
+        List<int> _trQuadrant = new();
+        List<int> _blQuadrant = new();
+        List<int> _brQuadrant = new();
+        List<Robot> _robots = new List<Robot>();
 
         #endregion
 
@@ -104,7 +102,7 @@ namespace AdventOfCode2024.Problems
             {
                 var newX = (robot.StartingPosition.startingPosX + robot.Velocity.velocityX * 100) % _gridWidth;
                 var newY = (robot.StartingPosition.startingPosY + robot.Velocity.velocityY * 100) % _gridHeight;
-                if (newX < 0) 
+                if (newX < 0)
                     newX += _gridWidth;
                 if (newY < 0)
                     newY += _gridHeight;
@@ -175,7 +173,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(0, typeof(T));
         }
 
-        void CreateRobots() 
+        void CreateRobots()
         {
             var regex = NumbersRegex();
             foreach (var line in _input)
@@ -238,9 +236,9 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-            #endregion
+        #endregion
 
-            [GeneratedRegex(@"-?[0-9]+,-?[0-9]+")]
+        [GeneratedRegex(@"-?[0-9]+,-?[0-9]+")]
         private static partial Regex NumbersRegex();
     }
 
@@ -255,7 +253,7 @@ namespace AdventOfCode2024.Problems
             get => _startingPosition;
             set
             {
-                if (_startingPosition != value) 
+                if (_startingPosition != value)
                 {
                     _startingPosition = value;
                 }
@@ -286,7 +284,7 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        public Robot((int x, int y) startingPosition, (int x, int y) velocity) 
+        public Robot((int x, int y) startingPosition, (int x, int y) velocity)
         {
             _startingPosition = startingPosition;
             _velocity = velocity;

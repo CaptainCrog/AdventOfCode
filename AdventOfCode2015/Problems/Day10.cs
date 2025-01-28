@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text;
 
 namespace AdventOfCode2015.Problems
 {
@@ -104,7 +105,7 @@ namespace AdventOfCode2015.Problems
                 foreach (char value in inputCopy)
                 {
                     if (value == repeatValue)
-                        times ++;
+                        times++;
                     else
                     {
                         result.Append(Convert.ToString(times) + repeatValue);

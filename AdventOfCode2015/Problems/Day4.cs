@@ -1,4 +1,6 @@
-﻿namespace AdventOfCode2015.Problems
+﻿using CommonTypes.CommonTypes.Classes;
+
+namespace AdventOfCode2015.Problems
 {
     public class Day4 : DayBase
     {

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode2024.Problems;
 
-public static class Menu2024 
+public static class Menu2024
 {
     public static void Main(string[] args)
     {

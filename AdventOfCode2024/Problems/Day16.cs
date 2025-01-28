@@ -11,10 +11,10 @@ namespace AdventOfCode2024.Problems
         int _secondResult = 0;
         (List<List<Node>> paths, int shortestPathScore) _result;
         string[] _raceMapRaw = [];
-        char[,] _raceMap = new char [0,0];
+        char[,] _raceMap = new char[0, 0];
         Node _start = new();
         Node _end = new();
-        List<Node> _djikstrasGraph = new ();
+        List<Node> _djikstrasGraph = new();
         (int dx, int dy, Direction direction)[] _directions = new (int, int, Direction)[]
         {
             (0, 1, Direction.East),   // Right
@@ -87,7 +87,7 @@ namespace AdventOfCode2024.Problems
             _raceMapRaw = File.ReadAllLines(InputPath);
             _raceMap = new char[_raceMapRaw.Length, _raceMapRaw[0].Length];
 
-            for (int i = 0; i < _raceMapRaw.Length; i++) 
+            for (int i = 0; i < _raceMapRaw.Length; i++)
             {
                 for (int j = 0; j < _raceMapRaw[0].Length; j++)
                 {
@@ -241,7 +241,7 @@ namespace AdventOfCode2024.Problems
 
         private bool IsValid(int x, int y, int rows, int cols)
         {
-            return x >= 0 && y >= 0 && x < rows && y < cols && _raceMap[x,y] != '#';
+            return x >= 0 && y >= 0 && x < rows && y < cols && _raceMap[x, y] != '#';
         }
 
     }

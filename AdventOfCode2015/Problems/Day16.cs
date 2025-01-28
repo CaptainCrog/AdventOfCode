@@ -1,7 +1,5 @@
 ﻿using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.Enums;
 using CommonTypes.CommonTypes.Regex;
-using System;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
@@ -105,9 +103,9 @@ namespace AdventOfCode2015.Problems
 
         #region Methods
         public override void InitialiseProblem()
-        { 
+        {
             var aunts = File.ReadAllLines(InputPath);
-            foreach (var aunt in aunts) 
+            foreach (var aunt in aunts)
             {
                 CreateAuntSue(aunt);
             }
@@ -121,7 +119,7 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            var childrenFilter = _auntSues.Where(x => x.ChildrenCount == _sueToSearch.ChildrenCount || !x.ChildrenCount.HasValue).Select(x => x.SueId).ToList(); 
+            var childrenFilter = _auntSues.Where(x => x.ChildrenCount == _sueToSearch.ChildrenCount || !x.ChildrenCount.HasValue).Select(x => x.SueId).ToList();
             var catFilter = _auntSues.Where(x => x.CatsCount == _sueToSearch.CatsCount || !x.CatsCount.HasValue).Select(x => x.SueId).ToList();
             var samoyedFilter = _auntSues.Where(x => x.SamoyedsCount == _sueToSearch.SamoyedsCount || !x.SamoyedsCount.HasValue).Select(x => x.SueId).ToList();
             var pomeranianFilter = _auntSues.Where(x => x.PomeraniansCount == _sueToSearch.PomeraniansCount || !x.PomeraniansCount.HasValue).Select(x => x.SueId).ToList();

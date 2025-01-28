@@ -1,4 +1,5 @@
-﻿using CommonTypes.CommonTypes.HelperFunctions;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.HelperFunctions;
 
 namespace AdventOfCode2015.Problems
 {

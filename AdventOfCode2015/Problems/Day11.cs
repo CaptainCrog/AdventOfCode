@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CommonTypes.CommonTypes.Classes;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
@@ -59,8 +59,8 @@ namespace AdventOfCode2015.Problems
         {
             _inputPath = inputPath;
             InitialiseProblem();
-            SolveFirstProblem<int>();
-            SolveSecondProblem<int>();
+            FirstResult = SolveFirstProblem<string>();
+            SecondResult = SolveSecondProblem<string>();
             OutputSolution();
         }
         #endregion
@@ -80,16 +80,16 @@ namespace AdventOfCode2015.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            FirstResult = GeneratePasswords();
-            return (T)Convert.ChangeType(0, typeof(T));
+            var password = GeneratePasswords();
+            return (T)Convert.ChangeType(password, typeof(T));
         }
 
 
         public override T SolveSecondProblem<T>()
         {
-            _currentPassword = ShiftPassword(FirstResult, FirstResult.Length-1);
-            SecondResult = GeneratePasswords();
-            return (T)Convert.ChangeType(0, typeof(T));
+            _currentPassword = ShiftPassword(FirstResult, FirstResult.Length - 1);
+            var password = GeneratePasswords();
+            return (T)Convert.ChangeType(password, typeof(T));
         }
 
         string GeneratePasswords()
@@ -106,15 +106,15 @@ namespace AdventOfCode2015.Problems
                     passwordCopy = ProcessInvalidCharacter(passwordCopy, passwordLength);
                     continue;
                 }
-                
+
                 var doubleMatches = doubleCharactersRegex.Matches(passwordCopy);
                 if (!doubleMatches.Any() || doubleMatches.Count < 2)
                 {
-                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length-1);
+                    passwordCopy = ShiftPassword(passwordCopy, passwordCopy.Length - 1);
                     continue;
                 }
 
-                for (int i = 0; i < passwordCopy.Length-3; i++)
+                for (int i = 0; i < passwordCopy.Length - 3; i++)
                 {
                     var firstChar = (int)passwordCopy[i];
                     var secondChar = (int)passwordCopy[i + 1];

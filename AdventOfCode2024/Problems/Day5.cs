@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
@@ -171,12 +172,12 @@ namespace AdventOfCode2024.Problems
 
         int ProcessPages()
         {
-            foreach(var page in PagesToProduce)
+            foreach (var page in PagesToProduce)
             {
                 var pageInvalid = false;
                 var numbers = page.Split(',').Select(int.Parse).ToList();
                 var middleNumber = numbers[numbers.Count / 2];
-                for (int i = 0; i < numbers.Count; i++) 
+                for (int i = 0; i < numbers.Count; i++)
                 {
                     if (pageInvalid)
                         break;
@@ -200,7 +201,7 @@ namespace AdventOfCode2024.Problems
 
         void FixPages()
         {
-            foreach(var invalidPage in InvalidPages)
+            foreach (var invalidPage in InvalidPages)
             {
                 var numbers = invalidPage.Split(',').Select(int.Parse).ToList();
                 var allPageGroups = GroupedRules.Where(x => numbers.Contains(x.Key));

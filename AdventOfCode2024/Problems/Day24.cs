@@ -1,4 +1,5 @@
-﻿using CommonTypes.CommonTypes.Constants;
+﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Constants;
 
 namespace AdventOfCode2024.Problems
 {
@@ -11,7 +12,7 @@ namespace AdventOfCode2024.Problems
         long _firstResult = 0;
         string _lastZOutput = string.Empty;
         string _secondResult = string.Empty;
-        Dictionary<string, int> _wireValues = new(); 
+        Dictionary<string, int> _wireValues = new();
         List<(string Input1, string Gate, string Input2, string Output)> _gates = new();
 
         #endregion
@@ -61,7 +62,7 @@ namespace AdventOfCode2024.Problems
             _lastZOutput = lastZOutput;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
-            SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<string>();
             OutputSolution();
         }
         #endregion
@@ -123,9 +124,9 @@ namespace AdventOfCode2024.Problems
                     var parts = line.Split(new[] { " -> " }, StringSplitOptions.None);
                     var gateParts = parts[0].Split(' ');
                     // re-organise x and y inputs to ensure x variables are INPUT 1 and y variables are INPUT 2
-                    _gates.Add((string.Compare(gateParts[0], gateParts[2], StringComparison.Ordinal) < 0 ? gateParts[0] : gateParts[2], 
+                    _gates.Add((string.Compare(gateParts[0], gateParts[2], StringComparison.Ordinal) < 0 ? gateParts[0] : gateParts[2],
                         gateParts[1],
-                        string.Compare(gateParts[0], gateParts[2], StringComparison.Ordinal) > 0 ? gateParts[0] : gateParts[2], 
+                        string.Compare(gateParts[0], gateParts[2], StringComparison.Ordinal) > 0 ? gateParts[0] : gateParts[2],
                         parts[1]));
                 }
             }
@@ -172,9 +173,9 @@ namespace AdventOfCode2024.Problems
             var distinctViolations = allViolations.Distinct().ToList();
             distinctViolations.Sort();
 
-            SecondResult = string.Join(',', distinctViolations);
+            var result = string.Join(',', distinctViolations);
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
 

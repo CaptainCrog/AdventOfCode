@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Classes;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
@@ -61,8 +62,7 @@ namespace AdventOfCode2024.Problems
         {
             _inputPath = inputPath;
             InitialiseProblem();
-            SolveFirstProblem<int>();
-            FirstResult = _output;
+            FirstResult = SolveFirstProblem<string>();
             SecondResult = SolveSecondProblem<ulong>();
             OutputSolution();
         }
@@ -126,7 +126,7 @@ namespace AdventOfCode2024.Problems
         {
             var result = ProcessProgram();
             _output = string.Join(",", Array.ConvertAll(result.ToArray(), x => x.ToString()));
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(_output, typeof(T));
         }
 
 
@@ -135,7 +135,7 @@ namespace AdventOfCode2024.Problems
             _output = string.Empty;
             var registerAReplacements = new List<ulong>() { 0 };
 
-            for (int i = 0; i < _reversedInstructions.Length; i++) 
+            for (int i = 0; i < _reversedInstructions.Length; i++)
             {
                 var registerAReplacementsTemp = new List<ulong>(); // temporary storage as we cant edit registerAReplacements when inside the foreach
                 foreach (var replacement in registerAReplacements)
