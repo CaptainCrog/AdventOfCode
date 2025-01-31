@@ -87,51 +87,26 @@ namespace AdventOfCode2016.Problems
         public override T SolveSecondProblem<T>()
         {
             var result = 0;
-            var bracketsContainingSslRegex = BracketsSupportingSSL();
             var sslRegex = SingleLetterRepeatedAfterAnotherLetter();
             var bracketRegex = StringWithinBrackets();
 
-            var potentialSslSupportedIpAddresses = _ipAddresses.Where(x => bracketsContainingSslRegex.IsMatch(x)).ToArray();
-            var temp2 = potentialSslSupportedIpAddresses.Where(x => bracketsContainingSslRegex.IsMatch(x)).Select(xx => bracketsContainingSslRegex.Matches(xx).Select(x => x.Value).ToArray()).ToArray();
-            var temp3 = new List<string>();
-            foreach (var x in temp2)
+            var potentialSslSupportedIpAddresses = _ipAddresses.Where(x => bracketRegex.IsMatch(x)).ToArray();
+
+            foreach (var ipAddress in potentialSslSupportedIpAddresses)
             {
-                foreach (var y in x)
-                {
-                    var temp4 = sslRegex.Matches(y).Select(x => x.Value).ToArray();
-                    temp3.AddRange(temp4);
-                }
-            }
+                var hypernets = bracketRegex.Matches(ipAddress).Select(x => x.Groups[1].Value).ToArray();
+                var supernets = bracketRegex.Replace(ipAddress, "-").Split("-");
 
-            foreach ( var ipAddress in potentialSslSupportedIpAddresses)
-            {
-                var sslBracket = bracketsContainingSslRegex.Match(ipAddress).Value;
-                var sslOptions = sslRegex.Matches(sslBracket).Select(x => x.Value).ToArray();
-                var supernet = bracketRegex.Replace(ipAddress, ""); //reduce the string to only look at the supernet sequence of chars
+                var sslOptions = supernets.SelectMany(x => sslRegex.Matches(x).Select(x => x.Groups[1].Value + x.Groups[2].Value + x.Groups[1].Value)).ToArray();
+                var invertedSslOptions = sslOptions.Select(InvertSSLValue).ToHashSet();
 
-                foreach (var ssl in sslOptions)
-                {
-                    //Skip options like "vvv" or "ddd"
-                    if (ssl.Distinct().Count() == 1)
-                        continue;
-
-                    var inverseSSL = InvertSSLValue(ssl);
-                    if (supernet.Contains(inverseSSL))
-                    {
-                        result++;
-                        break;
-                    }
-                }
-
-
-
+                if (hypernets.Any(hyper => invertedSslOptions.Any(invertedSsl => hyper.Contains(invertedSsl))))
+                    result++;
             }
 
             return (T)Convert.ChangeType(result, typeof(T));
-            //282 too High
-            //192 too low
-            //189
         }
+
 
         string InvertSSLValue(string ssl)
         {
@@ -153,19 +128,15 @@ namespace AdventOfCode2016.Problems
         [GeneratedRegex(@"(.)\1{3}")]
         private static partial Regex PalindromesWithoutCharDifference();
 
-
-        //https://regex101.com/r/9xqoR5/1
-        [GeneratedRegex(@"\[[^\]]*(.)\w\1[^\]]*\]")]
-        private static partial Regex BracketsSupportingSSL();
-
-        //https://regex101.com/r/r7gXs3/1
-        [GeneratedRegex(@"(.).\1")]
+        //https://regex101.com/r/Qopg0k/1
+        [GeneratedRegex(@"(?=(.)(.)\1)")]
         private static partial Regex SingleLetterRepeatedAfterAnotherLetter();
 
 
-        //https://regex101.com/r/SfZIeb/1
-        [GeneratedRegex(@"\[[^\][^\]]*\]")]
+        //https://regex101.com/r/SfZIeb/2
+        [GeneratedRegex(@"\[([^\]]+)\]")]
         private static partial Regex StringWithinBrackets();
+
         #endregion
     }
 }
