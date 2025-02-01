@@ -17,6 +17,38 @@
             return array;
         }
 
+        public static T[] ShiftForwards<T>(T[] array, int k)
+        {
+            int length = array.Length;
+            k %= length; // Handle cases where k is larger than array length
+
+            for (int times = 0; times < k; times++)
+            {
+                T temp = array[0];
+                for (int i = 0; i < length - 1; i++)
+                {
+                    array[i] = array[i + 1];
+                }
+                array[length - 1] = temp;
+            }
+
+            return array;
+        }
+
+        public static T[] GetColumn<T>(T[,] array, int column)
+        {
+            return Enumerable.Range(0, array.GetLength(0))
+                             .Select(row => array[row, column])
+                             .ToArray();
+        }
+
+        public static T[] GetRow<T>(T[,] array, int row)
+        {
+            return Enumerable.Range(0, array.GetLength(1))
+                             .Select(column => array[row, column])
+                             .ToArray();
+        }
+
         public static IEnumerable<T[]> GetAllCombinations<T>(T[] source)
         {
             for (var i = 0; i < (1 << source.Count()); i++)
