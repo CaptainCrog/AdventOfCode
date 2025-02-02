@@ -1,5 +1,6 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Regex;
+using System;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
@@ -9,7 +10,7 @@ namespace AdventOfCode2016.Problems
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
-        int _secondResult = 0;
+        long _secondResult = 0;
         string _rawInput = string.Empty;
         Regex _numberRegex = CommonRegexHelpers.NumberRegex();
 
@@ -38,7 +39,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> SecondResult
+        public Result<long> SecondResult
         {
             get => _secondResult;
             set
@@ -57,7 +58,7 @@ namespace AdventOfCode2016.Problems
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<long>();
             OutputSolution();
         }
         #endregion
@@ -76,56 +77,50 @@ namespace AdventOfCode2016.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            var decompressedResult = string.Empty;
-            for (int i = 0; i < _rawInput.Length; i++) 
-            {
-                if (_rawInput[i] == '(')
-                {
-                     i = GetMarker(i, ref decompressedResult);
-                }
-                else
-                    decompressedResult += _rawInput[i];
-
-            }
-
-
-            var result = decompressedResult.Length;
+            var result = Decompress(_rawInput, 0, _rawInput.Length, false);
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
+            var result = Decompress(_rawInput, 0, _rawInput.Length, true);
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        int GetMarker(int index, ref string decompressedResult)
+        long Decompress(string input, int start, int end, bool part2)
         {
-            var marker = string.Empty;
-            while (true)
+            long length = 0;
+
+            for (int i = start; i < end;)
             {
-                marker += _rawInput[index];
-                index++;
-                if (_rawInput[index] == ')')
+                if (input[i] == '(')
                 {
-                    marker += _rawInput[index];
-                    index++;
-                    break;
+                    int markerEnd = input.IndexOf(')', i);
+                    var marker = input.Substring(i + 1, markerEnd - i - 1);
+                    var numbers = _numberRegex.Matches(marker);
+                    var segmentLength = int.Parse(numbers[0].Value);
+                    var repetitionCount = int.Parse(numbers[1].Value);
+
+                    int segmentStart = markerEnd + 1;
+                    int segmentEnd = segmentStart + segmentLength;
+                    if (part2)
+                    {
+                        long decompressedSegmentLength = Decompress(input, segmentStart, segmentEnd, true);
+                        length += decompressedSegmentLength * repetitionCount;
+                    }
+                    else
+                        length += segmentLength * repetitionCount;
+
+                    i = segmentEnd;
+                }
+                else
+                {
+                    length++;
+                    i++;
                 }
             }
-            var numbers = _numberRegex.Matches(marker);
-            var segmentLength = int.Parse(numbers[0].Value);
-            var repetitionCount = int.Parse(numbers[1].Value);
-            var segmentToRepeat = _rawInput.Substring(index, segmentLength);
-            var iter = 0;
-            while (iter < repetitionCount)
-            {
-                decompressedResult += segmentToRepeat;
-                iter++;
-            }
 
-            index += segmentLength - 1;
-
-            return index;
+            return length;
         }
         #endregion
     }

@@ -46,6 +46,36 @@ namespace AdventOfCode2016Tests
             instance.FirstResult.ResultValue.Should().Be(18);
         }
 
-        //No part 2 data to test against
+        [TestMethod]
+        [DeploymentItem("Inputs/Day9/Day9Test3.txt")]
+        public void Part2_OutputsCorrectStringLengthFile3_IsTrue()
+        {
+            var instance = new AdventOfCode2016.Problems.Day9("Day9Test3.txt");
+            instance.SecondResult.ResultValue.Should().Be(9);
+        }
+        [TestMethod]
+        [DeploymentItem("Inputs/Day9/Day9Test6.txt")]
+        public void Part2_OutputsCorrectStringLengthFile6_IsTrue()
+        {
+            var instance = new AdventOfCode2016.Problems.Day9("Day9Test6.txt");
+            instance.SecondResult.ResultValue.Should().Be(20);
+        }
+        [TestMethod]
+        [DeploymentItem("Inputs/Day9/Day9Test7.txt")]
+        public void Part2_OutputsCorrectStringLengthFile7_IsTrue()
+        {
+            var instance = new AdventOfCode2016.Problems.Day9("Day9Test7.txt");
+            instance.SecondResult.ResultValue.Should().Be(241920);
+        }
+        [TestMethod]
+        [DeploymentItem("Inputs/Day9/Day9Test8.txt")]
+        public void Part2_OutputsCorrectStringLengthFile8_IsTrue()
+        {
+            var instance = new AdventOfCode2016.Problems.Day9("Day9Test8.txt");
+            instance.SecondResult.ResultValue.Should().Be(445);
+        }
+
+        //27 + 18 + 30 = 
+        // 75
     }
 }
