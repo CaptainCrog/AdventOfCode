@@ -74,8 +74,5 @@ namespace AdventOfCode2016Tests
             var instance = new AdventOfCode2016.Problems.Day9("Day9Test8.txt");
             instance.SecondResult.ResultValue.Should().Be(445);
         }
-
-        //27 + 18 + 30 = 
-        // 75
     }
 }
