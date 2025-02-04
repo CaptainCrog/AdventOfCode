@@ -4,6 +4,7 @@ using CommonTypes.CommonTypes.HelperFunctions;
 using CommonTypes.CommonTypes.Regex;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
@@ -14,8 +15,7 @@ namespace AdventOfCode2016.Problems
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
-        Building _building = new();
-        List<Isotope> _isotopes = new();
+        BuildingState _initialState;
         Regex _generatorRegex = GeneratorRegex();
         Regex _microchipRegex = MicrochipRegex();
 
@@ -72,11 +72,12 @@ namespace AdventOfCode2016.Problems
         public override void InitialiseProblem()
         {
             var floorPlan = File.ReadAllLines(_inputPath);
+            var items = new List<(string ElementName, bool IsMicrochip, int Floor)>();
             foreach (var floor in floorPlan)
             {
-                ProcessFloor(floor);
+                items.AddRange(ProcessFloor(floor));
             }
-            _building = new Building() { ElevatorCurrentFloor = 1, TotalNumberOfFloors = floorPlan.Count() };
+            _initialState = new BuildingState(1, items, 0);
         }
 
         public override void OutputSolution()
@@ -85,113 +86,110 @@ namespace AdventOfCode2016.Problems
             Console.WriteLine($"Second Solution is: {SecondResult.ResultValue}");
         }
 
-        // RULES:
-        // Can only carry up to 2 Generators/Microchips at a time
-
-        //Only valid moves:
-        //Moving Microchip upwards to a generator or vice versa
-        //Moving Microchip with its generator up to next floor
-        //Moving Microchip with another microchip up to next floor
-        //Moving Generator with another Generator up to next floor
-
-        //Invalid states:
-        //Microchip has no equivalent generator on the same level and another generator for a different element exists.
-
 
         public override T SolveFirstProblem<T>()
         {
-            var stepCounter = 0;
-            var temp = BreadthFirstSearch();
+            var stepCounter = BreadthFirstSearch();
             return (T)Convert.ChangeType(stepCounter, typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
+            //Each full pair requires 12 steps from floor 1 -> 4
+            //2 new pairs of Chips + generators are added meaning we add 2*12 = 24
+            //We can solve the original problem and then add 24 to this result
+            var result = FirstResult + 24;
+
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         int BreadthFirstSearch()
         {
-            var queue = new PriorityQueue<(int currentFloor, int stepCount, List<Isotope> isotopes), int>();
-            queue.Enqueue((1, 0, _isotopes.ToList()), 1);
+            var queue = new Queue<BuildingState>();
+            var visited = new HashSet<BuildingState>();
 
-            var visitedSequences = new HashSet<(int, int, Isotope[])>();
+            queue.Enqueue(_initialState);
+            visited.Add(_initialState);
 
             while (queue.Count > 0)
             {
-                var (currentFloor, stepCount, isotopes) = queue.Dequeue();
-                var availableIsotopes = isotopes.Where(x => x.CurrentFloor == currentFloor).ToArray();
-                var generatorNames = availableIsotopes.Where(x => x.IsotopeType == IsotopeType.Generator).Select(x => x.Name);
+                var state = queue.Dequeue();
+                if (state.IsGoal()) 
+                    return state.Steps;
 
-                //Invalid state
-                if (availableIsotopes.Any(x => x.IsotopeType == IsotopeType.Microchip && generatorNames.Any() && !generatorNames.Contains(x.Name)))
-                    continue;
-
-                if (currentFloor == _building.TotalNumberOfFloors && availableIsotopes.Count() == _isotopes.Count)
-                    return stepCount;
-                else
+                foreach (var next in GetNextStates(state))
                 {
-                    if (!visitedSequences.Add((currentFloor, stepCount, isotopes.ToArray()))) //If we somehow get into the same state as a previous search
-                        continue;
-
-                    var isotopeCombinations = ArrayHelperFunctions.GetAllCombinations(availableIsotopes).Where(x => x.Length <= 2 && x.Length > 0);
-                    foreach(var isotopeCombination in isotopeCombinations)
+                    if (!visited.Contains(next))
                     {
-                        var currentFloorCopy = currentFloor;
-                        var stepCountCopy = stepCount + 1;
-                        if (currentFloorCopy != 1)
-                        {
-                            var isotopesCopy = isotopes.ConvertAll(x => new Isotope(x.Name, x.CurrentFloor, x.IsotopeType));
-                            foreach (var isotope in isotopeCombination)
-                            {
-                                isotopesCopy.Where(x => x.Name == isotope.Name && x.IsotopeType == isotope.IsotopeType).Single().CurrentFloor--;
-                            }
-                            queue.Enqueue((--currentFloorCopy, stepCountCopy, isotopesCopy), -stepCountCopy);
-                        }
-                        if (currentFloorCopy != _building.TotalNumberOfFloors)
-                        {
-                            var isotopesCopy = isotopes.ConvertAll(x => new Isotope(x.Name, x.CurrentFloor, x.IsotopeType));
-                            foreach (var isotope in isotopeCombination)
-                            {
-                                isotopesCopy.Where(x => x.Name == isotope.Name && x.IsotopeType == isotope.IsotopeType).Single().CurrentFloor++;
-                            }
-                            queue.Enqueue((++currentFloorCopy, stepCountCopy, isotopesCopy), -stepCountCopy);
-                        }
+                        queue.Enqueue(next);
+                        visited.Add(next);
                     }
                 }
-
             }
-
-            return 0;
+            return -1; // No solution found
         }
 
         int GetFloorNumber(string floor)
         {
-            if (floor.Contains("first floor")) 
+            if (floor.Contains("first floor"))
                 return 1;
-            else if (floor.Contains("second floor")) 
+            else if (floor.Contains("second floor"))
                 return 2;
-            else if (floor.Contains("third floor")) 
+            else if (floor.Contains("third floor"))
                 return 3;
             return 4;
         }
 
-        void ProcessFloor(string floor)
+        List<(string ElementName, bool IsMicrochip, int Floor)> ProcessFloor(string floor)
         {
+            var items = new List<(string ElementName, bool IsMicrochip, int Floor)>();
             int floorNumber = GetFloorNumber(floor);
 
             foreach (Match generator in _generatorRegex.Matches(floor))
             {
                 var name = generator.Value.Split(' ')[0];
-                _isotopes.Add(new Isotope(name, floorNumber, IsotopeType.Generator));
+                items.Add((name, false, floorNumber));
             }
 
             foreach (Match microchip in _microchipRegex.Matches(floor))
             {
                 var name = microchip.Value.Split('-')[0];
-                _isotopes.Add(new Isotope(name, floorNumber, IsotopeType.Microchip));
+                items.Add((name, true, floorNumber));
             }
+
+            return items;
         }
 
+        List<BuildingState> GetNextStates(BuildingState state)
+        {
+            var nextStates = new List<BuildingState>();
+            var currentFloorItems = state.Items.Where(i => i.Item3 == state.Elevator).ToList();
+            var moves = new List<List<(string, bool, int)>>();
+
+            // Generate possible moves (one or two items)
+            for (int i = 0; i < currentFloorItems.Count; i++)
+            {
+                moves.Add(new List<(string, bool, int)> { currentFloorItems[i] });
+                for (int j = i + 1; j < currentFloorItems.Count; j++)
+                    moves.Add(new List<(string, bool, int)> { currentFloorItems[i], currentFloorItems[j] });
+            }
+
+            foreach (var move in moves)
+            {
+                foreach (var direction in new[] { -1, 1 }) // Move up or down
+                {
+                    int newFloor = state.Elevator + direction;
+                    if (newFloor < 1 || newFloor > 4)
+                        continue; // Out of bounds
+
+                    var newItems = state.Items.Select(i => move.Contains(i) ? (i.Item1, i.Item2, newFloor) : i).ToList();
+                    var newState = new BuildingState(newFloor, newItems, state.Steps + 1);
+
+                    if (newState.IsValid())
+                        nextStates.Add(newState);
+                }
+            }
+            return nextStates;
+        }
 
         //https://regex101.com/r/FME248/2
         [GeneratedRegex(@"[a-z]*-compatible microchip")]
@@ -201,34 +199,47 @@ namespace AdventOfCode2016.Problems
         [GeneratedRegex(@"[a-z]* generator")]
         private static partial Regex GeneratorRegex();
 
-        class Isotope
+        class BuildingState
         {
-            public string Name { get; init; }
-            public int CurrentFloor { get; set; }
-            public IsotopeType IsotopeType { get; init; }
-            public Isotope(string name, int currentFloor, IsotopeType isotopeType)
+            public int Elevator { get; set; }
+            public List<(string ElementName, bool IsMicrochip, int Floor)> Items { get; set; }
+            public int Steps { get; set; }
+
+            public BuildingState(int elevator, List<(string ElementName, bool IsMicrochip, int Floor)> items, int steps)
             {
-                Name = name;
-                CurrentFloor = currentFloor;
-                IsotopeType = isotopeType;
-            }
-        }
-
-        enum IsotopeType
-        {
-            Generator = 0,
-            Microchip = 1,
-        }
-
-        class Building
-        {
-            public int ElevatorCurrentFloor { get; set; }
-            public int TotalNumberOfFloors { get; init; }
-            public Building()
-            {
-
+                Elevator = elevator;
+                Items = items.OrderBy(i => i.ElementName).ThenBy(i => i.IsMicrochip).ThenBy(i => i.Floor).ToList();
+                Steps = steps;
             }
 
+            public bool IsValid()
+            {
+                var grouped = Items.GroupBy(i => i.Item3);
+                foreach (var group in grouped)
+                {
+                    var chips = group.Where(i => i.Item2).Select(i => i.Item1).ToHashSet();
+                    var generators = group.Where(i => !i.Item2).Select(i => i.Item1).ToHashSet();
+
+                    // A chip is fried if it's with an unmatched generator
+                    if (chips.Any(c => !generators.Contains(c) && generators.Count > 0))
+                        return false;
+                }
+                return true;
+            }
+
+            public bool IsGoal() => Items.All(i => i.Floor == 4); // Everything on 4th floor
+
+            public override bool Equals(object obj)
+            {
+                return obj is BuildingState other &&
+                       Elevator == other.Elevator &&
+                       Items.SequenceEqual(other.Items);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Elevator, string.Join(",", Items));
+            }
         }
         #endregion
     }
