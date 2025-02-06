@@ -14,6 +14,10 @@ namespace AdventOfCode2016.Problems
         string _md5HashSalt = string.Empty;
         decimal _iterator = 0;
         Regex _charSequentialOccurrences5Times = CharSequentialOccurrences5Times();
+        Regex _charSequentialOccurrences3Times = CharSequentialOccurrences3Times();
+        Dictionary<decimal, string> _md5Dictionary = new();
+
+        List<string> _validMd5s = new();
 
         #endregion
 
@@ -79,18 +83,15 @@ namespace AdventOfCode2016.Problems
         public override T SolveFirstProblem<T>()
         {
             decimal iterator = 0;
-            var keyIndexes = new List<decimal>();
-            while (keyIndexes.Count != 64)
+
+            while (_md5Dictionary.Select(x => x.Key).Distinct().ToArray().Count() < 64)
             {
                 var key = ProcessMD5Hash(iterator, null);
-                if (key.HasValue)
-                    keyIndexes.Add(key.Value);
                 iterator++;
             }
+            var result = _md5Dictionary.Select(x => x.Key).OrderDescending().ToList();
 
-            var result = keyIndexes.OrderDescending().ToList();
-
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result.First(), typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
@@ -99,33 +100,33 @@ namespace AdventOfCode2016.Problems
 
         decimal? ProcessMD5Hash(decimal index, char? repeatedCharToSearch)
         {
-            var temp = new Regex($"(.)\\1{{2}}");
             string newKey = $"{_md5HashSalt}{index}";
-            var hexString = string.Empty;
             byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(newKey);
             byte[] hashBytes = MD5.HashData(inputBytes);
 
-            hexString = Convert.ToHexString(hashBytes);
+            var hexString = Convert.ToHexString(hashBytes);
 
             if (repeatedCharToSearch.HasValue)
             {
                 var charSequentialOccurrences3Times = new Regex($"([{repeatedCharToSearch.Value}])\\1{{2}}");
-                if (charSequentialOccurrences3Times.IsMatch(hexString))
+                if (charSequentialOccurrences3Times.IsMatch(hexString) && _charSequentialOccurrences3Times.Match(hexString).Value.First() == repeatedCharToSearch)
                     return index;
             }
             else if (_charSequentialOccurrences5Times.IsMatch(hexString))
             {
                 decimal subIndex = index - 1000 < 0 ? 0 : index - 1000;
-                while (subIndex <= index)
+                while (subIndex < index)
                 {
-                    repeatedCharToSearch = _charSequentialOccurrences5Times.Match(hexString).Value.First();
+                    var md5Hash = _charSequentialOccurrences5Times.Match(hexString).Value;
+                    repeatedCharToSearch = md5Hash.First();
                     var iterationKey = ProcessMD5Hash(subIndex, repeatedCharToSearch);
-                    if (iterationKey.HasValue)
-                        return iterationKey.Value;
+                    if (iterationKey.HasValue && _md5Dictionary.Select(x => x.Key).Distinct().ToArray().Count() != 64)
+                    {
+                        _ = _md5Dictionary.TryAdd(iterationKey.Value, hexString);
+                    }
                     subIndex++;
                 }
             }
-
             return null;
         }
 
@@ -133,9 +134,13 @@ namespace AdventOfCode2016.Problems
 
 
         //https://regex101.com/r/w1JsoH/1
-        [GeneratedRegex(@"(\w)\1{4}")]
+        [GeneratedRegex(@"(.)\1{4}")]
         private static partial Regex CharSequentialOccurrences5Times();
 
+
+        //https://regex101.com/r/w1JsoH/1
+        [GeneratedRegex(@"(.)\1{2}")]
+        private static partial Regex CharSequentialOccurrences3Times();
         #endregion
     }
 }

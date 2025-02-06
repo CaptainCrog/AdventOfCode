@@ -57,7 +57,7 @@ public static class Menu2016
                             _ = new Day13(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day13Puzzle.txt", new Point() { X = 31, Y = 39 });
                             break;
                         case 14:
-                            //_ = new Day14(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day14Puzzle.txt");
+                            _ = new Day14(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day14Puzzle.txt");
                             break;
                         case 15:
                         case 16:
