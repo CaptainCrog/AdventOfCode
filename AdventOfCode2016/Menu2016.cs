@@ -1,4 +1,5 @@
 ﻿using AdventOfCode2016.Problems;
+using System.Drawing;
 
 public static class Menu2016
 {
@@ -53,6 +54,8 @@ public static class Menu2016
                             _ = new Day12(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day12Puzzle.txt");
                             break;
                         case 13:
+                            _ = new Day13(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day13Puzzle.txt", new Point() { X = 31, Y = 39 });
+                            break;
                         case 14:
                         case 15:
                         case 16:
