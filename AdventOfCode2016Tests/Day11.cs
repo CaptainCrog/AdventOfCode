@@ -8,7 +8,7 @@ namespace AdventOfCode2016Tests
         public void Part1_OutputsCorrectStepCount_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day11("Day11Test1.txt");
-            instance.FirstResult.ResultValue.Should().Be(11);
+            instance.FirstResult.Should().Be(11);
         }
     }
 }

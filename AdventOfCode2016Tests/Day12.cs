@@ -8,7 +8,7 @@ namespace AdventOfCode2016Tests
         public void Part1_OutputsCorrectRegisterOutput_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day12("Day12Test1.txt");
-            instance.FirstResult.ResultValue.Should().Be(42);
+            instance.FirstResult.Should().Be(42);
         }
     }
 }

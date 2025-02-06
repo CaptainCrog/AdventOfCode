@@ -25,7 +25,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -36,7 +36,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set

@@ -8,7 +8,7 @@ namespace AdventOfCode2016Tests
         public void Part1_OutputsCorrectPasswordFile1_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day5("Day5Test1.txt");
-            instance.FirstResult.ResultValue.Should().Be("18f47a30");
+            instance.FirstResult.Should().Be("18f47a30");
         }
 
         [TestMethod]
@@ -16,7 +16,7 @@ namespace AdventOfCode2016Tests
         public void Part2_OutputsCorrectPasswordFile1_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day5("Day5Test1.txt");
-            instance.SecondResult.ResultValue.Should().Be("05ace8e3");
+            instance.SecondResult.Should().Be("05ace8e3");
         }
     }
 }
