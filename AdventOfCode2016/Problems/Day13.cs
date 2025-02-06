@@ -22,6 +22,8 @@ namespace AdventOfCode2016.Problems
             (-1, 0, Direction.North)  // Up
         };
 
+        Dictionary<(int y, int x, Direction direction), int> _finalDistances = new();
+
         #endregion
 
         #region Properties
@@ -90,18 +92,7 @@ namespace AdventOfCode2016.Problems
         /// </summary>
         public override T SolveFirstProblem<T>()
         {
-            for (int i = 0; i <= _target.Y; i++)
-            {
-                _office.Add(new List<char>());
-                for (int j = 0; j <= _target.X; j++)
-                {
-                    var isOpenSpace = CalculatePosition(j, i);
-                    if (isOpenSpace)
-                        _office[i].Add('.');
-                    else
-                        _office[i].Add('#');
-                }
-            }
+            CreateGridRowsAndCols(_target.Y, _target.X);
 
             var pathSteps = int.MaxValue;
             var pathFound = false;
@@ -122,30 +113,8 @@ namespace AdventOfCode2016.Problems
                     var nextRow = _office.Count;
                     var nextCol = _office[0].Count;
 
-                    for (int i = 0; i < _office.Count; i++)
-                    {
-                        for (int j = nextCol; j < nextCol + 1; j++)
-                        {
-                            var isOpenSpace = CalculatePosition(j, i);
-                            if (isOpenSpace)
-                                _office[i].Add('.');
-                            else
-                                _office[i].Add('#');
-                        }
-                    }
-
-                    for (int i = nextRow; i < nextRow + 1; i++)
-                    {
-                        _office.Add(new List<char>());
-                        for (int j = 0; j < _office[0].Count; j++)
-                        {
-                            var isOpenSpace = CalculatePosition(j, i);
-                            if (isOpenSpace)
-                                _office[i].Add('.');
-                            else
-                                _office[i].Add('#');
-                        }
-                    }
+                    CreateGridRowsAndCols(nextRow-1, nextCol, 0, nextCol, false);
+                    CreateGridRowsAndCols(nextRow, nextCol, nextRow, 0, true);
                 }
                 else
                     pathFound = true;
@@ -156,7 +125,9 @@ namespace AdventOfCode2016.Problems
         }
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
+            var result = _finalDistances.Where(x => x.Value <= 50).DistinctBy(x => new { x.Key.x, x.Key.y }).ToDictionary().Count;
+
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
 
@@ -229,13 +200,31 @@ namespace AdventOfCode2016.Problems
                 var directionEnum = (Direction)direction;
                 minCostToTarget = Math.Min(minCostToTarget, distances[(target.Y, target.X, directionEnum)]);
             }
-
+            _finaldistances = distances;
             return minCostToTarget;
 
 
             bool IsValid(int x, int y, int rows, int cols)
             {
                 return x >= 0 && y >= 0 && x < rows && y < cols && grid[x, y] != '#';
+            }
+        }
+
+        void CreateGridRowsAndCols(int targetRow, int targetCol, int row = 0, int col = 0, bool generateRows = true)
+        {
+            for (int i = row; i < targetRow + 1; i++)
+            {
+                if (generateRows)
+                    _office.Add(new List<char>());
+
+                for (int j = col; j < targetCol + 1; j++)
+                {
+                    var isOpenSpace = CalculatePosition(j, i);
+                    if (isOpenSpace)
+                        _office[i].Add('.');
+                    else
+                        _office[i].Add('#');
+                }
             }
         }
         #endregion
