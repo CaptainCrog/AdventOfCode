@@ -94,19 +94,7 @@ namespace AdventOfCode2016.Problems
                 currentDiscConfiguration.Add((Disc)disc.Clone());
             }
 
-            _time = 0;
-            while (true)
-            {
-                var currentTime = _time;
-                var success = PressButton(currentTime, currentDiscConfiguration);
-                if (success)
-                    break;
-                _time++;
-                foreach (var disc in currentDiscConfiguration)
-                {
-                    disc.MoveDisc();
-                }
-            }
+            _time = RunProblem(currentDiscConfiguration);
 
             return (T)Convert.ChangeType(_time, typeof(T));
         }
@@ -119,22 +107,28 @@ namespace AdventOfCode2016.Problems
             }
             currentDiscConfiguration.Add(new Disc() { DiscId = currentDiscConfiguration.Count + 1, CurrentDivisionPosition = 0, Divisions = 11 });
 
-            _time = 0;
+            _time = RunProblem(currentDiscConfiguration);
+
+
+            return (T)Convert.ChangeType(_time, typeof(T));
+        }
+
+        int RunProblem(List<Disc> currentDiscConfiguration)
+        {
+            var time = 0;
             while (true)
             {
-                var currentTime = _time;
+                var currentTime = time;
                 var success = PressButton(currentTime, currentDiscConfiguration);
                 if (success)
                     break;
-                _time++;
+                time++;
                 foreach (var disc in currentDiscConfiguration)
                 {
                     disc.MoveDisc();
                 }
             }
-
-
-            return (T)Convert.ChangeType(_time, typeof(T));
+            return time;
         }
 
         bool PressButton(int currentTime, List<Disc> currentDiscConfiguration)
