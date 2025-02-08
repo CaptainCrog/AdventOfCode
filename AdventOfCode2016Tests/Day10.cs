@@ -8,7 +8,7 @@ namespace AdventOfCode2016Tests
         public void Part1_OutputsCorrectStringLengthFile1_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day10("Day10Test1.txt", (5,2));
-            instance.FirstResult.ResultValue.Should().Be(2);
+            instance.FirstResult.Should().Be(2);
         }
 
         [TestMethod]
@@ -16,7 +16,7 @@ namespace AdventOfCode2016Tests
         public void Part2_OutputsCorrectStringLengthFile3_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day10("Day10Test1.txt", (5, 2));
-            instance.SecondResult.ResultValue.Should().Be(30);
+            instance.SecondResult.Should().Be(30);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Drawing;
 
 namespace AdventOfCode2016.Problems
 {
-    public partial class Day13 : DayBase
+    public class Day13 : DayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -38,7 +38,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -49,7 +49,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -82,8 +82,8 @@ namespace AdventOfCode2016.Problems
 
         public override void OutputSolution()
         {
-            Console.WriteLine($"First Solution is: {FirstResult.ResultValue}");
-            Console.WriteLine($"Second Solution is: {SecondResult.ResultValue}");
+            Console.WriteLine($"First Solution is: {FirstResult}");
+            Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace AdventOfCode2016.Problems
                 var directionEnum = (Direction)direction;
                 minCostToTarget = Math.Min(minCostToTarget, distances[(target.Y, target.X, directionEnum)]);
             }
-            _finaldistances = distances;
+            _finalDistances = distances;
             return minCostToTarget;
 
 

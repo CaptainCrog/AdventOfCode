@@ -7,10 +7,10 @@ namespace AdventOfCode2016Tests
     {
         [TestMethod]
         [DeploymentItem("Inputs/Day13/Day13Test1.txt")]
-        public void Part1_OutputsCorrectRegisterOutput_IsTrue()
+        public void Part1_OutputsCorrectPathSteps_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day13("Day13Test1.txt", new Point() { X = 7, Y = 4 });
-            instance.FirstResult.ResultValue.Should().Be(11);
+            instance.FirstResult.Should().Be(11);
         }
     }
 }

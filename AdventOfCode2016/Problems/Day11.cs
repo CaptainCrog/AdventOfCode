@@ -1,10 +1,4 @@
 ﻿using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.Constants;
-using CommonTypes.CommonTypes.HelperFunctions;
-using CommonTypes.CommonTypes.Regex;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
@@ -33,7 +27,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> FirstResult
+        public int FirstResult
         {
             get => _firstResult;
             set
@@ -44,7 +38,7 @@ namespace AdventOfCode2016.Problems
                 }
             }
         }
-        public Result<int> SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -82,8 +76,8 @@ namespace AdventOfCode2016.Problems
 
         public override void OutputSolution()
         {
-            Console.WriteLine($"First Solution is: {FirstResult.ResultValue}");
-            Console.WriteLine($"Second Solution is: {SecondResult.ResultValue}");
+            Console.WriteLine($"First Solution is: {FirstResult}");
+            Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
 
