@@ -17,7 +17,7 @@ namespace AdventOfCode2016.Problems
         Regex _charSequentialOccurrences3Times = CharSequentialOccurrences3Times();
         Dictionary<decimal, string> _md5Dictionary = new();
 
-        List<string> _validMd5s = new();
+        List<decimal> _validMd5Indexes = new();
 
         #endregion
 
@@ -83,54 +83,72 @@ namespace AdventOfCode2016.Problems
         public override T SolveFirstProblem<T>()
         {
             decimal iterator = 0;
-
-            while (_md5Dictionary.Select(x => x.Key).Distinct().ToArray().Count() < 64)
+            _validMd5Indexes = new();
+            _md5Dictionary = new();
+            while (_validMd5Indexes.Count() < 64)
             {
-                var key = ProcessMD5Hash(iterator, null);
+                ProcessMD5Hash(iterator);
                 iterator++;
             }
-            var result = _md5Dictionary.Select(x => x.Key).OrderDescending().ToList();
 
-            return (T)Convert.ChangeType(result.First(), typeof(T));
+            var result = _validMd5Indexes.Order().Take(64).ToList();
+
+            return (T)Convert.ChangeType(result.Last(), typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            return (T)Convert.ChangeType(0, typeof(T));
+            decimal iterator = 0;
+            _validMd5Indexes = new();
+            _md5Dictionary = new();
+            while (_validMd5Indexes.Count() < 64)
+            {
+                ProcessMD5Hash(iterator, true);
+                iterator++;
+            }
+            var result = _validMd5Indexes.Order().Take(64).ToList();
+            return (T)Convert.ChangeType(result.Last(), typeof(T));
         }
 
-        decimal? ProcessMD5Hash(decimal index, char? repeatedCharToSearch)
+        void ProcessMD5Hash(decimal index, bool part2 = false)
         {
             string newKey = $"{_md5HashSalt}{index}";
             byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(newKey);
             byte[] hashBytes = MD5.HashData(inputBytes);
 
-            var hexString = Convert.ToHexString(hashBytes);
+            var hexString = Convert.ToHexString(hashBytes).ToLower();
+            if (part2)
+                hexString = StretchHash(hexString);
 
-            if (repeatedCharToSearch.HasValue)
-            {
-                var charSequentialOccurrences3Times = new Regex($"([{repeatedCharToSearch.Value}])\\1{{2}}");
-                if (charSequentialOccurrences3Times.IsMatch(hexString) && _charSequentialOccurrences3Times.Match(hexString).Value.First() == repeatedCharToSearch)
-                    return index;
-            }
-            else if (_charSequentialOccurrences5Times.IsMatch(hexString))
+            _md5Dictionary.Add(index, hexString); 
+            
+            if (_charSequentialOccurrences5Times.IsMatch(hexString))
             {
                 decimal subIndex = index - 1000 < 0 ? 0 : index - 1000;
-                while (subIndex < index)
+                var repeatedCharToSearch = _charSequentialOccurrences5Times.Match(hexString).Value.First();
+                var charSequentialOccurrences3Times = new Regex($"([{repeatedCharToSearch}])\\1{{2}}");
+                var md5Range = _md5Dictionary.Where(x => x.Key >= subIndex && x.Key < index && 
+                                                    charSequentialOccurrences3Times.IsMatch(x.Value) && _charSequentialOccurrences3Times.Match(x.Value).Value.First() == repeatedCharToSearch).ToDictionary();
+                foreach (var md5Hash in md5Range)
                 {
-                    var md5Hash = _charSequentialOccurrences5Times.Match(hexString).Value;
-                    repeatedCharToSearch = md5Hash.First();
-                    var iterationKey = ProcessMD5Hash(subIndex, repeatedCharToSearch);
-                    if (iterationKey.HasValue && _md5Dictionary.Select(x => x.Key).Distinct().ToArray().Count() != 64)
-                    {
-                        _ = _md5Dictionary.TryAdd(iterationKey.Value, hexString);
-                    }
-                    subIndex++;
+                    _validMd5Indexes.Add(md5Hash.Key);
                 }
             }
-            return null;
         }
 
+        string StretchHash(string hexString)
+        {
+            var iterator = 0;
 
+            while (iterator < 2016)
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(hexString);
+                byte[] hashBytes = MD5.HashData(inputBytes);
+                hexString = Convert.ToHexString(hashBytes).ToLower();
+                iterator++;
+            }
+
+            return hexString;
+        }
 
 
         //https://regex101.com/r/w1JsoH/1
