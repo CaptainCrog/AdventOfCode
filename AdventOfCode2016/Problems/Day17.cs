@@ -24,6 +24,7 @@ namespace AdventOfCode2016.Problems
         List<string> _validPasscodes = new();
         int _min = int.MaxValue;
         int _max = 0;
+        string _shortestPath = string.Empty;
 
         #endregion
 
@@ -125,6 +126,8 @@ namespace AdventOfCode2016.Problems
                 if (current.currentPosition.X == _target.X && current.currentPosition.Y == _target.Y)
                 {
                     _min = Math.Min(_min, current.passcode.Length);
+                    if (_min == current.passcode.Length)
+                        _shortestPath = current.passcode;
                     _max = Math.Max(_max, current.passcode.Length);
                     //_validPasscodes.Add(current.passcode);
                 }
