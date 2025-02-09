@@ -168,15 +168,6 @@ namespace AdventOfCode2016.Problems
 
             return true;
         }
-
-        //https://regex101.com/r/w1JsoH/1
-        [GeneratedRegex(@"(.)\1{4}")]
-        private static partial Regex CharSequentialOccurrences5Times();
-
-
-        //https://regex101.com/r/w1JsoH/1
-        [GeneratedRegex(@"(.)\1{2}")]
-        private static partial Regex CharSequentialOccurrences3Times();
         #endregion
 
         class Disc : ICloneable
