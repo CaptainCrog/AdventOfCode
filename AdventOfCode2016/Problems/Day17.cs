@@ -15,14 +15,7 @@ namespace AdventOfCode2016.Problems
         string _firstResult = string.Empty;
         int _secondResult = 0;
         string _passcode = string.Empty;
-        Node _start = new();
-        Node _target = new();
-        Node _currentPosition = new();
-        bool[,] _positions = new bool[0, 0];
-        (int dx, int dy, Direction direction)[] _directions = DirectionConstants.GetBasicDirections();
         Regex _capitalLetterRegex = CapitalLetterRegex();
-        List<string> _validPasscodes = new();
-        int _min = int.MaxValue;
         int _max = 0;
         string _shortestPath = string.Empty;
 
@@ -79,12 +72,8 @@ namespace AdventOfCode2016.Problems
         public override void InitialiseProblem()
         {
             _passcode = File.ReadAllText(_inputPath);
-            _start = new() { X = 0, Y = 0 };
-            _currentPosition = new() { X = 0, Y = 0 };
-            _target = new() { X = 3, Y = 3 };
-            _validPasscodes = new();
 
-            FindAllPaths(_start, _target);
+            FindAllPaths();
         }
 
         public override void OutputSolution()
@@ -95,86 +84,55 @@ namespace AdventOfCode2016.Problems
 
         public override T SolveFirstProblem<T>()
         {
-            //FindShortestPath(_positions, _start, _target, false);
-            var result = _validPasscodes.First();
-            var path = _capitalLetterRegex.Match(result).Value;
+            var path = _capitalLetterRegex.Match(_shortestPath).Value;
             return (T)Convert.ChangeType(path, typeof(T));
         }
         public override T SolveSecondProblem<T>()
         {
-            _validPasscodes = new();
-            //FindShortestPath(_positions, _start, _target, true);
-            var result = _validPasscodes.First();
-            var path = _capitalLetterRegex.Match(result).Value;
-            return (T)Convert.ChangeType(path.Length, typeof(T));
+            return (T)Convert.ChangeType(_max, typeof(T));
         }
 
 
-        void FindAllPaths(Node start, Node target)
+        void FindAllPaths()
         {
-            var distances = new Dictionary<(int y, int x, Direction direction, string passcode), string>();
-            var priorityQueue = new PriorityQueue<(Node, string), int>();
-            //var queue = new Queue<(Node, string)>();
-
-            priorityQueue.Enqueue((start, _passcode), 0);
-
-            while (priorityQueue.Count > 0)
+            for (int i = 0; i < 1000; i++)
             {
-                (Node currentPosition, string passcode) current = priorityQueue.Dequeue();
+                IterationDeepeningDFS(0, 0, _passcode, "", i);
+            }
+        }
 
+        void IterationDeepeningDFS(int x, int y, string passcode, string path, int depth)
+        {
+            if (x >= 3 && y >= 3)
+            {
+                if (string.IsNullOrEmpty(_shortestPath))
+                    _shortestPath = path;
+                _max = Math.Max(_max, path.Length);
+                return;
+            }
 
-                if (current.currentPosition.X == _target.X && current.currentPosition.Y == _target.Y)
+            if (path.Length >= depth)
+                return;
+
+            string passcodeHash = GeneratePasscodeHash(passcode + path);
+
+            (int dx, int dy, Direction direction, bool unlocked)[] directions =
+            [
+                (-1, 0, Direction.North, IsValidChar(passcodeHash[0])),
+                (1, 0, Direction.South, IsValidChar(passcodeHash[1])),
+                (0, -1, Direction.West, IsValidChar(passcodeHash[2])),
+                (0, 1, Direction.East, IsValidChar(passcodeHash[3])),
+            ];
+
+            foreach (var direction in directions.Where(x => x.unlocked))
+            {
+                int newX = x + direction.dx;
+                int newY = y + direction.dy;
+
+                if (IsValidPosition(newY, newX, 3, 3))
                 {
-                    _min = Math.Min(_min, current.passcode.Length);
-                    if (_min == current.passcode.Length)
-                        _shortestPath = current.passcode;
-                    _max = Math.Max(_max, current.passcode.Length);
-                    //_validPasscodes.Add(current.passcode);
+                    IterationDeepeningDFS(newX, newY, passcode, path + GetDirectionToAppend(direction.direction), depth);
                 }
-
-                //if (!distances.TryAdd((current.currentPosition.Y, current.currentPosition.X, current.currentPosition.Direction, current.passcode), current.passcode))
-                //    continue;
-
-                var passcodeHash = GeneratePasscodeHash(current.passcode);
-
-                if (current.currentPosition.X > 0 && IsValidChar(passcodeHash[0]))
-                    priorityQueue.Enqueue((new Node { X = current.currentPosition.X - 1, Y = current.currentPosition.Y }, current.passcode + 'U'), -current.passcode.Length);
-
-                if (current.currentPosition.X < _target.X && IsValidChar(passcodeHash[1]))
-                    priorityQueue.Enqueue((new Node { X = current.currentPosition.X + 1, Y = current.currentPosition.Y }, current.passcode + 'D'), -current.passcode.Length);
-
-                if (current.currentPosition.Y > 0 && IsValidChar(passcodeHash[2]))
-                    priorityQueue.Enqueue((new Node { X = current.currentPosition.X, Y = current.currentPosition.Y - 1 }, current.passcode + 'L'), -current.passcode.Length);
-
-                if (current.currentPosition.Y < _target.Y && IsValidChar(passcodeHash[3]))
-                    priorityQueue.Enqueue((new Node { X = current.currentPosition.X, Y = current.currentPosition.Y + 1 }, current.passcode + 'R'), -current.passcode.Length);
-
-                //(int dx, int dy, Direction direction, bool unlocked)[] directions =
-                //[
-                //    (-1, 0, Direction.North, IsValidChar(passcodeHash[0])),
-                //    (1, 0, Direction.South, IsValidChar(passcodeHash[1])),
-                //    (0, -1, Direction.West, IsValidChar(passcodeHash[2])),
-                //    (0, 1, Direction.East, IsValidChar(passcodeHash[3])),
-                //];
-                //foreach (var direction in directions.Where(x => x.unlocked))
-                //{
-                //    int newX = current.currentPosition.X + direction.dx;
-                //    int newY = current.currentPosition.Y + direction.dy;
-
-                //    if (IsValidPosition(newY, newX, 3, 3))
-                //    {
-                //        var newPasscode = current.passcode + GetDirectionToAppend(direction.direction);
-                //        queue.Enqueue((new Node { X = newX, Y = newY }, newPasscode));
-                //        //if (!part2)
-                //        //    queue.Enqueue((new Node { X = newX, Y = newY }, newPasscode), _target.X - newX + _target.Y + newY);
-                //        //else
-                //        //{
-                //        //    var path = _capitalLetterRegex.Match(newPasscode).Value;
-                //        //    priorityQueue.Enqueue((new Node { X = newX, Y = newY }, newPasscode), -path.Length);
-                //        //}
-
-                //    }
-                //}
             }
 
             bool IsValidPosition(int x, int y, int rows, int cols)
@@ -182,6 +140,7 @@ namespace AdventOfCode2016.Problems
                 return x >= 0 && y >= 0 && x <= rows && y <= cols;
             }
         }
+
 
         string GeneratePasscodeHash(string passcode)
         {
@@ -198,7 +157,7 @@ namespace AdventOfCode2016.Problems
 
         char GetDirectionToAppend(Direction direction)
         {
-            char appendingChar = 'U';
+            char appendingChar;
             switch (direction)
             {
                 case Direction.North:
@@ -212,6 +171,9 @@ namespace AdventOfCode2016.Problems
                     break;
                 case Direction.East:
                     appendingChar = 'R';
+                    break;
+                default:
+                    appendingChar = 'U';
                     break;
             }
             return appendingChar;
