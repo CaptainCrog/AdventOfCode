@@ -1,14 +1,14 @@
-﻿using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.Constants;
+﻿using CommonTypes.CommonTypes.Constants;
 using CommonTypes.CommonTypes.Enums;
 using System.Security.Cryptography;
 using System;
 using System.Text.RegularExpressions;
 using System.IO;
+using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2016.Problems
 {
-    public partial class Day17 : DayBase
+    public partial class Day17 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -22,7 +22,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -69,25 +69,25 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _passcode = File.ReadAllText(_inputPath);
 
             FindAllPaths();
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var path = _capitalLetterRegex.Match(_shortestPath).Value;
             return (T)Convert.ChangeType(path, typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             return (T)Convert.ChangeType(_max, typeof(T));
         }

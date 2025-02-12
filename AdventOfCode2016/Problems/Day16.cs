@@ -1,10 +1,8 @@
-﻿using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.Regex;
-using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2016.Problems
 {
-    public partial class Day16 : DayBase
+    public partial class Day16 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -16,7 +14,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -64,25 +62,25 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _input = File.ReadAllText(_inputPath);
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var valueStr = _input;
             var result = CreateDragonCurve(valueStr);
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             _length = 35651584;
             var valueStr = _input;

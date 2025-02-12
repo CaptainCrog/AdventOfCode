@@ -1,10 +1,9 @@
-﻿
-using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.HelperFunctions;
+﻿using CommonTypes.CommonTypes.HelperFunctions;
+using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2015.Problems
 {
-    public class Day24 : DayBase
+    public class Day24 : IDayBase
     {
         #region Fields
 
@@ -18,7 +17,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -67,7 +66,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllLines(_inputPath);
             _presentWeights = new int[input.Length];
@@ -77,13 +76,13 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             _quantumEntanglements = new();
             _balancedWeight = _presentWeights.Sum() / 3;
@@ -98,7 +97,7 @@ namespace AdventOfCode2015.Problems
             return (T)Convert.ChangeType(_quantumEntanglements.First().Value, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             _quantumEntanglements = new();
             _balancedWeight = _presentWeights.Sum() / 4;

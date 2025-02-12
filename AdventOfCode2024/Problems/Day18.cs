@@ -1,9 +1,10 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Enums;
+using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day18 : DayBase
+    public class Day18 : IDayBase
     {
         #region Fields
 
@@ -36,7 +37,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -106,7 +107,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllLines(_inputPath);
             foreach (var line in input)
@@ -120,7 +121,7 @@ namespace AdventOfCode2024.Problems
 
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
@@ -131,7 +132,7 @@ namespace AdventOfCode2024.Problems
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             WriteGrid(_numberOfBytes);
             var result = FindShortestPath(_charPositions, _start, _end);
@@ -145,7 +146,7 @@ namespace AdventOfCode2024.Problems
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             int low = 0;
             int high = _bytePositions.Count() - 1;

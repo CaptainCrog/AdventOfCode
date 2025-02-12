@@ -1,9 +1,9 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
-    public class Day19 : DayBase
+    public class Day19 : IDayBase
     {
         #region Fields
 
@@ -16,7 +16,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -65,7 +65,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllLines(InputPath).Where(x => !string.IsNullOrEmpty(x)).ToArray();
             foreach (var line in input)
@@ -80,13 +80,13 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var replacements = new List<string>();
             var distinctMatches = new Dictionary<string, string>();
@@ -112,7 +112,7 @@ namespace AdventOfCode2015.Problems
             return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             //My solution is based on this comment in the AOC subreddit https://www.reddit.com/r/adventofcode/comments/3xflz8/day_19_solutions/cy4etju/.
             //Tried thinking of different algorithms to use, e.g BFS, CYK, but ultimately it looks like this mathematical approach is the best way to go about solving the problem

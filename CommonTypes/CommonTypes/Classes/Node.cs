@@ -13,12 +13,12 @@ namespace CommonTypes.CommonTypes.Classes
         public Direction Direction { get; set; }
 
 
-        public override bool Equals(object obj)
+        public  bool Equals(object obj)
         {
             return obj is Node node && X == node.X && Y == node.Y;
         }
 
-        public override int GetHashCode()
+        public  int GetHashCode()
         {
             return HashCode.Combine(X, Y);
         }

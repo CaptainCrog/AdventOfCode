@@ -1,8 +1,8 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day19 : DayBase
+    public class Day19 : IDayBase
     {
         #region Fields
 
@@ -16,7 +16,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -77,7 +77,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _towelPatterns = new List<string>();
             _desiredDesigns = new List<string>();
@@ -105,20 +105,20 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             // Calculate the result
             int possibleCount = CountPossibleDesigns(_towelPatterns, _desiredDesigns);
             return (T)Convert.ChangeType(possibleCount, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             var totalArrangements = CountTotalArrangements(_towelPatterns, _desiredDesigns);
             return (T)Convert.ChangeType(totalArrangements, typeof(T));

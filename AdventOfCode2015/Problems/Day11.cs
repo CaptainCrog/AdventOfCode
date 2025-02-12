@@ -1,9 +1,9 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2015.Problems
 {
-    public partial class Day11 : DayBase
+    public partial class Day11 : IDayBase
     {
 
         #region Fields
@@ -16,7 +16,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -66,26 +66,26 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _currentPassword = File.ReadAllText(InputPath);
 
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var password = GeneratePasswords();
             return (T)Convert.ChangeType(password, typeof(T));
         }
 
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             _currentPassword = ShiftPassword(FirstResult, FirstResult.Length - 1);
             var password = GeneratePasswords();

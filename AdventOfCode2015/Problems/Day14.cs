@@ -1,9 +1,9 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using CommonTypes.CommonTypes.Regex;
 
 namespace AdventOfCode2015.Problems
 {
-    public partial class Day14 : DayBase
+    public partial class Day14 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -16,7 +16,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -67,7 +67,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllLines(InputPath);
             var regex = CommonRegexHelpers.NumberRegex();
@@ -88,13 +88,13 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             _reindeerFinalDistances = new();
             foreach (var reindeer in _reindeers)
@@ -120,7 +120,7 @@ namespace AdventOfCode2015.Problems
             return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             _reindeerFinalDistances = new();
             int iter = 0;

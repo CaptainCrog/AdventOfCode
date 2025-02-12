@@ -1,9 +1,9 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
 {
-    public partial class Day11 : DayBase
+    public partial class Day11 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -16,7 +16,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -63,7 +63,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var floorPlan = File.ReadAllLines(_inputPath);
             var items = new List<(string ElementName, bool IsMicrochip, int Floor)>();
@@ -74,19 +74,19 @@ namespace AdventOfCode2016.Problems
             _initialState = new BuildingState(1, items, 0);
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var stepCounter = BreadthFirstSearch();
             return (T)Convert.ChangeType(stepCounter, typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             //Each full pair requires 12 steps from floor 1 -> 4
             //2 new pairs of Chips + generators are added meaning we add 2*12 = 24
@@ -223,14 +223,14 @@ namespace AdventOfCode2016.Problems
 
             public bool IsGoal() => Items.All(i => i.Floor == 4); // Everything on 4th floor
 
-            public override bool Equals(object obj)
+            public  bool Equals(object obj)
             {
                 return obj is BuildingState other &&
                        Elevator == other.Elevator &&
                        Items.SequenceEqual(other.Items);
             }
 
-            public override int GetHashCode()
+            public  int GetHashCode()
             {
                 return HashCode.Combine(Elevator, string.Join(",", Items));
             }

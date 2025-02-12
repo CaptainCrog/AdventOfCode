@@ -7,7 +7,7 @@ namespace AdventOfCode2024Tests
         [DeploymentItem("Inputs/Day14/Day14Test1.txt")]
         public void Part1_ProducesCorrectSafetyFactorAfter100Seconds_IsTrue()
         {
-            var instance = new AdventOfCode2024.Problems.Day14("Day14Test1.txt");
+            var instance = new AdventOfCode2024.Problems.Day14("Day14Test1.txt", (7, 11));
             instance.FirstResult.Should().Be(12);
         }
 

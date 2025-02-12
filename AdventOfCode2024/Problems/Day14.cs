@@ -1,10 +1,10 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
-    public partial class Day14 : DayBase
+    public partial class Day14 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -27,7 +27,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -66,9 +66,11 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Constructor
-        public Day14(string inputPath)
+        public Day14(string inputPath, (int gridHeight, int gridWidth) gridDimensions)
         {
             _inputPath = inputPath;
+            _gridHeight = gridDimensions.gridHeight; 
+            _gridWidth = gridDimensions.gridWidth;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<long>();
             SecondResult = SolveSecondProblem<ulong>();
@@ -77,11 +79,9 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _input = File.ReadAllLines(InputPath);
-            _gridHeight = 103;
-            _gridWidth = 101;
             _heightCenter = _gridHeight / 2;
             _widthCenter = _gridWidth / 2;
             _bathroom = new int[_gridWidth, _gridHeight];
@@ -90,13 +90,13 @@ namespace AdventOfCode2024.Problems
             CreateRobots();
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution can be found in the file setup in the output path");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             foreach (var robot in _robots)
             {
@@ -118,7 +118,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(sum, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             int iter = 0;
 
