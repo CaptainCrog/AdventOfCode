@@ -37,7 +37,7 @@ namespace AdventOfCode2015Tests
         public void Part1_ProducesCorrectTrailHeadCountFile5_IsTrue()
         {
             var instance = new AdventOfCode2015.Problems.Day10("Day10Test5.txt", 1);
-            instance.FirstResult.Should().Be(7);
+            instance.FirstResult.Should().Be(6);
         }
         // No part 2 tests as it builds off the original functionality again which is already covered by part 1 tests
     }

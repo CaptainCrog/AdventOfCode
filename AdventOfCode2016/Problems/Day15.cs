@@ -1,10 +1,10 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using CommonTypes.CommonTypes.Regex;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
 {
-    public partial class Day15 : DayBase
+    public partial class Day15 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -16,7 +16,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -63,7 +63,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllLines(_inputPath);
             var numberRegex = CommonRegexHelpers.NumberRegex();
@@ -80,13 +80,13 @@ namespace AdventOfCode2016.Problems
 
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var currentDiscConfiguration = new List<Disc>();
             foreach (var disc in _discs)
@@ -98,7 +98,7 @@ namespace AdventOfCode2016.Problems
 
             return (T)Convert.ChangeType(_time, typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             var currentDiscConfiguration = new List<Disc>();
             foreach (var disc in _discs)

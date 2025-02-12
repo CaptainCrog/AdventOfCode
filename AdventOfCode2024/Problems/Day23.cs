@@ -1,9 +1,9 @@
 ﻿using CommonTypes.CommonTypes.Algorithms;
-using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day23 : DayBase
+    public class Day23 : IDayBase
     {
         #region Fields
 
@@ -16,7 +16,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -65,7 +65,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var connections = File.ReadAllLines(_inputPath);
             foreach (var connection in connections)
@@ -84,13 +84,13 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             HashSet<string> triangles = new HashSet<string>();
 
@@ -119,7 +119,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(tTriangles.Count, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             //Find the largest clique using Bron-Kerbosch algorithm
             List<string> largestClique = new List<string>();

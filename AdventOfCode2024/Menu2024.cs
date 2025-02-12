@@ -17,31 +17,31 @@ public static class Menu2024
                     switch (choiceSanitised)
                     {
                         case 1:
-                            _ = new Day1(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day1Puzzle.txt");
+                            _ = new Day01(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day01Puzzle.txt");
                             break;
                         case 2:
-                            _ = new Day2(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day2Puzzle.txt");
+                            _ = new Day02(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day02Puzzle.txt");
                             break;
                         case 3:
-                            _ = new Day3(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day3Puzzle.txt");
+                            _ = new Day03(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day03Puzzle.txt");
                             break;
                         case 4:
-                            _ = new Day4(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day4Puzzle.txt");
+                            _ = new Day04(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day04Puzzle.txt");
                             break;
                         case 5:
-                            _ = new Day5(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day5Puzzle.txt");
+                            _ = new Day05(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day05Puzzle.txt");
                             break;
                         case 6:
-                            _ = new Day6(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day6Puzzle.txt");
+                            _ = new Day06(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day06Puzzle.txt");
                             break;
                         case 7:
-                            _ = new Day7(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day7Puzzle.txt");
+                            _ = new Day07(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day07Puzzle.txt");
                             break;
                         case 8:
-                            _ = new Day8(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day8Puzzle.txt");
+                            _ = new Day08(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day08Puzzle.txt");
                             break;
                         case 9:
-                            _ = new Day9(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day9Puzzle.txt");
+                            _ = new Day09(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day09Puzzle.txt");
                             break;
                         case 10:
                             _ = new Day10(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day10Puzzle.txt");
@@ -56,7 +56,7 @@ public static class Menu2024
                             _ = new Day13(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day13Puzzle.txt");
                             break;
                         case 14:
-                            _ = new Day14(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day14Puzzle.txt");
+                            _ = new Day14(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day14Puzzle.txt", (103, 101));
                             break;
                         case 15:
                             _ = new Day15(@"..\..\..\..\AdventOfCode2024\Inputs\Puzzles\Day15Puzzle.txt");

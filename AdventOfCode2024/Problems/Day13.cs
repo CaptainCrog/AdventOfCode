@@ -1,9 +1,9 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2024.Problems
 {
-    public partial class Day13 : DayBase
+    public partial class Day13 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -17,7 +17,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -92,20 +92,20 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllText(InputPath);
             var inputRegex = InputRegex();
             ClawMachineMatches = inputRegex.Matches(input);
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             long sum = 0;
 
@@ -139,7 +139,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(sum, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             long sum = 0;
 

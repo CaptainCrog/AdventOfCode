@@ -1,9 +1,9 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using CommonTypes.CommonTypes.Regex;
 
 namespace AdventOfCode2015.Problems
 {
-    public class Day15 : DayBase
+    public class Day15 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -17,7 +17,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -67,7 +67,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllLines(InputPath);
             var numberRegex = CommonRegexHelpers.NumberRegex();
@@ -120,20 +120,20 @@ namespace AdventOfCode2015.Problems
 
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var result = _ingredientScore.OrderDescending().ToHashSet().First();
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             var result = _calorieScore.Where(x => x.calories == 500).OrderByDescending(x => x.score).First().score;
 

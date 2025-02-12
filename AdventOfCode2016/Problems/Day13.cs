@@ -1,10 +1,11 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Enums;
+using CommonTypes.CommonTypes.Interfaces;
 using System.Drawing;
 
 namespace AdventOfCode2016.Problems
 {
-    public class Day13 : DayBase
+    public class Day13 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -27,7 +28,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -75,12 +76,12 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _favouriteNumber = int.Parse(File.ReadAllText(_inputPath));
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
@@ -90,7 +91,7 @@ namespace AdventOfCode2016.Problems
         /// Work out all walls up to the target coordinates row and col, then run the Path Finding algorithm.
         /// If path cant be found (implying there are more rows and cols to generate) then we append an additional 1 row and 1 col and re-run the path finding algorithm
         /// </summary>
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             CreateGridRowsAndCols(_target.Y, _target.X);
 
@@ -123,7 +124,7 @@ namespace AdventOfCode2016.Problems
 
             return (T)Convert.ChangeType(pathSteps, typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             var result = _finalDistances.Where(x => x.Value <= 50).DistinctBy(x => new { x.Key.x, x.Key.y }).ToDictionary().Count;
 

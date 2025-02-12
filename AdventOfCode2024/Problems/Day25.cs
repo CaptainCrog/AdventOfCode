@@ -1,8 +1,8 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day25 : DayBase
+    public class Day25 : IDayBase
     {
         #region Fields
 
@@ -16,7 +16,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -76,7 +76,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var inputGrids = File.ReadAllText(_inputPath).Split("\r\n\r\n", StringSplitOptions.RemoveEmptyEntries);
             foreach (var grid in inputGrids)
@@ -85,13 +85,13 @@ namespace AdventOfCode2024.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             Sum = 0;
             foreach (var fivePinLock in _locks)
@@ -117,7 +117,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             Sum = 0;
             return (T)Convert.ChangeType(Sum, typeof(T));

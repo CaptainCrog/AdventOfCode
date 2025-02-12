@@ -1,11 +1,11 @@
 ﻿using AdventOfCode2015.CommonInternalTypes.Classes;
-using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.HelperFunctions;
+using CommonTypes.CommonTypes.Interfaces;
 using CommonTypes.CommonTypes.Regex;
 
 namespace AdventOfCode2015.Problems
 {
-    public class Day21 : DayBase
+    public class Day21 : IDayBase
     {
         #region Fields
 
@@ -23,7 +23,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -73,7 +73,7 @@ namespace AdventOfCode2015.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var input = File.ReadAllText(_inputPath);
             var bossStats = CommonRegexHelpers.NumberRegex().Matches(input);
@@ -127,13 +127,13 @@ namespace AdventOfCode2015.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var successfulAttempts = _bossAttempts.Where(x => x.Value.success).ToDictionary();
             var orderedByCost = successfulAttempts.OrderBy(x => x.Value.cost).ToDictionary();
@@ -142,7 +142,7 @@ namespace AdventOfCode2015.Problems
             return (T)Convert.ChangeType(cheapest, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             var failedAttempts = _bossAttempts.Where(x => !x.Value.success).ToDictionary();
             var orderedByCost = failedAttempts.OrderByDescending(x => x.Value.cost).ToDictionary();

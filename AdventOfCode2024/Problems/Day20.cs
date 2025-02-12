@@ -1,8 +1,9 @@
 ﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day20 : DayBase
+    public class Day20 : IDayBase
     {
         #region Fields
 
@@ -11,7 +12,7 @@ namespace AdventOfCode2024.Problems
         int _secondResult = 0;
         int _sum = 0;
         int _targetCheatTime = 0;
-        Dictionary<Node, int> _initialRun = new();
+        Dictionary<(int x, int y), int> _initialRun = new();
         char[,] _charPositions = new char[0, 0];
         Node _start = new Node()
         {
@@ -36,7 +37,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -98,7 +99,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
 
 
@@ -129,13 +130,13 @@ namespace AdventOfCode2024.Problems
             _initialRun = CalculateWithoutCheats(_start, _end, _directions);
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             Sum = 0;
             var results = CalculateWithCheats(2, _initialRun);
@@ -143,7 +144,7 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             Sum = 0;
             var results = CalculateWithCheats(20, _initialRun);
@@ -151,28 +152,28 @@ namespace AdventOfCode2024.Problems
             return (T)Convert.ChangeType(Sum, typeof(T));
         }
 
-        Dictionary<Node, int> CalculateWithoutCheats(Node start, Node end, List<(int dx, int dy)> directions)
+        Dictionary<(int, int), int> CalculateWithoutCheats(Node start, Node end, List<(int dx, int dy)> directions)
         {
-            var path = new Dictionary<Node, int>();
+            var path = new Dictionary<(int x, int y), int>();
             var current = end;
             int time = 0;
 
-            path[current] = time;
+            path[(current.X, current.Y)] = time;
 
             while (!(current.X == start.X && current.Y == start.Y))
             {
-                var next = directions
+                var nexts = directions
                     .Select(dir => new Node { X = current.X + dir.dx, Y = current.Y + dir.dy })
-                    .Single(pos => IsValid(pos) && !path.ContainsKey(pos));
-
+                    .Where(pos => IsValid(pos) && !path.ContainsKey((pos.X, pos.Y))).ToList();
+                var next = nexts.First();
                 time++;
-                path[next] = time;
+                path[(next.X, next.Y)] = time;
                 current = next;
             }
             return path;
         }
 
-        List<(int timeSaved, (int cheatDistance, int startingPositionScore) cheatDetails)> CalculateWithCheats(int maxCheatDistance, Dictionary<Node, int> gridScores)
+        List<(int timeSaved, (int cheatDistance, int startingPositionScore) cheatDetails)> CalculateWithCheats(int maxCheatDistance, Dictionary<(int x, int y), int> gridScores)
         {
             var results = new List<(int timeSaved, (int cheatDistance, int startingPositionScore) cheatDetails)>();
 
@@ -188,7 +189,7 @@ namespace AdventOfCode2024.Problems
                     // Calculate the time saved by applying the cheat (difference between current score, neighbor score, and cheat distance)
                     // Add the time saved and cheat details to the results list
 
-                    int timeSaved = currentScore - gridScores[cheatedPosition] - cheatDistance;
+                    int timeSaved = currentScore - gridScores[(cheatedPosition.X, cheatedPosition.Y)] - cheatDistance;
                     results.Add((timeSaved, (cheatDistance, gridScores[currentPosition])));
                 }
             }
@@ -197,7 +198,7 @@ namespace AdventOfCode2024.Problems
             return results;
         }
 
-        List<(Node neighboringPosition, int distanceFromCurrentPosition)> GetPositionsWithinRange(Dictionary<Node, int> gridPositionsWithScores, Node currentPosition, int maxCheatDistance)
+        List<(Node neighboringPosition, int distanceFromCurrentPosition)> GetPositionsWithinRange(Dictionary<(int x, int y), int> gridPositionsWithScores, (int x, int y) currentPosition, int maxCheatDistance)
         {
             var validPositions = new List<(Node, int)>();
 
@@ -214,10 +215,10 @@ namespace AdventOfCode2024.Problems
                         continue;
 
                     // Calculate the new position to check
-                    var potentialPosition = new Node { X = currentPosition.X + row, Y = currentPosition.Y + col };
+                    var potentialPosition = new Node { X = currentPosition.x + row, Y = currentPosition.y + col };
 
                     // If this position is valid (exists in the grid), add it to the results
-                    if (gridPositionsWithScores.ContainsKey(potentialPosition))
+                    if (gridPositionsWithScores.ContainsKey((potentialPosition.X, potentialPosition.Y)))
                     {
                         validPositions.Add((potentialPosition, distance));
                     }

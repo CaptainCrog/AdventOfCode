@@ -1,5 +1,5 @@
-﻿using CommonTypes.CommonTypes.Classes;
-using CommonTypes.CommonTypes.Constants;
+﻿using CommonTypes.CommonTypes.Constants;
+using CommonTypes.CommonTypes.Interfaces;
 using CommonTypes.CommonTypes.Regex;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
 {
-    public class Day10 : DayBase
+    public class Day10 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -22,7 +22,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -70,7 +70,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             var instructions = File.ReadAllLines(_inputPath);
             _botInstructions = instructions.Where(x => x.StartsWith("bot")).ToArray();
@@ -110,13 +110,13 @@ namespace AdventOfCode2016.Problems
             }
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             var resultBot = 0;
             while (_bots.Count() > 0 )
@@ -133,7 +133,7 @@ namespace AdventOfCode2016.Problems
 
             return (T)Convert.ChangeType(resultBot, typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             var allRequiredOutputs = _outputs.Where(x => x.Key == 0 || x.Key == 1 || x.Key == 2 ).Select(x => x.Value.CarriedNumbers.First()).ToList();
             var result = allRequiredOutputs[0] * allRequiredOutputs[1] * allRequiredOutputs[2]; 

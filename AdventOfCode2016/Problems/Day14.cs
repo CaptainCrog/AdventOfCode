@@ -1,11 +1,11 @@
-﻿using CommonTypes.CommonTypes.Classes;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2016.Problems
 {
-    public partial class Day14 : DayBase
+    public partial class Day14 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -22,7 +22,7 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -69,18 +69,18 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _md5HashSalt = File.ReadAllText(_inputPath);
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             decimal iterator = 0;
             _validMd5Indexes = new();
@@ -95,7 +95,7 @@ namespace AdventOfCode2016.Problems
 
             return (T)Convert.ChangeType(result.Last(), typeof(T));
         }
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             decimal iterator = 0;
             _validMd5Indexes = new();

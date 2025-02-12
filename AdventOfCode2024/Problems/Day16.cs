@@ -1,9 +1,10 @@
 ﻿using CommonTypes.CommonTypes.Classes;
 using CommonTypes.CommonTypes.Enums;
+using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2024.Problems
 {
-    public class Day16 : DayBase
+    public class Day16 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
@@ -33,7 +34,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Properties
-        protected override string InputPath
+        protected  string InputPath
         {
             get => _inputPath;
             set
@@ -82,7 +83,7 @@ namespace AdventOfCode2024.Problems
         #endregion
 
         #region Methods
-        public override void InitialiseProblem()
+        public  void InitialiseProblem()
         {
             _raceMapRaw = File.ReadAllLines(InputPath);
             _raceMap = new char[_raceMapRaw.Length, _raceMapRaw[0].Length];
@@ -118,17 +119,17 @@ namespace AdventOfCode2024.Problems
             SecondResult = SolveSecondProblem<int>();
         }
 
-        public override T SolveFirstProblem<T>()
+        public  T SolveFirstProblem<T>() where T : IConvertible
         {
             return (T)Convert.ChangeType(_result.shortestPathScore, typeof(T));
         }
 
-        public override T SolveSecondProblem<T>()
+        public  T SolveSecondProblem<T>() where T : IConvertible
         {
             return (T)Convert.ChangeType(_result.paths.SelectMany(x => x.Select(xx => (xx.X, xx.Y))).ToList().Distinct().Count(), typeof(T));
         }
 
-        public override void OutputSolution()
+        public  void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
