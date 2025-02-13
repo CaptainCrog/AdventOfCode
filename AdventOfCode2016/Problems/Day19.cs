@@ -82,49 +82,16 @@ namespace AdventOfCode2016.Problems
         }
         public  T SolveSecondProblem<T>() where T : IConvertible
         {
-            //int survivor = 0; // g(1, k) = 0
-            //var reducedElves = _numberOfElves;
-            //for (int i = 2; i <= _numberOfElves; i++)
-            //{
-            //    var k = reducedElves / 2;
-            //    survivor = (survivor + k) % i;
-            //    reducedElves--;
-            //}
-            //var result = survivor + 1; // Convert from 0-based to 1-based index
-
-
-            LinkedList<int> prisoners = new LinkedList<int>();
-            for (int i = 1; i <= _numberOfElves; i++)
+            int powerOf3 = 1;
+            while (powerOf3 * 3 <= _numberOfElves)
             {
-                prisoners.AddLast(i); // Populate the list with prisoner numbers
+                powerOf3 *= 3;
             }
 
-            LinkedListNode<int> current = prisoners.First;
-
-            while (prisoners.Count > 1)
-            {
-                // Find the opposite person
-                int steps = prisoners.Count / 2;
-                //ADD IF MODULUS CHECK
-                LinkedListNode<int> opposite = current;
-                for (int i = 0; i < steps; i++)
-                {
-                    opposite = (opposite.Next != null) ? opposite.Next : prisoners.First;
-                }
-
-                // Remove the opposite prisoner
-                LinkedListNode<int> next = (opposite.Next != null) ? opposite.Next : prisoners.First;
-                prisoners.Remove(opposite);
-
-                // Move to the next survivor
-                current = next;
-            }
-
-            var result = prisoners.First.Value; // Return the last remaining prisoner
+            var result = _numberOfElves - powerOf3 + Math.Max(0, _numberOfElves - 2 * powerOf3);
 
 
             return (T)Convert.ChangeType(result, typeof(T));
-            //915059 too Low
 
         }
 

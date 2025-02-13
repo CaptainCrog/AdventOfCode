@@ -34,7 +34,7 @@ namespace AdventOfCode2016Tests
         public void Part2_OutputsCorrectElfFile2_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day19("Day19Test2.txt");
-            instance.SecondResult.Should().Be(37);
+            instance.SecondResult.Should().Be(19);
         }
 
     }
