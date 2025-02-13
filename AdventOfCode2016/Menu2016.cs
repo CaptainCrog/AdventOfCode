@@ -72,6 +72,8 @@ public static class Menu2016
                             _ = new Day18(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day18Puzzle.txt", 40);
                             break;
                         case 19:
+                            _ = new Day19(@"..\..\..\..\AdventOfCode2016\Inputs\Puzzles\Day19Puzzle.txt");
+                            break;
                         case 20:
                         case 21:
                         case 22:
