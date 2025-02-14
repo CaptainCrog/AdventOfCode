@@ -10,7 +10,7 @@ namespace CommonTypes.CommonTypes.HelperFunctions
     {
         public static IEnumerable<uint> UIntRange(uint start, uint count)
         {
-            for (uint val = start; val <= start + count; val++)
+            for (uint val = start; val < start + count; val++)
             {
                 yield return val;
             }

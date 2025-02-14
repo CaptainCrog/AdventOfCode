@@ -10,9 +10,9 @@ namespace AdventOfCode2016.Problems
         uint _firstResult = 0;
         int _secondResult = 0;
         uint _maxValue = 0;
-        //Dictionary<uint, bool> _validValues = new();
         List<uint> _validValues = new();
-        string[] _invalidValueRanges = [];
+        List<uint> _invalidValues = new();
+
 
         #endregion
 
@@ -67,13 +67,20 @@ namespace AdventOfCode2016.Problems
         #region Methods
         public  void InitialiseProblem()
         {
-            _invalidValueRanges = File.ReadAllLines(_inputPath);
-            //for (uint i = 0; i <= _maxValue; i++) 
-            //{
-            //    _validValues.Add(i);
-            //}
+            var input = File.ReadAllLines(_inputPath);
+            List<(uint left, uint right)> invalidValueRanges = new();
 
-            _validValues = EnumerableHelperFunctions.UIntRange(0, _maxValue).ToList();
+            foreach (var valueRanges in input)
+            {
+                var parts = valueRanges.Split('-');
+                (uint left, uint right) range = (uint.Parse(parts[0]), uint.Parse(parts[1]));
+                invalidValueRanges.Add(range);
+            }
+            invalidValueRanges = invalidValueRanges.OrderBy(x => x.left).ToList();
+
+            var simplifiedInvalidValueRanges = SimplifyInvalidRanges(invalidValueRanges);
+
+            FindValidIpAddresses(simplifiedInvalidValueRanges);
         }
 
         public  void OutputSolution()
@@ -84,25 +91,77 @@ namespace AdventOfCode2016.Problems
 
         public T SolveFirstProblem<T>() where T : IConvertible
         {
-            var copy = _validValues.ToList();
-            foreach(var valueRanges in _invalidValueRanges)
-            {
-                var parts = valueRanges.Split('-');
-                (uint left, uint right) range = (uint.Parse(parts[0]), uint.Parse(parts[1]));
-                copy = copy.Where(x => (x < range.left && x < range.right) || (x > range.right && x > range.left)).ToList();
-            }
 
-            var orderedCopy = copy.Order().ToList();
-            var result = string.Join("", orderedCopy.Select(x => x.ToString()));
+            var result = _validValues.Order().ToList().First();
 
-            return (T)Convert.ChangeType(uint.Parse(result), typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
+        
         public  T SolveSecondProblem<T>() where T : IConvertible
         {
 
+            var result = _validValues.Count();
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
 
+        }
+
+
+        bool IsOverlapping((uint left, uint right) firstRange, (uint left, uint right) secondRange)
+        {
+            var intersect = Math.Min(uint.MaxValue, Math.Min(firstRange.right, secondRange.right) - Math.Max(firstRange.left, secondRange.left) + 1);
+            return intersect < uint.MaxValue;
+        }
+
+        List<(uint left, uint right)> SimplifyInvalidRanges(List<(uint left, uint right)> invalidValueRanges)
+        {
+            var simplifiedInvalidValueRanges = new List<(uint left, uint right)>();
+            for (int i = 0; i < invalidValueRanges.Count - 1; i++)
+            {
+                var valueRange = invalidValueRanges[i];
+                for (int j = i + 1; j < invalidValueRanges.Count; j++)
+                {
+                    var otherRange = invalidValueRanges[j];
+                    if (IsOverlapping(valueRange, otherRange))
+                    {
+                        valueRange.right = Math.Max(valueRange.right, otherRange.right);
+                        valueRange.left = Math.Min(valueRange.left, otherRange.left);
+                        i = j; // Dont process this next in the above for loop since we know its already handled
+                    }
+                    else
+                        break;
+                }
+                simplifiedInvalidValueRanges.Add(valueRange);
+            }
+            return simplifiedInvalidValueRanges;
+        }
+
+        void FindValidIpAddresses(List<(uint left, uint right)> simplifiedInvalidValueRanges)
+        {
+            uint currentIterator = 0;
+            uint skip = 0;
+            while (currentIterator < _maxValue)
+            {
+                var blacklist = simplifiedInvalidValueRanges.Where(x => x.left == currentIterator).ToList();
+                if (blacklist.Any())
+                {
+                    if (blacklist.First().right != uint.MaxValue)
+                        currentIterator = blacklist.First().right + 1;
+                    else
+                        break;
+                }
+                else
+                {
+                    var remainingBlackLists = simplifiedInvalidValueRanges.Where(x => x.left > currentIterator).ToList();
+                    if (remainingBlackLists.Any())
+                        skip = remainingBlackLists.First().left - currentIterator;
+                    else
+                        skip = _maxValue - currentIterator;
+
+                    _validValues.AddRange(EnumerableHelperFunctions.UIntRange(currentIterator, skip).ToList());
+                    currentIterator += skip;
+                }
+            }
         }
 
         #endregion
