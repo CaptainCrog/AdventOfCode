@@ -13,6 +13,7 @@ namespace AdventOfCode2016.Problems
         string _secondResult = string.Empty;
         string[] _instructions = [];
         string _scrambledResult = string.Empty;
+        string _unscrambledResult = string.Empty;
         Regex _numberRegex = CommonRegexHelpers.NumberRegex();
         Regex _charRegex = InstructionLetters();
 
@@ -56,9 +57,10 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Constructor
-        public Day21(string inputPath, string scrambledPassword)
+        public Day21(string inputPath, string unscrambledPassword, string scrambledPassword)
         {
             _inputPath = inputPath;
+            _unscrambledResult = unscrambledPassword;
             _scrambledResult = scrambledPassword;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<string>();
@@ -81,28 +83,25 @@ namespace AdventOfCode2016.Problems
 
         public T SolveFirstProblem<T>() where T : IConvertible
         {
-            var result = ProcessPassword(_scrambledResult, false);
+            var result = ProcessPassword(_unscrambledResult, false);
             return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
             _instructions = _instructions.Reverse().ToArray();
-            var result = ProcessPassword("fbgdceah", true);
+            var result = ProcessPassword(_scrambledResult, true);
             return (T)Convert.ChangeType(result, typeof(T));
 
         }
-        //bahcdefg wrong
-        //hefbgacd wrong
+
 
         string ProcessPassword(string scrambledResult, bool reverse)
         {
-            var firstNum = 0;
-            var secondNum = 0;
-            var firstChar = '!';
-            var secondChar = '!';
             foreach (var instruction in _instructions)
             {
+                int secondNum;
+                int firstNum;
                 if (instruction.Contains("swap"))
                 {
                     if (instruction.Contains("position"))
@@ -124,6 +123,8 @@ namespace AdventOfCode2016.Problems
                     {
                         var letters = _charRegex.Matches(instruction);
 
+                        char firstChar;
+                        char secondChar;
                         if (reverse)
                         {
                             firstChar = letters[1].Value.Trim().First();
@@ -208,11 +209,21 @@ namespace AdventOfCode2016.Problems
 
         string RotateFromLetterIndex(string scrambledPassword, char letter, bool reverse)
         {
-            var steps = scrambledPassword.IndexOf(letter) + 1;
-            if (scrambledPassword.IndexOf(letter) >= 4)
-                steps++;
+            var steps = 0;
+            if (reverse)
+            {
+                var index = scrambledPassword.IndexOf(letter);
+                steps = index / 2 + (index % 2 == 1 || index == 0 ? 1 : 5);
+            }
+            else
+            {
+                steps = scrambledPassword.IndexOf(letter) + 1;
+                if (scrambledPassword.IndexOf(letter) >= 4)
+                    steps++;
 
-            return Rotate(scrambledPassword.ToCharArray(), !reverse, steps);
+            }
+
+            return Rotate(scrambledPassword.ToCharArray(), !reverse, Math.Abs(steps));
         }
 
         string ReversePositions(string scrambledPassword, int firstPosition, int lastPosition)
@@ -229,8 +240,6 @@ namespace AdventOfCode2016.Problems
         string Move(string scrambledPassword, int fromPosition, int toPosition, bool reverse)
         {
             bool rotateRight = toPosition - fromPosition > 0;
-            //if (reverse)
-            //    rotateRight = !rotateRight;
 
             int iterator = fromPosition;
             while (iterator != toPosition)
