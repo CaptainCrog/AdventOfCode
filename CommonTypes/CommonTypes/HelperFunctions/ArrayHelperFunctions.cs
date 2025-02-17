@@ -57,7 +57,6 @@
                    .ToArray();
         }
 
-
         public static IEnumerable<int[]> GetAllTargetCombinations(int[] numbers, int target)
         {
             List<int[]> result = new List<int[]>();
