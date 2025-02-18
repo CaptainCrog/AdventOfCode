@@ -127,149 +127,52 @@ namespace AdventOfCode2016.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            var rows = _nodeDiskUsageData.Select(x => x.Node.X).Max() + 1;
-            var cols = _nodeDiskUsageData.Select(y => y.Node.Y).Max() + 1;
-            _grid = new NodeDiskUsageData[rows, cols];
+            var cols = _nodeDiskUsageData.Select(x => x.Node.X).Max();
+            var rows = _nodeDiskUsageData.Select(y => y.Node.Y).Max();
+            _grid = new NodeDiskUsageData[rows+1, cols+1];
             for (int i = 0; i < _nodeDiskUsageData.Length; i++)
             {
                 var position = (_nodeDiskUsageData[i].Node.X, _nodeDiskUsageData[i].Node.Y);
-                _grid[position.X, position.Y] = _nodeDiskUsageData[i];
+                _grid[position.Y, position.X] = _nodeDiskUsageData[i];
             }
+
+            var goalNode = _grid[0, _grid.GetLength(1) - 1];
+            NodeDiskUsageData emptyNode = null;
+
+            for (int i = 0; i < _grid.GetLength(0); i++)
+            {
+                for (int j = 0; j < _grid.GetLength(1); j++)
+                {
+                    if (i == 0 && j == 0)
+                        Console.Write('T');
+                    else if (i == 0 && j == _grid.GetLength(1) - 1)
+                        Console.Write('G');
+                    else if (_grid[i,j].DiskUsedPercent == 0)
+                    {
+                        Console.Write('_');
+                        emptyNode = _grid[i,j];
+                    }
+                    else if (_grid[i, j].DiskSize > 100)
+                        Console.Write('#');
+                    else
+                        Console.Write('.');
+
+                }
+                Console.WriteLine();
+            }
+
 
             var result = FindMinimumMoves(_grid);
 
             return (T)Convert.ChangeType(0, typeof(T));
         }
-
-        //List<(int, int)> FindPath(NodeDiskUsageData[,] grid, Node start, Node target)
-        //{
-        //    int rows = grid.GetLength(0);
-        //    int cols = grid.GetLength(1);
-
-        //    var priorityQueue = new PriorityQueue<(Node, Node), int>();
-        //    var visited = new HashSet<(int, int, int, int)>();
-        //    var costFromStart = new Dictionary<(int, int), int>() { [(start.Node.X, start.Node.Y)] = 0};
-        //    var estimatedTotalCost = new Dictionary<(int, int), int>() { [(start.Node.X, start.Node.Y)] = CalculateHeuristic((start.Node.X, start.Node.Y), (target.Node.X, target.Node.Y)) };
-
-        //    priorityQueue.Enqueue(start, estimatedTotalCost[(start.Node.X, start.Node.Y)]);
-
-        //    while (priorityQueue.Count > 0)
-        //    {
-        //        var currentNode = priorityQueue.Dequeue();
-
-        //        if (currentNode.Node.Equals(target.Node))
-        //            return ReconstructPath(visited, currentNode);
-
-        //        foreach (var direction in _directions)
-        //        {
-
-        //            var neighbouringNode = new Node() { X = currentNode.Node.X + direction.dx, Y = currentNode.Node.Y + direction.dy };
-
-        //            if (neighborX < 0 || neighborY < 0 || neighborX >= rows || neighborY >= cols || grid[neighborX, neighborY] == 1)
-        //                continue; // Skip out-of-bounds or blocked cells
-
-        //            int newMovementCost = costFromStart[currentNode] + 1;
-
-        //            if (!costFromStart.ContainsKey((neighborX, neighborY)) || newMovementCost < costFromStart[(neighborX, neighborY)])
-        //            {
-        //                visited[(neighborX, neighborY)] = currentNode;
-        //                costFromStart[(neighborX, neighborY)] = newMovementCost;
-        //                estimatedTotalCost[(neighborX, neighborY)] = newMovementCost + CalculateHeuristic((neighborX, neighborY), target);
-        //                priorityQueue.Enqueue((neighborX, neighborY), estimatedTotalCost[(neighborX, neighborY)]);
-        //            }
-        //        }
-        //    }
-        //}
-
-        int FindMinimumMoves(NodeDiskUsageData[,] grid)
-        {
-            int rows = grid.GetLength(0);
-            int cols = grid.GetLength(1);
-            Node emptyNode = null;
-            Node goalNode = null;
-
-            // Identify positions of Empty Node and Goal Data
-            foreach (var nodeData in grid)
-            {
-                if (nodeData.DiskUsed == 0) emptyNode = nodeData.Node;
-                if (nodeData.Node.Y == cols - 1 && nodeData.Node.X == 0) goalNode = nodeData.Node;
-            }
-
-            // A* Search: Priority Queue based on estimated total cost
-            var openSet = new PriorityQueue<(Node, Node), int>();
-            var visited = new HashSet<(int, int, int, int)>();
-
-            openSet.Enqueue((emptyNode, goalNode), 0);
-            visited.Add((emptyNode.X, emptyNode.Y, goalNode.X, goalNode.Y));
-
-            int steps = 0;
-
-            while (openSet.Count > 0)
-            {
-                int levelSize = openSet.Count;
-                for (int i = 0; i < levelSize; i++)
-                {
-                    var (eNode, gNode) = openSet.Dequeue();
-                    if (gNode.X == 0 && gNode.Y == 0) 
-                        return steps; // Goal reached
-
-                    foreach (var direction in _directions)
-                    {
-                        int newEx = eNode.X + direction.dx, newEy = eNode.Y + direction.dy;
-
-                        if (!IsValidMove(grid, newEx, newEy, rows, cols))
-                            continue;
-
-                        // If empty node moves into the goal's position, goal moves too
-                        int newGx = gNode.X;
-                        int newGy = gNode.Y;
-                        if (newEx == gNode.X && newEy == gNode.Y)
-                        {
-                            newGx = eNode.X; newGy = eNode.Y;
-                        }
-
-                        if (!visited.Contains((newEx, newEy, newGx, newGy)))
-                        {
-                            visited.Add((newEx, newEy, newGx, newGy));
-                            int heuristic = ManhattanDistance(newGx, newGy, 0, 0);
-                            openSet.Enqueue((new Node { X = newEx, Y = newEy }, new Node { X = newGx, Y = newGy }), steps + 1 + heuristic);
-                        }
-                    }
-                }
-                steps++;
-            }
-            return -1; // No valid solution found
-
-            bool IsValidMove(NodeDiskUsageData[,] grid, int x, int y, int rows, int cols)
-            {
-                return x >= 0 && y >= 0 && x < cols && y < rows && grid[y, x].DiskUsedPercent < 100;
-            }
-
-            int ManhattanDistance(int x1, int y1, int x2, int y2)
-            {
-                return Math.Abs(x1 - x2) + Math.Abs(y1 - y2);
-            }
-        }
-
-
-        //int CalculateHeuristic((int x, int y) start, (int x, int y) target)
-        //{
-        //    return Math.Abs(start.x - target.x) + Math.Abs(start.y - target.y); // Manhattan distance heuristic
-        //}
-
-        //List<(int x, int y)> ReconstructPath(Dictionary<NodeDiskUsageData, NodeDiskUsageData> visited, NodeDiskUsageData currentNode)
-        //{
-        //    var path = new List<NodeDiskUsageData> { currentNode };
-
-        //    while (visited.ContainsKey(currentNode))
-        //    {
-        //        currentNode = visited[currentNode];
-        //        path.Add(currentNode);
-        //    }
-
-        //    path.Reverse();
-        //    return path;
-        //}
+        //173 too low
+        //194 too low
+        //199 too low
+        //239 wrong
+        //234 wrong
+        //235 wrong
+        //240 wrong
 
 
         record NodeDiskUsageData
