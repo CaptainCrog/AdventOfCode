@@ -3,23 +3,26 @@ using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2016.Problems
 {
-    public class Day12 : IDayBase
+    public partial class Day23 : IDayBase
     {
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
         int _secondResult = 0;
+        int _initialRegisterValue = 0;
         string[] _instructions = [];
         Dictionary<string, int> _registers = new();
         const string _cpy = "cpy";
         const string _jnz = "jnz";
         const string _inc = "inc";
         const string _dec = "dec";
+        const string _tgl = "tgl";
+
 
         #endregion
 
         #region Properties
-        protected  string InputPath
+        string InputPath
         {
             get => _inputPath;
             set
@@ -42,7 +45,7 @@ namespace AdventOfCode2016.Problems
             }
         }
         public int SecondResult
-        {
+        { 
             get => _secondResult;
             set
             {
@@ -55,9 +58,10 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Constructor
-        public Day12(string inputPath)
+        public Day23(string inputPath, int initialRegisterValue)
         {
             _inputPath = inputPath;
+            _initialRegisterValue = initialRegisterValue;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
             SecondResult = SolveSecondProblem<int>();
@@ -66,49 +70,39 @@ namespace AdventOfCode2016.Problems
         #endregion
 
         #region Methods
-        public  void InitialiseProblem()
+        public void InitialiseProblem()
         {
             _instructions = File.ReadAllLines(_inputPath);
         }
 
-        public  void OutputSolution()
+        public void OutputSolution()
         {
             Console.WriteLine($"First Solution is: {FirstResult}");
             Console.WriteLine($"Second Solution is: {SecondResult}");
         }
 
-
-        public  T SolveFirstProblem<T>() where T : IConvertible
+        public T SolveFirstProblem<T>() where T : IConvertible
         {
+
 
             _registers = new Dictionary<string, int>()
             {
-                { "a", 0 },
+                { "a", _initialRegisterValue },
                 { "b", 0 },
                 { "c", 0 },
                 { "d", 0 },
             };
 
             RunProgram();
-           
-            var result = _registers["a"];
-            return (T)Convert.ChangeType(result, typeof(T));
+
+            return (T)Convert.ChangeType(0, typeof(T));
         }
-        public  T SolveSecondProblem<T>() where T : IConvertible
+
+        public T SolveSecondProblem<T>() where T : IConvertible
         {
-            _registers = new Dictionary<string, int>()
-            {
-                { "a", 0 },
-                { "b", 0 },
-                { "c", 1 },
-                { "d", 0 },
-            };
-
-            RunProgram();
-
-            var result = _registers["a"];
-            return (T)Convert.ChangeType(result, typeof(T));
+            return (T)Convert.ChangeType(0, typeof(T));
         }
+
 
         void RunProgram()
         {
@@ -130,49 +124,16 @@ namespace AdventOfCode2016.Problems
                     case _dec:
                         RegisterFunctions.Decrease(instructionParts[1], ref _registers);
                         break;
+                    case _tgl:
+                        RegisterFunctions.Toggle(instructionParts[1], i, ref _instructions, _registers);
+                        break;
+
                 }
 
             }
         }
 
-        void Copy(string copy, string register)
-        {
-            if (int.TryParse(copy, out int copyValue))
-                _registers[register] = copyValue;
-            else
-            {
-                copyValue = _registers[copy];
-                _registers[register] = copyValue;
-            }
-        }
-
-        void Increase(string register)
-        {
-            _registers[register]++;
-        }
-
-        void Decrease(string register) 
-        {
-            _registers[register]--;
-        }
-
-        int Jump(string register, int jumpMovement, int currentIndex)
-        {
-            if (!int.TryParse(register, out int value))
-            {
-                if (_registers[register] == 0)
-                    return currentIndex;
-                else
-                    return currentIndex + jumpMovement - 1;
-            }
-            else
-            {
-                if (value == 0)
-                    return currentIndex;
-                else
-                    return currentIndex + jumpMovement - 1;
-            }
-        }
         #endregion
+
     }
 }
