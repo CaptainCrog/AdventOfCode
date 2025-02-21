@@ -134,45 +134,6 @@ namespace AdventOfCode2016.Problems
 
             }
         }
-
-        void Copy(string copy, string register)
-        {
-            if (int.TryParse(copy, out int copyValue))
-                _registers[register] = copyValue;
-            else
-            {
-                copyValue = _registers[copy];
-                _registers[register] = copyValue;
-            }
-        }
-
-        void Increase(string register)
-        {
-            _registers[register]++;
-        }
-
-        void Decrease(string register) 
-        {
-            _registers[register]--;
-        }
-
-        int Jump(string register, int jumpMovement, int currentIndex)
-        {
-            if (!int.TryParse(register, out int value))
-            {
-                if (_registers[register] == 0)
-                    return currentIndex;
-                else
-                    return currentIndex + jumpMovement - 1;
-            }
-            else
-            {
-                if (value == 0)
-                    return currentIndex;
-                else
-                    return currentIndex + jumpMovement - 1;
-            }
-        }
         #endregion
     }
 }
