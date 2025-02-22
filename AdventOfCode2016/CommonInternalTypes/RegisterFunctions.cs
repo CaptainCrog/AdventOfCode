@@ -119,5 +119,22 @@ namespace AdventOfCode2016.CommonInternalTypes
 
             return false;
         }
+
+        public static bool Output(string register, ref string currentSignal, Dictionary<string, int> registers)
+        {
+            var outputValue = registers[register];
+
+            if (outputValue > 1)
+                return false;
+            if (string.IsNullOrEmpty(currentSignal) && outputValue != 0)
+                return false;
+            // 0101|0 == 0 / 01010|1 == 1
+            if (!string.IsNullOrEmpty(currentSignal) && int.Parse(currentSignal.Last().ToString()) == outputValue)
+                return false;
+
+            currentSignal += outputValue.ToString();
+
+            return true;
+        }
     }
 }
