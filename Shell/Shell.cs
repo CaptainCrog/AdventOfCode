@@ -23,7 +23,7 @@
                                 Menu2016.Main([]);
                                 break;
                             case 17:
-                                Console.WriteLine("Option is out of bound or unavailable at the moment");
+                                Menu2017.Main([]);
                                 break;
                             case 18:
                                 Console.WriteLine("Option is out of bound or unavailable at the moment");
