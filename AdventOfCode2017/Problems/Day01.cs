@@ -80,7 +80,6 @@ namespace AdventOfCode2017.Problems
         int ProcessCaptcha(int lookAhead)
         {
             int sum = 0;
-            //Check rest of the string
             for (int i = 0; i < _captchaInput.Length; i++)
             {
                 var nextIndex = i + lookAhead;
