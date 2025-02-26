@@ -13,7 +13,7 @@ namespace AdventOfCode2017Tests
 
         [TestMethod]
         [DeploymentItem("Inputs/Day02/Day2Test2.txt")]
-        public void Part1_OutputsCorrectSumFile2_IsTrue()
+        public void Part2_OutputsCorrectSumFile2_IsTrue()
         {
             var instance = new AdventOfCode2017.Problems.Day02("Day2Test2.txt");
             instance.SecondResult.Should().Be(9);
