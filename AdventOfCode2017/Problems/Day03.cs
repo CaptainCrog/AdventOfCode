@@ -45,7 +45,7 @@ namespace AdventOfCode2017.Problems
         #endregion
 
         #region Constructor
-        public Day03(string inputPath) 
+        public Day03(string inputPath)
         {
             _inputPath = inputPath;
             InitialiseProblem();
@@ -133,98 +133,47 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            /*
-Starting from the middle (1), the numbers follow a spiral pattern:
-
-369601  363010  349975  330785  312453  295229  279138  266330  130654
-739202   6591     6444    6155    5733    5336    5022   2450   128204
-13486     147     142     133     122      59    2391   123363
-14267     304       5       4       2      57    2275   116247
-15252     330      10       1       1      54    2105   109476
-16295     351      11      23      25      26    1968   103128
-17008     362     747     806     880     931     957    98098
-17370   35487   37402   39835   42452   45220   47108    48065
-
-*/
-
             var iterator = 1;
             var currentDirection = Direction.East;
             var data = new List<Node>();
-            var nextNode = new Node { X = 0, Y = 0, Direction = currentDirection, Cost = 1 };
+            var currentNode = new Node { X = 0, Y = 0, Direction = currentDirection, Cost = 1 };
+            int turnCounter = 0;
+            int stepsBeforeTurn = 1;
+            int stepsInCurrentDirection = 0;
             while (true)
             {
                 if (data.Any() && data.Last().Cost > _puzzleNumber)
                     break;
 
-                if (iterator == 1)
-                {
-                    data.Add(nextNode);
-                    nextNode = SetupNextNode(data.Last(), true);
-                    iterator += 2;
-                }
-                else
-                {
-                    int spiralSize = iterator; // Defines the size of the spiral layer
-                    int stepsInCurrentDirection = 0; // Tracks steps taken in current direction
-                    int stepsBeforeTurn = 1; // The number of steps before changing direction
-                    bool shouldIncreaseStepLimit = false; // Increases step limit every two turns
+                int spiralSize = iterator * iterator - 1 > 0 ? iterator * iterator - 1 : 1;
 
-                    for (int i = 0; i < spiralSize * spiralSize - 1; i++)
+
+                for (int i = 0; i < spiralSize; i++)
+                {
+                    var surroundingPositions = GetSurroundingPositions(currentNode);
+                    currentNode.Cost = data.Any() ? data
+                        .Where(x => surroundingPositions.Any(xx => xx.Equals(x)))
+                        .Select(x => x.Cost)
+                        .Sum() : 1;
+
+                    data.Add(currentNode);
+
+                    stepsInCurrentDirection++;
+
+                    if (stepsInCurrentDirection == stepsBeforeTurn)
                     {
-                        var surroundingPositions = GetSurroundingPositions(nextNode);
-                        nextNode.Cost = data
-                            .Where(x => surroundingPositions.Any(xx => xx.Equals(x)))
-                            .Select(x => x.Cost)
-                            .Sum();
+                        currentDirection = PivotDirection(currentDirection);
+                        stepsInCurrentDirection = 0;
+                        turnCounter++;
 
-                        data.Add(nextNode);
-
-                        stepsInCurrentDirection++;
-
-                        // Change direction when reaching the limit
-                        if (stepsInCurrentDirection == stepsBeforeTurn)
+                        if (turnCounter == 2)
                         {
-                            currentDirection = PivotDirection(data.Last().Direction);
-                            stepsInCurrentDirection = 0;
-
-                            // Increase step limit every two turns
-                            if (shouldIncreaseStepLimit)
-                            {
-                                stepsBeforeTurn++;
-                            }
-                            shouldIncreaseStepLimit = !shouldIncreaseStepLimit;
+                            stepsBeforeTurn++;
+                            turnCounter = 0;
                         }
-
-                        // Move to next node in the current direction
-                        nextNode = SetupNextNode(data.Last(), stepsInCurrentDirection == 0);
                     }
 
-
-
-                    //bool startOfNextSpiral = true;
-                    //var spiralSpace = _squares[iterator] - _squares[iterator - 2];
-                    //var spiralSideSpace = spiralSpace / 4;
-                    //while (spiralSpace != 0)
-                    //{
-                    //    var iterationSpiralSideSpace = spiralSideSpace;
-                    //    if (startOfNextSpiral)
-                    //    {
-                    //        iterationSpiralSideSpace--;
-                    //        spiralSpace--;
-                    //    }
-
-                    //    var surroundingPositions = GetSurroundingPositions(nextNode);
-                    //    nextNode.Cost = data.Where(x => surroundingPositions.Any(xx => xx.Equals(x))).Select(x => x.Cost).Sum();
-                    //    data.Add(nextNode);
-                    //    iterationSpiralSideSpace--; //Track how far we are along the side
-                    //    spiralSpace--; //Track how far we are along the whole space.
-
-                    //    nextNode = SetupNextNode(data.Last(), iterationSpiralSideSpace == 0);
-                    //    if (iterationSpiralSideSpace == 0)
-                    //        iterationSpiralSideSpace = spiralSideSpace;
-                    //    startOfNextSpiral = false;
-
-                    //}
+                    currentNode = SetupNextNode(currentNode, stepsInCurrentDirection == 0);
                 }
             }
 
@@ -233,7 +182,7 @@ Starting from the middle (1), the numbers follow a spiral pattern:
 
         Node ProcessPosition(Node corner, bool isNegative, bool isVertical, int iterator)
         {
-            var answerPosition = new Node() { X = corner.X, Y = corner.Y};
+            var answerPosition = new Node() { X = corner.X, Y = corner.Y };
             if (isNegative && isVertical)
             {
                 answerPosition.X = corner.X - iterator;
@@ -277,7 +226,7 @@ Starting from the middle (1), the numbers follow a spiral pattern:
                 case Direction.West:
                     nextNode.Y--;
                     break;
-                case Direction.South: 
+                case Direction.South:
                     nextNode.X++;
                     break;
                 case Direction.East:
@@ -290,13 +239,18 @@ Starting from the middle (1), the numbers follow a spiral pattern:
             return nextNode;
         }
 
-        Node[] GetSurroundingPositions(Node nextNode) 
+        Node[] GetSurroundingPositions(Node nextNode)
         {
             return
             [
-                new() { X = nextNode.X-1, Y = nextNode.Y-1 }, new() { X = nextNode.X-1, Y = nextNode.Y }, new() { X = nextNode.X-1, Y = nextNode.Y+1 },
-                new() { X = nextNode.X, Y = nextNode.Y-1 },                                               new() { X = nextNode.X, Y = nextNode.Y+1 },
-                new() { X = nextNode.X+1, Y = nextNode.Y-1 }, new() { X = nextNode.X+1, Y = nextNode.Y }, new() { X = nextNode.X+1, Y = nextNode.Y+1 },
+                new() { X = nextNode.X - 1, Y = nextNode.Y - 1 },
+                new() { X = nextNode.X - 1, Y = nextNode.Y },
+                new() { X = nextNode.X - 1, Y = nextNode.Y + 1 },
+                new() { X = nextNode.X, Y = nextNode.Y - 1 },
+                new() { X = nextNode.X, Y = nextNode.Y + 1 },
+                new() { X = nextNode.X + 1, Y = nextNode.Y - 1 },
+                new() { X = nextNode.X + 1, Y = nextNode.Y },
+                new() { X = nextNode.X + 1, Y = nextNode.Y + 1 },
             ];
         }
 
