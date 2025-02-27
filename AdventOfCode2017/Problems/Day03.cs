@@ -1,6 +1,8 @@
 ﻿using CommonTypes.CommonTypes.Classes;
+using CommonTypes.CommonTypes.Enums;
 using CommonTypes.CommonTypes.HelperFunctions;
 using CommonTypes.CommonTypes.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AdventOfCode2017.Problems
 {
@@ -43,7 +45,7 @@ namespace AdventOfCode2017.Problems
         #endregion
 
         #region Constructor
-        public Day03(string inputPath) 
+        public Day03(string inputPath)
         {
             _inputPath = inputPath;
             InitialiseProblem();
@@ -131,27 +133,56 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            /*
-Starting from the middle (1), the numbers follow a spiral pattern:
+            var iterator = 1;
+            var currentDirection = Direction.East;
+            var data = new List<Node>();
+            var currentNode = new Node { X = 0, Y = 0, Direction = currentDirection, Cost = 1 };
+            int turnCounter = 0;
+            int stepsBeforeTurn = 1;
+            int stepsInCurrentDirection = 0;
+            while (true)
+            {
+                if (data.Any() && data.Last().Cost > _puzzleNumber)
+                    break;
 
-    369601  363010  349975  330785  312453  295229  279138  266330  130654
-    739202   6591     6444    6155    5733    5336    5022   2450   128204
-            13486     147     142     133     122      59    2391   123363
-            14267     304       5       4       2      57    2275   116247
-            15252     330      10       1       1      54    2105   109476
-            16295     351      11      23      25      26    1968   103128
-            17008     362     747     806     880     931     957    98098
-            17370   35487   37402   39835   42452   45220   47108    48065
-
-*/
+                int spiralSize = iterator * iterator - 1 > 0 ? iterator * iterator - 1 : 1;
 
 
-            return (T)Convert.ChangeType(363010, typeof(T));
+                for (int i = 0; i < spiralSize; i++)
+                {
+                    var surroundingPositions = GetSurroundingPositions(currentNode);
+                    currentNode.Cost = data.Any() ? data
+                        .Where(x => surroundingPositions.Any(xx => xx.Equals(x)))
+                        .Select(x => x.Cost)
+                        .Sum() : 1;
+
+                    data.Add(currentNode);
+
+                    stepsInCurrentDirection++;
+
+                    if (stepsInCurrentDirection == stepsBeforeTurn)
+                    {
+                        currentDirection = PivotDirection(currentDirection);
+                        stepsInCurrentDirection = 0;
+                        turnCounter++;
+
+                        if (turnCounter == 2)
+                        {
+                            stepsBeforeTurn++;
+                            turnCounter = 0;
+                        }
+                    }
+
+                    currentNode = SetupNextNode(currentNode, stepsInCurrentDirection == 0);
+                }
+            }
+
+            return (T)Convert.ChangeType(data.Last().Cost, typeof(T));
         }
 
         Node ProcessPosition(Node corner, bool isNegative, bool isVertical, int iterator)
         {
-            var answerPosition = new Node() { X = corner.X, Y = corner.Y};
+            var answerPosition = new Node() { X = corner.X, Y = corner.Y };
             if (isNegative && isVertical)
             {
                 answerPosition.X = corner.X - iterator;
@@ -170,6 +201,57 @@ Starting from the middle (1), the numbers follow a spiral pattern:
             }
 
             return answerPosition;
+        }
+
+        Direction PivotDirection(Direction currentDirection)
+        {
+            if (currentDirection == Direction.East)
+                return Direction.North;
+            else if (currentDirection == Direction.North)
+                return Direction.West;
+            else if (currentDirection == Direction.West)
+                return Direction.South;
+            else
+                return Direction.East;
+        }
+
+        Node SetupNextNode(Node previousNode, bool pivot)
+        {
+            var nextNode = new Node() { X = previousNode.X, Y = previousNode.Y, Direction = previousNode.Direction };
+            switch (previousNode.Direction)
+            {
+                case Direction.North:
+                    nextNode.X--;
+                    break;
+                case Direction.West:
+                    nextNode.Y--;
+                    break;
+                case Direction.South:
+                    nextNode.X++;
+                    break;
+                case Direction.East:
+                    nextNode.Y++;
+                    break;
+            }
+            if (pivot)
+                nextNode.Direction = PivotDirection(previousNode.Direction);
+
+            return nextNode;
+        }
+
+        Node[] GetSurroundingPositions(Node nextNode)
+        {
+            return
+            [
+                new() { X = nextNode.X - 1, Y = nextNode.Y - 1 },
+                new() { X = nextNode.X - 1, Y = nextNode.Y },
+                new() { X = nextNode.X - 1, Y = nextNode.Y + 1 },
+                new() { X = nextNode.X, Y = nextNode.Y - 1 },
+                new() { X = nextNode.X, Y = nextNode.Y + 1 },
+                new() { X = nextNode.X + 1, Y = nextNode.Y - 1 },
+                new() { X = nextNode.X + 1, Y = nextNode.Y },
+                new() { X = nextNode.X + 1, Y = nextNode.Y + 1 },
+            ];
         }
 
         #endregion
