@@ -3,19 +3,21 @@ namespace AdventOfCode2016Tests
     [TestClass]
     public class Day20
     {
+        const string _basePath = "Inputs/Day20";
+        const string _baseTestName = "Day20Test";
         [TestMethod]
-        [DeploymentItem("Inputs/Day20/Day20Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part1_OutputsCorrectSmallestIPAddressValues_IsTrue()
         {
-            var instance = new AdventOfCode2016.Problems.Day20("Day20Test1.txt", 9);
+            var instance = new AdventOfCode2016.Problems.Day20($"{_baseTestName}1.txt", 9);
             instance.FirstResult.Should().Be(3);
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day20/Day20Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part2_OutputsCorrectValidIPAddressCount_IsTrue()
         {
-            var instance = new AdventOfCode2016.Problems.Day20("Day20Test1.txt", 9);
+            var instance = new AdventOfCode2016.Problems.Day20($"{_baseTestName}1.txt", 9);
             instance.SecondResult.Should().Be(2);
         }
     }
