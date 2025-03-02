@@ -125,61 +125,64 @@ namespace AdventOfCode2015.Problems
             _roboSantaPositions[0] = currentRoboSantaNode;
             var santaIterator = 1;
             var roboSantaIterator = 1;
-
-            for (int i = 0; i < _movements.Length; i++)
+            if (_santaPositions.Length > 1 && _roboSantaPositions.Length > 1)
             {
-                var movement = _movements[i];
-                if (i % 2 == 0)
+
+                for (int i = 0; i < _movements.Length; i++)
                 {
-                    var nextNode = new Node() { X = currentSantaNode.X, Y = currentSantaNode.Y };
-                    if (movement == '^')
+                    var movement = _movements[i];
+                    if (i % 2 == 0)
                     {
-                        nextNode.X = currentSantaNode.X + 1;
-                        _santaPositions[santaIterator] = nextNode;
-                    }
-                    else if (movement == '>')
-                    {
-                        nextNode.Y = currentSantaNode.Y + 1;
-                        _santaPositions[santaIterator] = nextNode;
-                    }
-                    else if (movement == 'v')
-                    {
-                        nextNode.X = currentSantaNode.X - 1;
-                        _santaPositions[santaIterator] = nextNode;
+                        var nextNode = new Node() { X = currentSantaNode.X, Y = currentSantaNode.Y };
+                        if (movement == '^')
+                        {
+                            nextNode.X = currentSantaNode.X + 1;
+                            _santaPositions[santaIterator] = nextNode;
+                        }
+                        else if (movement == '>')
+                        {
+                            nextNode.Y = currentSantaNode.Y + 1;
+                            _santaPositions[santaIterator] = nextNode;
+                        }
+                        else if (movement == 'v')
+                        {
+                            nextNode.X = currentSantaNode.X - 1;
+                            _santaPositions[santaIterator] = nextNode;
+                        }
+                        else
+                        {
+                            nextNode.Y = currentSantaNode.Y - 1;
+                            _santaPositions[santaIterator] = nextNode;
+                        }
+                        currentSantaNode = nextNode;
+                        santaIterator++;
                     }
                     else
                     {
-                        nextNode.Y = currentSantaNode.Y - 1;
-                        _santaPositions[santaIterator] = nextNode;
+                        var nextNode = new Node() { X = currentRoboSantaNode.X, Y = currentRoboSantaNode.Y };
+                        if (movement == '^')
+                        {
+                            nextNode.X = currentRoboSantaNode.X + 1;
+                            _roboSantaPositions[roboSantaIterator] = nextNode;
+                        }
+                        else if (movement == '>')
+                        {
+                            nextNode.Y = currentRoboSantaNode.Y + 1;
+                            _roboSantaPositions[roboSantaIterator] = nextNode;
+                        }
+                        else if (movement == 'v')
+                        {
+                            nextNode.X = currentRoboSantaNode.X - 1;
+                            _roboSantaPositions[roboSantaIterator] = nextNode;
+                        }
+                        else
+                        {
+                            nextNode.Y = currentRoboSantaNode.Y - 1;
+                            _roboSantaPositions[roboSantaIterator] = nextNode;
+                        }
+                        currentRoboSantaNode = nextNode;
+                        roboSantaIterator++;
                     }
-                    currentSantaNode = nextNode;
-                    santaIterator++;
-                }
-                else
-                {
-                    var nextNode = new Node() { X = currentRoboSantaNode.X, Y = currentRoboSantaNode.Y };
-                    if (movement == '^')
-                    {
-                        nextNode.X = currentRoboSantaNode.X + 1;
-                        _roboSantaPositions[roboSantaIterator] = nextNode;
-                    }
-                    else if (movement == '>')
-                    {
-                        nextNode.Y = currentRoboSantaNode.Y + 1;
-                        _roboSantaPositions[roboSantaIterator] = nextNode;
-                    }
-                    else if (movement == 'v')
-                    {
-                        nextNode.X = currentRoboSantaNode.X - 1;
-                        _roboSantaPositions[roboSantaIterator] = nextNode;
-                    }
-                    else
-                    {
-                        nextNode.Y = currentRoboSantaNode.Y - 1;
-                        _roboSantaPositions[roboSantaIterator] = nextNode;
-                    }
-                    currentRoboSantaNode = nextNode;
-                    roboSantaIterator++;
                 }
             }
             var allPositions = _santaPositions.Concat(_roboSantaPositions).ToArray();
