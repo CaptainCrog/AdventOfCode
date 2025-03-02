@@ -3,47 +3,49 @@ namespace AdventOfCode2015Tests
     [TestClass]
     public class Day03
     {
+        const string _basePath = "Inputs/Day03";
+        const string _baseTestName = "Day3Test";
         [TestMethod]
-        [DeploymentItem("Inputs/Day3/Day3Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part1_CalculatesDistinctHousePositionsFile1_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day03("Day3Test1.txt");
+            var instance = new AdventOfCode2015.Problems.Day03($"{_baseTestName}1.txt");
             instance.FirstResult.Should().Be(2);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day3/Day3Test2.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}2.txt")]
         public void Part1_CalculatesDistinctHousePositionsFile2_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day03("Day3Test2.txt");
+            var instance = new AdventOfCode2015.Problems.Day03($"{_baseTestName}2.txt");
             instance.FirstResult.Should().Be(4);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day3/Day3Test3.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}3.txt")]
         public void Part1_CalculatesDistinctHousePositionsFile3_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day03("Day3Test3.txt");
+            var instance = new AdventOfCode2015.Problems.Day03($"{_baseTestName}3.txt");
             instance.FirstResult.Should().Be(2);
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day3/Day3Test4.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}4.txt")]
         public void Part2_CalculatesDistinctHousePositionsFile4_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day03("Day3Test4.txt");
+            var instance = new AdventOfCode2015.Problems.Day03($"{_baseTestName}4.txt");
             instance.SecondResult.Should().Be(3);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day3/Day3Test2.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}2.txt")]
         public void Part2_CalculatesDistinctHousePositionsFile2_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day03("Day3Test2.txt");
+            var instance = new AdventOfCode2015.Problems.Day03($"{_baseTestName}2.txt");
             instance.SecondResult.Should().Be(3);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day3/Day3Test3.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}3.txt")]
         public void Part2_CalculatesDistinctHousePositionsFile3_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day03("Day3Test3.txt");
+            var instance = new AdventOfCode2015.Problems.Day03($"{_baseTestName}3.txt");
             instance.SecondResult.Should().Be(11);
         }
     }

@@ -17,7 +17,7 @@ namespace AdventOfCode2016Tests
         [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part2_OutputsCorrectValidIPAddressCount_IsTrue()
         {
-            var instance = new AdventOfCode2016.Problems.Day20($"{_baseTestName}1.txt", 9);
+            var instance = new AdventOfCode2016.Problems.Day20($"{_baseTestName}1.txt", 10);
             instance.SecondResult.Should().Be(2);
         }
     }

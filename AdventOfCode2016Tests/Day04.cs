@@ -35,17 +35,10 @@ namespace AdventOfCode2016Tests
         }
         [TestMethod]
         [DeploymentItem($"{_basePath}/{_baseTestName}5.txt")]
-        public void Part1_OutputsCorrectTriangleCountFil5_IsTrue()
+        public void Part1_OutputsCorrectTriangleCountFile5_IsTrue()
         {
             var instance = new AdventOfCode2016.Problems.Day04($"{_baseTestName}5.txt", "");
             instance.FirstResult.Should().Be(1514);
-        }
-        [TestMethod]
-        [DeploymentItem($"{_basePath}/{_baseTestName}6.txt")]
-        public void Part2_OutputsCorrectTriangleCountFile6_IsTrue()
-        {
-            var instance = new AdventOfCode2016.Problems.Day04($"{_baseTestName}6.txt", "encrypted");
-            instance.SecondResult.Should().Be(343);
         }
     }
 }

@@ -83,7 +83,9 @@ namespace AdventOfCode2016.Problems
 
         public  T SolveSecondProblem<T>() where T : IConvertible
         {
-            var totalDistanceMoved = Math.Abs(_firstIntersectPosition.Value.x) + Math.Abs(_firstIntersectPosition.Value.y);
+            var totalDistanceMoved = 0;
+            if (_firstIntersectPosition.HasValue)
+                totalDistanceMoved = Math.Abs(_firstIntersectPosition.Value.x) + Math.Abs(_firstIntersectPosition.Value.y);
             return (T)Convert.ChangeType(totalDistanceMoved, typeof(T));
         }
 

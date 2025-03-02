@@ -91,9 +91,12 @@ namespace AdventOfCode2017.Problems
             foreach (var row in _spreadsheetData)
             {
                 var combinations = ArrayHelperFunctions.GetAllCombinations(row).Where(x => x.Length == 2).ToArray();
-                var result = combinations.Where(x => (x[0] % x[1] == 0) || (x[1] % x[0] == 0)).Select(x => x).Single();
-                var division = result.Max() / result.Min();
-                sum += division;
+                var result = combinations.Where(x => (x[0] % x[1] == 0) || (x[1] % x[0] == 0)).Select(x => x).FirstOrDefault();
+                if (result != null)
+                {
+                    var division = result.Max() / result.Min();
+                    sum += division;
+                }
             }
 
             return (T)Convert.ChangeType(sum, typeof(T));
