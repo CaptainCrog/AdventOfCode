@@ -3,8 +3,10 @@ namespace AdventOfCode2024Tests
     [TestClass]
     public class Day08
     {
+        const string _basePath = "Inputs/Day08";
+        const string _baseTestName = "Day8Test";
         [TestMethod]
-        [DeploymentItem("Inputs/Day08/Day8Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part1_ProducesCorrectTotalOfUniqueAntinodesFile1_IsTrue()
         {
             var instance = new AdventOfCode2024.Problems.Day08("Day8Test1.txt");
@@ -12,7 +14,7 @@ namespace AdventOfCode2024Tests
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day08/Day8Test2.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}2.txt")]
         public void Part1_ProducesCorrectTotalOfUniqueAntinodesFile2_IsTrue()
         {
             var instance = new AdventOfCode2024.Problems.Day08("Day8Test2.txt");
@@ -20,7 +22,7 @@ namespace AdventOfCode2024Tests
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day08/Day8Test3.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}3.txt")]
         public void Part1_ProducesCorrectTotalOfUniqueAntinodesFile3_IsTrue()
         {
             var instance = new AdventOfCode2024.Problems.Day08("Day8Test3.txt");
@@ -28,7 +30,7 @@ namespace AdventOfCode2024Tests
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day08/Day8Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part2_ProducesCorrectTotalOfUniqueAntinodesFile1_IsTrue()
         {
             var instance = new AdventOfCode2024.Problems.Day08("Day8Test1.txt");
@@ -36,7 +38,7 @@ namespace AdventOfCode2024Tests
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day08/Day8Test4.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}4.txt")]
         public void Part2_ProducesCorrectTotalOfUniqueAntinodesFile4_IsTrue()
         {
             var instance = new AdventOfCode2024.Problems.Day08("Day8Test4.txt");

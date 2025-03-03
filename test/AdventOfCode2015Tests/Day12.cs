@@ -3,99 +3,101 @@ namespace AdventOfCode2015Tests
     [TestClass]
     public class Day12
     {
+        const string _basePath = "Inputs/Day12";
+        const string _baseTestName = "Day12Test";
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part1_CalculatesCorrectValueFile1_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test1.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}1.txt");
             instance.FirstResult.Should().Be(6);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test2.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}2.txt")]
         public void Part1_CalculatesCorrectValueFile2_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test2.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}2.txt");
             instance.FirstResult.Should().Be(6);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test3.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}3.txt")]
         public void Part1_CalculatesCorrectValueFile3_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test3.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}3.txt");
             instance.FirstResult.Should().Be(3);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test4.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}4.txt")]
         public void Part1_CalculatesCorrectValueFile4_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test4.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}4.txt");
             instance.FirstResult.Should().Be(3);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test5.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}5.txt")]
         public void Part1_CalculatesCorrectValueFile5_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test5.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}5.txt");
             instance.FirstResult.Should().Be(0);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test6.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}6.txt")]
         public void Part1_CalculatesCorrectValueFile6_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test6.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}6.txt");
             instance.FirstResult.Should().Be(0);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test7.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}7.txt")]
         public void Part1_CalculatesCorrectValueFile7_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test7.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}7.txt");
             instance.FirstResult.Should().Be(0);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test8.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}8.txt")]
         public void Part1_CalculatesCorrectValueFile8_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test8.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}8.txt");
             instance.FirstResult.Should().Be(0);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test9.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}9.txt")]
         public void Part1_CalculatesCorrectValueFile9_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test9.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}9.txt");
             instance.FirstResult.Should().Be(171);
         }
 
 
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part2_CalculatesCorrectValueFile1_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test1.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}1.txt");
             instance.SecondResult.Should().Be(6);
         }
 
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test10.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}10.txt")]
         public void Part2_CalculatesCorrectBulkDiscountPriceFile10_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test10.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}10.txt");
             instance.SecondResult.Should().Be(4);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test11.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}11.txt")]
         public void Part2_CalculatesCorrectBulkDiscountPriceFile11_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test11.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}11.txt");
             instance.SecondResult.Should().Be(0);
         }
         [TestMethod]
-        [DeploymentItem("Inputs/Day12/Day12Test12.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}12.txt")]
         public void Part2_CalculatesCorrectBulkDiscountPriceFile12_IsTrue()
         {
-            var instance = new AdventOfCode2015.Problems.Day12("Day12Test12.txt");
+            var instance = new AdventOfCode2015.Problems.Day12($"{_baseTestName}12.txt");
             instance.SecondResult.Should().Be(6);
         }
     }
