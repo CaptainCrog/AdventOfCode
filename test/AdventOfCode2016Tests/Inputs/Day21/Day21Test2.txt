@@ -1,0 +1,1 @@
+﻿rotate based on position of letter a
