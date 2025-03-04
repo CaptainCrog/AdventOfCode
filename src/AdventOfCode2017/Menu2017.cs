@@ -33,6 +33,8 @@ public static class Menu2017
                             _ = new Day05(@"..\..\..\..\AdventOfCode2017\Inputs\Puzzles\Day05Puzzle.txt");
                             break;
                         case 6:
+                            _ = new Day06(@"..\..\..\..\AdventOfCode2017\Inputs\Puzzles\Day06Puzzle.txt");
+                            break;
                         case 7:
                         case 8:
                         case 9:
