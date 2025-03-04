@@ -1,11 +1,13 @@
 name: .NET Core Desktop
-'on':
+
+on:
   push:
     branches:
       - master
   pull_request:
     branches:
       - master
+
 jobs:
   build:
     strategy:
@@ -29,16 +31,14 @@ jobs:
       - name: Setup MSBuild.exe
         uses: microsoft/setup-msbuild@v2
       - name: Restore the application
-        run: >-
-          msbuild $env:Solution_Name /t:Restore
-          /p:Configuration=$env:Configuration
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
         env:
-          Configuration: '${{ matrix.configuration }}'
+          Configuration: ${{ matrix.configuration }}
       - name: Build the application
-        run: 'msbuild $env:Solution_Name /p:Configuration=$env:Configuration'
+        run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration
         env:
-          Configuration: '${{ matrix.configuration }}'
+          Configuration: ${{ matrix.configuration }}
       - name: Execute unit tests
-        run: 'dotnet test $env:Test_Folder_Path --configuration $env:Configuration'
+        run: dotnet test $env:Test_Folder_Path --configuration $env:Configuration
         env:
-          Configuration: '${{ matrix.configuration }}'
+          Configuration: ${{ matrix.configuration }}
