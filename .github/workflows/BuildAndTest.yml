@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
     env:
       Solution_Name: AdventOfCode.sln
-      Test_Folder_Path: AdventOfCode\tests
+      Test_Folder_Path: AdventOfCode\test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
