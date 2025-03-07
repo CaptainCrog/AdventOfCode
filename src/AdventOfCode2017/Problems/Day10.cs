@@ -10,6 +10,7 @@ namespace AdventOfCode2017.Problems
         int _secondResult = 0;
         int[] _instructions = [];
         LinkedList<int> _numbers = [];
+        int[] _part2SuffixSequence = [17, 31, 73, 47, 23];
 
         #endregion
 
@@ -90,7 +91,30 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            var numbersCopy = new LinkedList<int>(_numbers);
+            var part2List = new LinkedList<int>();
+            for (int i = 0; i < _numbers.Count; i++)
+            {
+                part2List.AddLast(i.ToString().First());
+                if (i != _numbers.Count - 1)
+                    part2List.AddLast(44);
+            }
+
+            int numberIterator = 0;
+            int skipSize = 0;
+            for (int i = 0; i < _instructions.Length; i++)
+            {
+                var currentNumberIterator = numberIterator % part2List.Count;
+                var instruction = _instructions[i];
+                if (instruction > part2List.Count)
+                    continue;
+
+                var numberRange = GetNumberRange(currentNumberIterator, instruction, part2List);
+                var reversedRange = numberRange.Reverse().ToArray();
+                ReplaceNumbers(currentNumberIterator, reversedRange, part2List);
+                numberIterator += instruction + skipSize;
+                skipSize++;
+
+            }
 
             return (T)Convert.ChangeType(0, typeof(T));
         }
