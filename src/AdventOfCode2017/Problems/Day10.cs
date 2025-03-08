@@ -11,7 +11,6 @@ namespace AdventOfCode2017.Problems
         string _secondResult = string.Empty;
         string[] _instructions = [];
         LinkedList<int> _numbers = [];
-        int[] _part2SuffixSequence = [17, 31, 73, 47, 23];
 
         #endregion
 
