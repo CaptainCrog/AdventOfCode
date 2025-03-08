@@ -1,4 +1,5 @@
 ﻿using CommonTypes.CommonTypes.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode2017.Problems
 {
@@ -7,8 +8,8 @@ namespace AdventOfCode2017.Problems
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
-        int _secondResult = 0;
-        int[] _instructions = [];
+        string _secondResult = string.Empty;
+        string[] _instructions = [];
         LinkedList<int> _numbers = [];
         int[] _part2SuffixSequence = [17, 31, 73, 47, 23];
 
@@ -27,7 +28,7 @@ namespace AdventOfCode2017.Problems
                 }
             }
         }
-        public int SecondResult
+        public string SecondResult
         {
             get => _secondResult;
             set
@@ -47,7 +48,7 @@ namespace AdventOfCode2017.Problems
             _numbers = new LinkedList<int>(Enumerable.Range(0, listLength).ToArray());
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<int>();
+            SecondResult = SolveSecondProblem<string>();
             OutputSolution();
         }
         #endregion
@@ -56,7 +57,7 @@ namespace AdventOfCode2017.Problems
 
         public void InitialiseProblem()
         {
-            _instructions = File.ReadAllText(_inputPath).Split(',').Select(int.Parse).ToArray();
+            _instructions = Regex.Split(File.ReadAllText(_inputPath), @"(,)"); //.Split(',').Select(int.Parse).ToArray();
         }
 
         public void OutputSolution()
@@ -67,13 +68,14 @@ namespace AdventOfCode2017.Problems
 
         public T SolveFirstProblem<T>() where T : IConvertible
         {
+            int[] part1Instructions = _instructions.Where(x => int.TryParse(x, out _)).Select(int.Parse).ToArray();
             var numbersCopy = new LinkedList<int>(_numbers);
             int numberIterator = 0;
             int skipSize = 0;
-            for (int i = 0; i < _instructions.Length; i++)
+            for (int i = 0; i < part1Instructions.Length; i++)
             {
                 var currentNumberIterator = numberIterator % numbersCopy.Count;
-                var instruction = _instructions[i];
+                var instruction = part1Instructions[i];
                 if (instruction > numbersCopy.Count)
                     continue;
 
@@ -91,32 +93,37 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            var part2List = new LinkedList<int>();
-            for (int i = 0; i < _numbers.Count; i++)
-            {
-                part2List.AddLast(i.ToString().First());
-                if (i != _numbers.Count - 1)
-                    part2List.AddLast(44);
-            }
+            int[] part2Instructions = [.._instructions.SelectMany(x => x.ToCharArray()).Select(x => (int)x).ToArray(), 17, 31, 73, 47, 23];
+            var numbersCopy = new LinkedList<int>(_numbers);
+            List<int> denseHashes = new List<int>();
 
             int numberIterator = 0;
             int skipSize = 0;
-            for (int i = 0; i < _instructions.Length; i++)
+            for (int i = 0; i < 64; i++)
             {
-                var currentNumberIterator = numberIterator % part2List.Count;
-                var instruction = _instructions[i];
-                if (instruction > part2List.Count)
-                    continue;
+                for (int j= 0; j< part2Instructions.Length; j++)
+                {
+                    var currentNumberIterator = numberIterator % numbersCopy.Count;
+                    var instruction = part2Instructions[j];
+                    if (instruction > numbersCopy.Count)
+                        continue;
 
-                var numberRange = GetNumberRange(currentNumberIterator, instruction, part2List);
-                var reversedRange = numberRange.Reverse().ToArray();
-                ReplaceNumbers(currentNumberIterator, reversedRange, part2List);
-                numberIterator += instruction + skipSize;
-                skipSize++;
-
+                    var numberRange = GetNumberRange(currentNumberIterator, instruction, numbersCopy);
+                    var reversedRange = numberRange.Reverse().ToArray();
+                    ReplaceNumbers(currentNumberIterator, reversedRange, numbersCopy);
+                    numberIterator += instruction + skipSize;
+                    skipSize++;
+                }
             }
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            for (int i = 0; i < numbersCopy.Count; i += 16)
+            {
+                denseHashes.Add(ReduceSparseHash(numbersCopy.Skip(i).Take(16).ToArray()));
+            }
+
+            var result = string.Join(string.Empty, denseHashes.Select(x => x.ToString("X2"))).ToLower();
+
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         int[] GetNumberRange(int numberIterator, int instruction, LinkedList<int> numbers)
@@ -143,6 +150,16 @@ namespace AdventOfCode2017.Problems
                 currentNumberNode.ValueRef = reversedRange[i];
                 currentNumberNode = currentNumberNode.Next ?? numbers.First;
             }
+        }
+
+        int ReduceSparseHash(int[] sparseHash)
+        {
+            int denseHash = 0;
+            for (int i = 0; i < sparseHash.Length; i++)
+            {
+                denseHash ^= sparseHash[i];
+            }
+            return denseHash;
         }
         #endregion
     }
