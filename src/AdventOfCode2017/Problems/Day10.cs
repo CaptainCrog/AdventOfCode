@@ -56,7 +56,7 @@ namespace AdventOfCode2017.Problems
 
         public void InitialiseProblem()
         {
-            _instructions = Regex.Split(File.ReadAllText(_inputPath), @"(,)"); //.Split(',').Select(int.Parse).ToArray();
+            _instructions = Regex.Split(File.ReadAllText(_inputPath), @"(,)");
         }
 
         public void OutputSolution()
