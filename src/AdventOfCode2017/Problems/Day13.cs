@@ -74,12 +74,16 @@ namespace AdventOfCode2017.Problems
 
         public T SolveFirstProblem<T>() where T : IConvertible
         {
+            var firewallLevels = _firewallLevels.ToList();
             var totalSeverityScore = 0;
+            var currentPicosecond = -1;
             _currentDepth = -1;
-            while (_currentDepth < _firewallLevels.Last().Depth)
+            while (_currentDepth < firewallLevels.Last().Depth)
             {
                 _currentDepth++;
-                var depthSeverityScore = ProcessMovement(_firewallLevels);
+                var depthSeverityScore = ProcessMovement(firewallLevels, currentPicosecond);
+                currentPicosecond++;
+
                 if (depthSeverityScore.HasValue)
                     totalSeverityScore += depthSeverityScore.Value;
             }
@@ -89,44 +93,25 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            _firewallLevels.Where(x => x.CurrentScannerPosition.HasValue).ToList().ForEach(x => x.Reset());
+            var firewallLevels = _firewallLevels.ToList();
             _currentDepth = -1;
 
             var startingPicosecond = -1;
             var currentPicosecond = -1;
             var initialised = false;
-            Dictionary<int, List<FirewallLevel>> cachedStates = new() { {-1, _firewallLevels.ConvertAll(x => new FirewallLevel()
-            {
-                CurrentScannerPosition = x.CurrentScannerPosition,
-                Depth = x.Depth,
-                Range = x.Range,
-                ScannerMovementDirection = x.ScannerMovementDirection
-            })}};
-
-            List<FirewallLevel> currentFirewallState = new();
-            List<FirewallLevel> editableFirewallState = new();
             while (true)
             {
                 if (!initialised)
                 {
-                    currentFirewallState = cachedStates[startingPicosecond];
-                    editableFirewallState = currentFirewallState.ConvertAll(x => new FirewallLevel()
-                    {
-                        CurrentScannerPosition = x.CurrentScannerPosition,
-                        Depth = x.Depth,
-                        Range = x.Range,
-                        ScannerMovementDirection = x.ScannerMovementDirection
-                    });
                     currentPicosecond = startingPicosecond;
                     initialised = true;
                 }
                 _currentDepth++;
-                var depthSeverityScore = ProcessMovement(editableFirewallState);
+                var depthSeverityScore = ProcessMovement(firewallLevels, currentPicosecond);
 
                 currentPicosecond++;
-                cachedStates.TryAdd(currentPicosecond, editableFirewallState);
 
-                if (!depthSeverityScore.HasValue && _currentDepth == _firewallLevels.Last().Depth)
+                if (!depthSeverityScore.HasValue && _currentDepth == firewallLevels.Last().Depth)
                     break;
                 else if (depthSeverityScore.HasValue)
                 {
@@ -136,23 +121,89 @@ namespace AdventOfCode2017.Problems
                 }
             }
 
-
             return (T)Convert.ChangeType(startingPicosecond, typeof(T));
         }
 
-        int? ProcessMovement(List<FirewallLevel> firewallLevels)
+        int? ProcessMovement(List<FirewallLevel> firewallLevels, int currentPicosecond)
+        {
+            int? depthSeverityScore = null;
+            var firewallLevel = firewallLevels.First(x => x.Depth == _currentDepth);
+
+            if (firewallLevel.CurrentScannerPosition != null && GetScannerPosition(firewallLevel.Range, currentPicosecond) == 0)
+                depthSeverityScore = firewallLevel.Depth * firewallLevel.Range;
+
+            return depthSeverityScore;
+        }
+
+        int GetScannerPosition(int firewallRange, int currentPicosecond)
+        {
+            int scannerCycle = 2 * (firewallRange - 1); // Distance to move from top -> bottom -> top
+            int scannerPosition = currentPicosecond % scannerCycle;
+            return scannerPosition < firewallRange ? scannerPosition : scannerCycle - scannerPosition;
+        }
+
+
+        struct FirewallLevel
+        {
+            public required int Depth { get; init; }
+            public required int Range { get; init; }
+            public int? CurrentScannerPosition { get; set;}
+            public Direction? ScannerMovementDirection { get; set; }
+        }
+
+        /// <summary>
+        /// Keeping this for posterity as this brute force approach provided me the answer for part 2, however in the spirit of speed I am looking into a faster approach using modular arithmetic
+        /// </summary>
+        [Obsolete]
+        void OriginalImplementationPart2()
+        {
+            var firewallLevels = _firewallLevels.ToList();
+            _currentDepth = -1;
+
+            var startingPicosecond = -1;
+            var currentPicosecond = -1;
+            var initialised = false;
+            Dictionary<int, List<FirewallLevel>> cachedStates = new() { { -1, firewallLevels } };
+
+            List<FirewallLevel> editableFirewallState = new();
+            while (true)
+            {
+                if (!initialised)
+                {
+                    editableFirewallState = cachedStates[startingPicosecond].ToList();
+                    currentPicosecond = startingPicosecond;
+                    initialised = true;
+                }
+                _currentDepth++;
+                var depthSeverityScore = OriginalImplementationProcessMovement(ref editableFirewallState);
+
+                currentPicosecond++;
+                cachedStates.TryAdd(currentPicosecond, editableFirewallState.ToList());
+
+                if (!depthSeverityScore.HasValue && _currentDepth == firewallLevels.Last().Depth)
+                    break;
+                else if (depthSeverityScore.HasValue)
+                {
+                    _currentDepth = -1;
+                    startingPicosecond++;
+                    initialised = false;
+                }
+            }
+        }
+        [Obsolete]
+        int? OriginalImplementationProcessMovement(ref List<FirewallLevel> firewallLevels)
         {
             int? depthSeverityScore = null;
             var firewallLevel = firewallLevels.Where(x => x.Depth == _currentDepth).Single();
             if (firewallLevel.CurrentScannerPosition == 1)
                 depthSeverityScore = firewallLevel.Depth * firewallLevel.Range;
 
-            firewallLevels.ForEach(MoveScanner);
+            firewallLevels = firewallLevels.Select(MoveScanner).ToList();
 
             return depthSeverityScore;
         }
-
-        void MoveScanner(FirewallLevel firewallLevel)
+        [Obsolete]
+        FirewallLevel MoveScanner(FirewallLevel firewallLevel)
         {
             if (firewallLevel.ScannerMovementDirection == Direction.South)
                 firewallLevel.CurrentScannerPosition++;
@@ -163,26 +214,10 @@ namespace AdventOfCode2017.Problems
                 firewallLevel.ScannerMovementDirection = Direction.North;
             else if (firewallLevel.CurrentScannerPosition == 1)
                 firewallLevel.ScannerMovementDirection = Direction.South;
+
+            return firewallLevel;
         }
 
-        class FirewallLevel
-        {
-            public required int Depth { get; init; }
-            public required int Range { get; init; }
-            public int? CurrentScannerPosition { get; set;}
-            public Direction? ScannerMovementDirection { get; set; }
-
-            public FirewallLevel()
-            {
-
-            }
-
-            public void Reset()
-            {
-                ScannerMovementDirection = Direction.South;
-                CurrentScannerPosition = 1;
-            }
-        }
         #endregion
     }
 }
