@@ -17,7 +17,7 @@ namespace AdventOfCode2017Tests
         public void Part2_OutputsCorrectValueFile1_IsTrue()
         {
             var instance = new AdventOfCode2017.Problems.Day14($"{_baseTestName}1.txt");
-            instance.SecondResult.Should().Be("10");
+            instance.SecondResult.Should().Be(1242);
         }
     }
 }
