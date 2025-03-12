@@ -1,4 +1,6 @@
-﻿using CommonTypes.CommonTypes.Interfaces;
+﻿using AdventOfCode2017.CommonInternalTypes;
+using CommonTypes.CommonTypes.HelperFunctions;
+using CommonTypes.CommonTypes.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2017.Problems
@@ -92,32 +94,15 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            int[] part2Instructions = [.._instructions.SelectMany(x => x.ToCharArray()).Select(x => (int)x).ToArray(), 17, 31, 73, 47, 23];
+            int[] part2Instructions = [..ArrayHelperFunctions.GetAsciiValues(_instructions), 17, 31, 73, 47, 23];
             var numbersCopy = new LinkedList<int>(_numbers);
+            numbersCopy = KnotHashing.CreateSparseHash(part2Instructions, numbersCopy);
+
+
             List<int> denseHashes = new List<int>();
-
-            int numberIterator = 0;
-            int skipSize = 0;
-            for (int i = 0; i < 64; i++)
-            {
-                for (int j= 0; j< part2Instructions.Length; j++)
-                {
-                    var currentNumberIterator = numberIterator % numbersCopy.Count;
-                    var instruction = part2Instructions[j];
-                    if (instruction > numbersCopy.Count)
-                        continue;
-
-                    var numberRange = GetNumberRange(currentNumberIterator, instruction, numbersCopy);
-                    var reversedRange = numberRange.Reverse().ToArray();
-                    ReplaceNumbers(currentNumberIterator, reversedRange, numbersCopy);
-                    numberIterator += instruction + skipSize;
-                    skipSize++;
-                }
-            }
-
             for (int i = 0; i < numbersCopy.Count; i += 16)
             {
-                denseHashes.Add(ReduceSparseHash(numbersCopy.Skip(i).Take(16).ToArray()));
+                denseHashes.Add(KnotHashing.ReduceSparseHash(numbersCopy.Skip(i).Take(16).ToArray()));
             }
 
             var result = string.Join(string.Empty, denseHashes.Select(x => x.ToString("X2"))).ToLower();
@@ -149,16 +134,6 @@ namespace AdventOfCode2017.Problems
                 currentNumberNode.ValueRef = reversedRange[i];
                 currentNumberNode = currentNumberNode.Next ?? numbers.First;
             }
-        }
-
-        int ReduceSparseHash(int[] sparseHash)
-        {
-            int denseHash = 0;
-            for (int i = 0; i < sparseHash.Length; i++)
-            {
-                denseHash ^= sparseHash[i];
-            }
-            return denseHash;
         }
         #endregion
     }
