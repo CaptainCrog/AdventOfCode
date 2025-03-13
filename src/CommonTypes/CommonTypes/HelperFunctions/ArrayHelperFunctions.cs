@@ -126,5 +126,11 @@
 
             return result;
         }
+
+
+        public static int[] GetAsciiValues(string[] source)
+        {
+            return source.SelectMany(x => x.ToCharArray()).Select(x => (int)x).ToArray();
+        }
     }
 }
