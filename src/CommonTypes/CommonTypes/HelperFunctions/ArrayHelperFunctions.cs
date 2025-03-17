@@ -49,6 +49,17 @@
                              .ToArray();
         }
 
+        public static T[] SwapPositions<T>(T[] array, int firstPosition, int secondPosition)
+        {
+            var store = array[firstPosition];
+            array[firstPosition] = array[secondPosition];
+            array[secondPosition] = store;
+            return array;
+        }
+
+        public static T[] SwapValues<T>(T[] array, T firstValue, T secondValue)
+            => SwapPositions(array, Array.IndexOf(array, firstValue), Array.IndexOf(array, secondValue));
+
         public static IEnumerable<T[]> GetAllCombinations<T>(T[] source)
         {
             for (var i = 0; i < (1 << source.Count()); i++)
