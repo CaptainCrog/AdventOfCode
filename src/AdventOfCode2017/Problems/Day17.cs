@@ -9,7 +9,7 @@ namespace AdventOfCode2017.Problems
         #region Fields
         string _inputPath = string.Empty;
         int _firstResult = 0;
-        string _secondResult = string.Empty;
+        int _secondResult = 0;
         int _stepsToTake = 0;
         List<int> _spinLock = new() { 0 };
         int _currentPosition = 0;
@@ -31,7 +31,7 @@ namespace AdventOfCode2017.Problems
                 }
             }
         }
-        public string SecondResult
+        public int SecondResult
         {
             get => _secondResult;
             set
@@ -50,7 +50,7 @@ namespace AdventOfCode2017.Problems
             _inputPath = inputPath;
             InitialiseProblem();
             FirstResult = SolveFirstProblem<int>();
-            SecondResult = SolveSecondProblem<string>();
+            SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
         #endregion
@@ -82,15 +82,20 @@ namespace AdventOfCode2017.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            for (int i = 2018; i <= 50000000; i++)
+            int currentPosition = 0;
+            int result = 0;
+
+            for (int i = 1; i <= 50000000; i++)
             {
-                ProcessSpinlock(i);
+                currentPosition = (currentPosition + _stepsToTake) % i + 1;
+                if (currentPosition == 1)
+                {
+                    result = i;
+                }
             }
 
-            var result = Array.IndexOf(_spinLock.ToArray(), 0);
-            return (T)Convert.ChangeType("", typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
-        //Each element processed has a difference of 381 from the previous
         void ProcessSpinlock(int indexValue)
         {
             _currentPosition += _stepsToTake;
