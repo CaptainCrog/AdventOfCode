@@ -13,11 +13,11 @@ namespace AdventOfCode2017Tests
             instance.FirstResult.Should().Be(4);
         }
         [TestMethod]
-        [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
+        [DeploymentItem($"{_basePath}/{_baseTestName}2.txt")]
         public void Part2_OutputsCorrectValueFile1_IsTrue()
         {
-            var instance = new AdventOfCode2017.Problems.Day18($"{_baseTestName}1.txt");
-            instance.SecondResult.Should().Be(309);
+            var instance = new AdventOfCode2017.Problems.Day18($"{_baseTestName}2.txt");
+            instance.SecondResult.Should().Be(3);
         }
     }
 }
