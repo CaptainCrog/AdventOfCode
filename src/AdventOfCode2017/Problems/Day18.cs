@@ -199,7 +199,7 @@ namespace AdventOfCode2017.Problems
                         break;
 
                     case "jgz":
-                        if (AddOrGetRegister(ref currentRegisters, registerKey) > 0)
+                        if (AddOrGetRegister(ref currentRegisters, registerKey) > 0) //The input can be number number not just register number, so I need to add something here to factor that in
                         {
                             i += registerAdjustment - 1;
                         }
