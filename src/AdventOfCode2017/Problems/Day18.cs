@@ -102,7 +102,8 @@ namespace AdventOfCode2017.Problems
                             recovered = true;
                         break;
                     case "jgz":
-                        if (AddOrGetRegister(ref registers, registerKey) > 0)
+                        var registerValue = int.TryParse(registerKey, out int _) ? int.Parse(registerKey) : AddOrGetRegister(ref registers, registerKey);
+                        if (registerValue > 0)
                         {
                             i += registerAdjustment - 1;
                         }
@@ -125,8 +126,6 @@ namespace AdventOfCode2017.Problems
             Queue<(long, long)> indexHistory = new();
             var program0Registers = new Dictionary<string, long>() { { "p", 0 } };
             var program1Registers = new Dictionary<string, long>() { { "p", 1 } };
-            long prevRcvInstructionIndexProgram0 = 0;
-            long prevRcvInstructionIndexProgram1 = 0;
             long lastInstructionIndexProgram0 = 0;
             long lastInstructionIndexProgram1 = 0;
             bool isProgram0 = true;
@@ -199,7 +198,8 @@ namespace AdventOfCode2017.Problems
                         break;
 
                     case "jgz":
-                        if (AddOrGetRegister(ref currentRegisters, registerKey) > 0) //The input can be number number not just register number, so I need to add something here to factor that in
+                        var registerValue = int.TryParse(registerKey, out int _) ? int.Parse(registerKey) : AddOrGetRegister(ref currentRegisters, registerKey);
+                        if (registerValue > 0)
                         {
                             i += registerAdjustment - 1;
                         }
@@ -212,7 +212,6 @@ namespace AdventOfCode2017.Problems
             }
 
             return (T)Convert.ChangeType(result, typeof(T));
-            //537 too low
         }
 
         long AddOrGetRegister(ref Dictionary<string, long> registers, string registerKey)
