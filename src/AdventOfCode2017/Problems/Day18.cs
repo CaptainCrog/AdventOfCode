@@ -1,10 +1,4 @@
-﻿using AdventOfCode2017.CommonInternalTypes;
-using CommonTypes.CommonTypes.ExtensionMethods;
-using CommonTypes.CommonTypes.HelperFunctions;
-using CommonTypes.CommonTypes.Interfaces;
-using CommonTypes.CommonTypes.Regex;
-using Microsoft.Win32;
-using System.Text.RegularExpressions;
+﻿using CommonTypes.CommonTypes.Interfaces;
 
 namespace AdventOfCode2017.Problems
 {
