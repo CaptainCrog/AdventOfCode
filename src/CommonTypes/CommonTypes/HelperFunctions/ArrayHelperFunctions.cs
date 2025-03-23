@@ -143,5 +143,13 @@
         {
             return source.SelectMany(x => x.ToCharArray()).Select(x => (int)x).ToArray();
         }
+
+        public static bool In2DArrayBounds<T>(T[,] array, int x, int y)
+        {
+            if (x < array.GetLowerBound(0) || x > array.GetUpperBound(0) ||
+                y < array.GetLowerBound(1) || y > array.GetUpperBound(1))
+                return false;
+            return true;
+        }
     }
 }
