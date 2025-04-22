@@ -90,6 +90,8 @@ public static class Menu2017
                             _ = new Day24(@"..\..\..\..\AdventOfCode2017\Inputs\Puzzles\Day24Puzzle.txt");
                             break;
                         case 25:
+                            _ = new Day25(@"..\..\..\..\AdventOfCode2017\Inputs\Puzzles\Day25Puzzle.txt");
+                            break;
                         default:
                             Console.WriteLine("Option is out of bound or unavailable at the moment");
                             break;
