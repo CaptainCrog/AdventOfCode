@@ -26,7 +26,7 @@
                                 Menu2017.Main([]);
                                 break;
                             case 18:
-                                Console.WriteLine("Option is out of bound or unavailable at the moment");
+                                Menu2018.Main([]);
                                 break;
                             case 19:
                                 Console.WriteLine("Option is out of bound or unavailable at the moment");
