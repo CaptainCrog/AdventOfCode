@@ -89,9 +89,23 @@ namespace AdventOfCode2018.Problems
 
             foreach(var pair in potentialPairs)
             {
-                var differences = pair.Item1.Except(pair.Item2);
-                if (differences.Count() == 1)
-                    result = string.Join("", pair.Item1.Intersect(pair.Item2));
+                var differences = 0;
+                var tempResult = string.Empty;
+                for (int i = 0; i < pair.Item1.Length; i++)
+                {
+                    if (pair.Item1[i] != pair.Item2[i])
+                        differences++;
+                    else
+                        tempResult += pair.Item1[i];
+                    if (differences > 1)
+                        continue;
+                }
+                if (differences == 1)
+                {
+                    result = tempResult;
+                    break;
+                }
+
             }
 
 
