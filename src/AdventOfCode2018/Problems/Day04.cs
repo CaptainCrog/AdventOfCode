@@ -67,11 +67,10 @@ namespace AdventOfCode2018.Problems
             //var temp = new DateTime(1518,11,01, 0,5)
         }
 
-        //Read in the inputs, order them chronologically ✅
-        //Calculate each guards total time asleep in minutes
-        //Store each shift as a separate time frame
-        //Select guard with most time asleep
-        //Find the best overlapping point where the guard will most likely be asleep
+        //Read in the inputs, order them chronologically
+        //Store each minute the guard is asleep in a given shift
+        //Calculate and select guard with most time asleep
+        //Group by the minutes spent asleep and select the minute with the most time asleep
 
         public  T SolveFirstProblem<T>() where T : IConvertible
         {
@@ -86,28 +85,40 @@ namespace AdventOfCode2018.Problems
                         _guards.Add(new Guard(guardId));
 
                     selectedGuard = _guards.Where(x => x.Id == guardId).Single();
-                    selectedGuard.Shifts.Add(new Shift(guardEvent.Key.Date));
-                    selectedShift = selectedGuard.Shifts.Where(x => x.Date == guardEvent.Key.Date).Single();
+                    selectedGuard.Shifts.Add(new Shift(guardEvent.Key));
+                    selectedShift = selectedGuard.Shifts.Where(x => x.ShiftStart == guardEvent.Key).Single();
                 }
                 else if (guardEvent.Value.Contains("falls"))
                 {
-                    selectedShift.ShiftPatterns.Add((guardEvent.Key.TimeOfDay, true));
+                    selectedShift.ShiftPatterns.Add((guardEvent.Key, true));
                 }
                 else
                 {
-                    selectedShift.ShiftPatterns.Add((guardEvent.Key.TimeOfDay, false));
+                    var asleepStart = selectedShift.ShiftPatterns.Last().Item1.Minute;
+                    for (int i = asleepStart; i < guardEvent.Key.Minute; i++)
+                    {
+                        selectedShift.MinutesAsleep.Add(i);
+                    }
+                    selectedShift.ShiftPatterns.Add((guardEvent.Key, false));
                 }
             }
+            var longestGuardAsleep = _guards.Where(x => x.Id == _guards.ToDictionary(g => g.Id, g => g.Shifts.SelectMany(s => s.MinutesAsleep).Count()).MaxBy(x => x.Value).Key).First();
+            var mostCommonMinute = longestGuardAsleep.Shifts.SelectMany(s => s.MinutesAsleep).GroupBy(m => m).OrderByDescending(x => x.Count()).First();
 
 
+            var result = mostCommonMinute.Key * longestGuardAsleep.Id;
 
-            return (T)Convert.ChangeType(0, typeof(T));
+
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public  T SolveSecondProblem<T>() where T : IConvertible
         {
+            var guardSleepDictionary = _guards.ToDictionary(g => g.Id, g => g.Shifts.SelectMany(s => s.MinutesAsleep).GroupBy(m => m).ToDictionary(x => x.Key, x => x.Count()));
+            var guardsLongestSleepMinute = guardSleepDictionary.Where(x => x.Value.Values.Count > 0).Select(x => x.Value.OrderByDescending(xx => xx.Value).Select(xx => (x.Key, xx.Key, xx.Value)).First()).ToList();
+            var result = guardsLongestSleepMinute.OrderByDescending(x => x.Item3).Select(xx => xx.Item1 * xx.Item2).First();
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(result, typeof(T));
         }
 
         public  void OutputSolution()
@@ -131,13 +142,15 @@ namespace AdventOfCode2018.Problems
 
         class Shift
         {
-            public DateTime Date { get; set; }
-            public List<(TimeSpan, bool)> ShiftPatterns { get; set; }
+            public DateTime ShiftStart { get; set; }
+            public List<(DateTime, bool)> ShiftPatterns { get; set; }
+            public List<int> MinutesAsleep { get; set; }
 
-            public Shift(DateTime date)
+            public Shift(DateTime shiftStart)
             {
-                Date = date;
-                ShiftPatterns = new List<(TimeSpan, bool)>();
+                ShiftStart = shiftStart;
+                ShiftPatterns = new List<(DateTime, bool)>();
+                MinutesAsleep = new List<int>();
             }
         }
     }

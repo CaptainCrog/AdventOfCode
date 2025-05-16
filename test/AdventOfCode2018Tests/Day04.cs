@@ -16,10 +16,10 @@ namespace AdventOfCode2018Tests
 
         [TestMethod]
         [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
-        public void Part2_OutputsCorrectCommonCharsFile2_IsTrue()
+        public void Part2_OutputsCorrectAnswerFile1_IsTrue()
         {
             var instance = new AdventOfCode2018.Problems.Day04($"{_baseTestName}1.txt");
-            instance.SecondResult.Should().Be(4);
+            instance.SecondResult.Should().Be(4455);
         }
     }
 }
