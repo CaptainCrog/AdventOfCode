@@ -1,8 +1,5 @@
-﻿using CommonTypes.CommonTypes.HelperFunctions;
-using CommonTypes.CommonTypes.Interfaces;
+﻿using CommonTypes.CommonTypes.Interfaces;
 using CommonTypes.CommonTypes.Regex;
-using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2018.Problems
