@@ -30,6 +30,8 @@ public static class Menu2018
                             _ = new Day04(@$"{_basePath}\Day04Puzzle.txt");
                             break;
                         case 5:
+                            _ = new Day05(@$"{_basePath}\Day05Puzzle.txt");
+                            break;
                         case 6:
                         case 7:
                         case 8:
