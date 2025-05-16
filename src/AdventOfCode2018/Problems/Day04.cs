@@ -64,7 +64,6 @@ namespace AdventOfCode2018.Problems
                 _orderedEventsDictionary.Add(new DateTime(int.Parse(matches[0].Value), int.Parse(matches[1].Value), int.Parse(matches[2].Value), int.Parse(matches[3].Value), int.Parse(matches[4].Value), 0), line.Split("] ").Last());
             }
             _orderedEventsDictionary = _orderedEventsDictionary.OrderBy(x => x.Key).ToDictionary();
-            //var temp = new DateTime(1518,11,01, 0,5)
         }
 
         //Read in the inputs, order them chronologically
