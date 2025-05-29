@@ -10,7 +10,7 @@ namespace AdventOfCode2018Tests
         [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part1_OutputsCorrectAnswerFile1_IsTrue()
         {
-            var instance = new AdventOfCode2018.Problems.Day06($"{_baseTestName}1.txt");
+            var instance = new AdventOfCode2018.Problems.Day06($"{_baseTestName}1.txt", 32);
             instance.FirstResult.Should().Be(17);
         }
 
@@ -18,8 +18,8 @@ namespace AdventOfCode2018Tests
         [DeploymentItem($"{_basePath}/{_baseTestName}1.txt")]
         public void Part2_OutputsCorrectAnswerFile1_IsTrue()
         {
-            var instance = new AdventOfCode2018.Problems.Day06($"{_baseTestName}1.txt");
-            instance.SecondResult.Should().Be(4);
+            var instance = new AdventOfCode2018.Problems.Day06($"{_baseTestName}1.txt", 32);
+            instance.SecondResult.Should().Be(16);
         }
     }
 }
