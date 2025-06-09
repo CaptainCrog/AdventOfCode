@@ -107,25 +107,53 @@ namespace AdventOfCode2018.Problems
 
         public T SolveSecondProblem<T>() where T : IConvertible
         {
-            int startTime = -1;
+            int timer = 0;
             for (int i = 0; i < _sleighWorkerCount; i ++)
             {
-                _sleighWorkers.Add(new SleighWorker());
+                _sleighWorkers.Add(new SleighWorker(i+1));
             }
 
             var stepStateCopy = _stepState.ToDictionary();
             while (stepStateCopy.Any(x => x.Value != StepState.Complete))
             {
-                startTime++;
-                var availableSteps = stepStateCopy.Where(x => x.Value == StepState.Available).Select(x => x.Key).ToList();
-                var availableWorkers = _sleighWorkers.Where(x => x.AssignedChar == null).ToList();
-                foreach (var availableStep in availableSteps) 
+                //startTime++;
+                var availableSteps = stepStateCopy.Where(x => x.Value == StepState.Available).Select(x => x.Key).Order().ToList();
+                foreach (var availableStep in availableSteps)
                 {
-                    
+                    var availableWorker = _sleighWorkers.Where(x => x.AssignedChar == null).OrderBy(x => x.WorkerId).FirstOrDefault();
+                    if (availableWorker != null) 
+                    {
+                        availableWorker.AssignedChar = availableStep;
+                        availableWorker.InstructionTime = (char.ToUpper(availableStep) - 64) + _instructionTime;
+                        stepStateCopy[availableStep] = StepState.InProgress;
+                    }
                 }
+
+                var assignedWorkers = _sleighWorkers.Where(x => x.AssignedChar != null).ToList();
+                foreach (var assignedWorker in assignedWorkers)
+                {
+                    assignedWorker.InstructionTime--;
+                    if (assignedWorker.InstructionTime == 0)
+                    {
+                        stepStateCopy[assignedWorker.AssignedChar.Value] = StepState.Complete;
+                        if (_stepRules.TryGetValue(assignedWorker.AssignedChar.Value, out var nextSteps))
+                        {
+                            foreach (var nextStep in nextSteps)
+                            {
+                                var connectedStepStates = _stepRules.Where(x => x.Value.Contains(nextStep)).Select(xx => stepStateCopy[xx.Key]).ToList();
+
+                                if (connectedStepStates.All(x => x == StepState.Complete))
+                                    stepStateCopy[nextStep] = StepState.Available;
+                            }
+                        }
+
+                        assignedWorker.AssignedChar = null;
+                    }
+                }
+                timer++;
             }
 
-            return (T)Convert.ChangeType(0, typeof(T));
+            return (T)Convert.ChangeType(timer, typeof(T));
         }
 
         public void OutputSolution()
@@ -142,16 +170,18 @@ namespace AdventOfCode2018.Problems
             Unavailable = 0,
             Available = 1,
             Complete = 2,
+            InProgress = 3,
         }
 
         class SleighWorker
         {
+            public int WorkerId { get; set; }
             public char? AssignedChar { get; set; }
             public int InstructionTime { get; set; }
 
-            public SleighWorker() 
+            public SleighWorker(int workerId) 
             { 
-
+                WorkerId = workerId;
             }
         }
 
