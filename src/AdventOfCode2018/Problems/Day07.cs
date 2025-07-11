@@ -116,7 +116,6 @@ namespace AdventOfCode2018.Problems
             var stepStateCopy = _stepState.ToDictionary();
             while (stepStateCopy.Any(x => x.Value != StepState.Complete))
             {
-                //startTime++;
                 var availableSteps = stepStateCopy.Where(x => x.Value == StepState.Available).Select(x => x.Key).Order().ToList();
                 foreach (var availableStep in availableSteps)
                 {
