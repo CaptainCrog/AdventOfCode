@@ -46,6 +46,9 @@
                             case 24:
                                 Menu2024.Main([]);
                                 break;
+                            case 25:
+                                Menu2025.Main([]);
+                                break;
                             default:
                                 Console.WriteLine("Option is out of bound or unavailable at the moment");
                                 break;
