@@ -364,4 +364,3 @@ FodyWeavers.xsd
 
 !test/**/*.txt
 src/**/*.txt
-/AdventOfCode2025/Inputs/Puzzles
