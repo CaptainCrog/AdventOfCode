@@ -65,7 +65,7 @@ namespace AdventOfCode2025.Problems
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
-        //1029
+
         public  T SolveSecondProblem<T>() where T : IConvertible
         {
             int result = 0;
@@ -74,21 +74,33 @@ namespace AdventOfCode2025.Problems
             foreach (var line in _input)
             {
                 int value = int.Parse(line.Substring(1));
-                var isLeft = line.First() == 'L';
-                int stepsUntilZero = (100 - currentPosition) % 100;
-                int kFirst = (stepsUntilZero == 0) ? 100 : stepsUntilZero;
+                bool isLeft = line.First() == 'L';
 
-                if (value >= kFirst)
+                int stepsUntilZero;
+
+                if (isLeft)
                 {
-                    result += 1 + (value - kFirst) / 100;
+                    // Moving left toward lower numbers
+                    stepsUntilZero = currentPosition == 0 ? 0 : currentPosition;
+                }
+                else
+                {
+                    // Moving right toward higher numbers
+                    stepsUntilZero = (100 - currentPosition) % 100;
                 }
 
-                currentPosition = isLeft ? Mod(currentPosition - value, 100) : Mod(currentPosition + value, 100);
+                int kFirst = stepsUntilZero == 0 ? 100 : stepsUntilZero;
+
+                if (value >= kFirst)
+                    result += 1 + (value - kFirst) / 100;
+
+                currentPosition = isLeft
+                    ? Mod(currentPosition - value, 100)
+                    : Mod(currentPosition + value, 100);
             }
 
             return (T)Convert.ChangeType(result, typeof(T));
         }
-        //5611 - too low
 
         public  void OutputSolution()
         {
@@ -104,7 +116,8 @@ namespace AdventOfCode2025.Problems
             SecondResult = SolveSecondProblem<int>();
             OutputSolution();
         }
-        int Mod(int x, int m)
+
+        static int Mod(int x, int m)
         {
             return (x % m + m) % m;
         }
