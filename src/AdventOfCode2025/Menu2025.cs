@@ -6,7 +6,7 @@ public static class Menu2025
     {
         while (true)
         {
-            Console.WriteLine("Choose which problem to solve (Options between 1 - 25)");
+            Console.WriteLine("Choose which problem to solve (Options between 1 - 12)");
             Console.WriteLine("Press Q to return to the main menu");
             var choiceRaw = Console.ReadLine();
             if (choiceRaw != null)
@@ -20,7 +20,7 @@ public static class Menu2025
                             _ = new Day01(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day01Puzzle.txt");
                             break;
                         case 2:
-                            //_ = new Day02(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day02Puzzle.txt");
+                            _ = new Day02(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day02Puzzle.txt");
                             break;
                         case 3:
                             //_ = new Day03(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day03Puzzle.txt");
@@ -51,45 +51,6 @@ public static class Menu2025
                             break;
                         case 12:
                           //  _ = new Day12(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day12Puzzle.txt");
-                            break;
-                        case 13:
-                           // _ = new Day13(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day13Puzzle.txt");
-                            break;
-                        case 14:
-                           // _ = new Day14(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day14Puzzle.txt", (103, 101));
-                            break;
-                        case 15:
-                          //  _ = new Day15(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day15Puzzle.txt");
-                            break;
-                        case 16:
-                           // _ = new Day16(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day16Puzzle.txt");
-                            break;
-                        case 17:
-                           // _ = new Day17(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day17Puzzle.txt");
-                            break;
-                        case 18:
-                           // _ = new Day18(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day18Puzzle.txt", 1024);
-                            break;
-                        case 19:
-                           // _ = new Day19(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day19Puzzle.txt");
-                            break;
-                        case 20:
-                          //  _ = new Day20(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day20Puzzle.txt", 100);
-                            break;
-                        case 21:
-                          //  _ = new Day21(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day21Puzzle.txt");
-                            break;
-                        case 22:
-                           // _ = new Day22(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day22Puzzle.txt");
-                            break;
-                        case 23:
-                           // _ = new Day23(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day23Puzzle.txt");
-                            break;
-                        case 24:
-                          //  _ = new Day24(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day24Puzzle.txt", "z45");
-                            break;
-                        case 25:
-                          //  _ = new Day25(@"..\..\..\..\AdventOfCode2025\Inputs\Puzzles\Day25Puzzle.txt");
                             break;
                         default:
                             Console.WriteLine("Option is out of bound or unavailable at the moment");
